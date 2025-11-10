@@ -1,0 +1,18 @@
+[ req ]
+default_bits       = 4096
+distinguished_name = req_distinguished_name
+req_extensions     = req_ext
+prompt             = no
+
+[ req_distinguished_name ]
+commonName                  = CA
+organizationalUnitName=vast-ca
+organizationName=Virginia Systems and Technology
+countryName                 = US
+
+[ req_ext ]
+basicConstraints     = CA:TRUE
+extendedKeyUsage     = serverAuth, clientAuth, codeSigning, emailProtection, timeStamping
+keyUsage             = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment, keyCertSign, cRLSign
+nsCertType           = client, email, objsign, sslCA, emailCA, objCA
+subjectKeyIdentifier = hash

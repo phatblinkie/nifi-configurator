@@ -1,0 +1,2 @@
+#Allow ansible user to access untrusted Pythong scripts in temp dirs
+allow perm=any all : dir=/var/tmp/ans/ ftype=text/x-python trust=0

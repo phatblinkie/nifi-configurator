@@ -1,0 +1,5 @@
+allow perm=any uid=1001 exe=/usr/bin/git-lfs : dir=/opt/upload ftype=application/java-archive trust=0
+allow perm=any uid=1001 exe=/usr/bin/git-lfs : dir=/mission-share ftype=application/java-archive trust=0
+allow perm=any uid=1001 : dir=/opt/upload all trust=0
+allow perm=any uid=1001 : dir=/mission-share all trust=0
+

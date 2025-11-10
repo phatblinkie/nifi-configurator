@@ -1,0 +1,95 @@
+user nginx;
+worker_processes auto;
+error_log /var/log/nginx/error.log;
+pid /run/nginx.pid;
+
+# Load dynamic modules. See /usr/share/doc/nginx/README.dynamic.
+include /usr/share/nginx/modules/*.conf;
+
+events {
+    worker_connections 1024;
+}
+
+http {
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+    access_log  /var/log/nginx/access.log  main;
+
+    sendfile            on;
+    tcp_nopush          on;
+    tcp_nodelay         on;
+    keepalive_timeout   65;
+    types_hash_max_size 4096;
+
+    include             /etc/nginx/mime.types;
+    default_type        application/octet-stream;
+
+    # Load modular configuration files from the /etc/nginx/conf.d directory.
+    # See http://nginx.org/en/docs/ngx_core_module.html#include
+    # for more information.
+    include /etc/nginx/conf.d/*.conf;
+
+    server {
+        listen 80 default_server;
+        server_name _;
+        return 301 https://$host$request_uri;
+    }
+
+    # Default catch-all server for HTTPS to close unmatched connections
+    server {
+        listen 443 ssl default_server;
+        server_name _;
+        ssl_certificate /etc/pki/tls/ssl.crt;
+        ssl_certificate_key /etc/pki/tls/ssl.key;
+
+	location / {
+            root /usr/share/nginx/html;
+	}
+        # To enable PKI login
+#        ssl_client_certificate /etc/pki/ca-trust/extracted/pem/DOD_CAs.pem;
+#        ssl_verify_client on;
+
+	#return 444;
+    }
+
+    # Server block for nifi
+    server {
+        listen 443 ssl;
+        server_name nifi.DOMAIN;
+
+        ssl_certificate /etc/pki/tls/ssl.crt;
+        ssl_certificate_key /etc/pki/tls/ssl.key;
+
+        # To enable PKI login
+        #ssl_client_certificate /etc/pki/ca-trust/extracted/pem/DOD_CAs.pem;
+        #ssl_verify_client on;
+
+        # Error pages (optional, but added for consistency)
+        error_page 404 /404.html;
+        location = /404.html {
+            root /usr/share/nginx/html;
+            internal;
+        }
+
+        error_page 500 502 503 504 /50x.html;
+        location = /50x.html {
+            root /usr/share/nginx/html;
+            internal;
+        }
+
+        # Proxy all requests to port 8443
+        location / {
+            proxy_pass https://localhost:8443;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_redirect off;
+        }
+    }
+}
