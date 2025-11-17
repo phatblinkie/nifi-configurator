@@ -358,7 +358,7 @@ generate_ssl_keys() {
  domain=$OGS_DOMAIN_NAME
  #used by nginx template
  echo "DOMAIN=$domain" > /mission-share/podman/containers/keys/DOMAIN
-
+ mkdir -p /mission-share/.tmp
  local temp_file=$(mktemp)
  echo "$msnsvr_ip $msnsvr_fqdn msnsvr grafana loki mimir nifi.$domain" > "$temp_file"
  echo "INFO: Updating /etc/hosts with msnsvr details"
@@ -371,7 +371,7 @@ generate_ssl_keys() {
  fi
  rm -f "$temp_file"
 
-
+ clear
  # Creating Nifi Certs
  echo "INFO: Creating Nifi certificates"
  printf "$NIFI_DOMAIN_FQDN\n\msnsvr.$OGS_DOMAIN_NAME\n\nUS\nMaryland\nAPG\nFII\n3650\nsilkwave\n" | ./server-cert-gen.sh /mission-share/podman/containers/keys/nifi/
@@ -382,7 +382,8 @@ generate_ssl_keys() {
  echo "ERROR: Failed to create or rename Nifi certificates" >&2
  return 1
  fi
-
+ 
+ clear
  # Creating NGINX proxy certs
  #  ?? maybe we should instead use the nifi certs above? can nginx access them?
  echo "INFO: Creating NGINX proxy certificates"
@@ -1048,14 +1049,35 @@ install_tarball_images() {
  for i in $(ls /mission-share/upload/*.tar.gz | grep -v part); do
  echo "INFO: Importing container image: $i"
  mkdir -p /mission-share/.tmp >/dev/null
- if export TMPDIR=/mission-share/.tmp && podman load -i "$i"; then
+
+ # Load versions
+ . versions.txt
+
+ if export TMPDIR=/mission-share/.tmp && podman load -i "$i" | awk '{print $3}' | xargs -I{} podman tag {} $NIFI_IMAGENAME:${NIFI_VERSION}; then
  echo "SUCCESS: Imported container image $i"
+ echo "SUCCESS: Tagged imported image to name $NIFI_IMAGENAME:$NIFI_VERSION"
  else
  echo "ERROR: Failed to import container image $i" >&2
  return 1
  fi
  done
+#export TMPDIR=/mission-share/.tmp && podman load -i /mission-share/upload/nifi-1.24-py.tar.gz | awk '{print $3}' | xargs -I{} podman tag {} test:latest
+
+ # Load versions
+# . versions.txt
+
+  # tag Nifi
+# echo "INFO: tagging tarball import to nifi version ${NIFI_VERSION}"
+# if podman pull docker.io/phatblinkie/bigimage:tsb_py && \
+#  if podman image tag nifi:${NIFI_VERSION} nifi-custom:${NIFI_VERSION}; then
+# echo "SUCCESS: Nifi image pulled and tagged"
+# else
+# echo "ERROR: Failed to pull or tag Nifi image" >&2
+# return 1
+# fi
+
  echo "SUCCESS: Tarball image installation completed"
+
 }
 
 copy_source_directories() {
@@ -1070,6 +1092,10 @@ copy_source_directories() {
     rootpath="/mission-share"
     podmanshare="/mission-share/podman"
 
+
+
+    echo "INFO: Creating TMPDIR"
+    mkdir $rootpath/.tmp
     echo "INFO: Creating container storage folders"
     run_with_sudo chcon -t -R container_file_t $podmanshare
     echo "SUCCESS: SELinux context set for $podmanshare"
@@ -1225,8 +1251,12 @@ build_and_start_pod() {
     if cat nifi-pod.yml.template | \
        sed "s|NIFI_FQDN_NAME|$NIFI_DOMAIN_FQDN|g" |\
        sed "s|SINGLE_USER_CREDENTIALS_USERNAME_VALUE|$SINGLE_USER_CREDENTIALS_USERNAME|g" |\
-       sed "s|SINGLE_USER_CREDENTIALS_PASSWORD_VALUE|$SINGLE_USER_CREDENTIALS_PASSWORD|g" > nifi-pod.yml; then
+       sed "s|SINGLE_USER_CREDENTIALS_PASSWORD_VALUE|$SINGLE_USER_CREDENTIALS_PASSWORD|g" |\
+       sed "s|NIFI_IMAGENAME|$NIFI_IMAGENAME|g" |\
+       sed "s|NIFI_VERSION|$NIFI_VERSION|g" > nifi-pod.yml; then
         echo "SUCCESS: Generated NIFI pod YAML"
+	echo "---> credentials of user:$SINGLE_USER_CREDENTIALS_USERNAME, pw:$SINGLE_USER_CREDENTIALS_PASSWORD"
+	echo "---> image name: $NIFI_IMAGENAME, image version: $NIFI_VERSION"
     else
         echo "ERROR: Failed to generate NIFI pod YAML" >&2
         return 1

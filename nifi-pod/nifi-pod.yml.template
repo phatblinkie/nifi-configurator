@@ -12,7 +12,8 @@ spec:
   containers:
     - name: nifi
       #image: apache/nifi:latest
-      image: localhost/nifi-custom:2.6.0-fips-bc
+      #image: localhost/nifi-custom:2.6.0-fips-bc
+      image: NIFI_IMAGENAME:NIFI_VERSION
 
       # Security context forces UID/GID matching miadmin (1001)
       #securityContext:

@@ -7,11 +7,12 @@ metadata:
     io.podman.annotations.userns: keep-id
 
 spec:
-  restartPolicy: Always
+  restartPolicy: Never
 
   containers:
     - name: nifi
       #image: apache/nifi:latest
+      #image: localhost/nifi-custom:2.6.0-fips-bc
       image: localhost/nifi-custom:2.6.0-fips-bc
 
       # Security context forces UID/GID matching miadmin (1001)
