@@ -3,105 +3,79 @@ kind: Pod
 metadata:
   name: nifi
   annotations:
-    #very important, this prevents pod from running with random mapped uid, rather it will run with the pods creators uid
-    #supposedly anyway
-
+    # Ensures container runs with the same UID/GID as the pod creator (miadmin)
     io.podman.annotations.userns: keep-id
+
 spec:
-  restartPolicy: Never
-
-  #general host directory maps
-  volumes:
-    - name: shared-storage
-      hostPath:
-        path: /mission-share/podman/containers
-        type: DirectoryOrCreate  # Creates directory if it doesn't exist
-
-    - name: configs
-      hostPath:
-        path: /mission-share/podman/containers/configs
-        type: DirectoryOrCreate
-
-  #nifi specific host directory maps
-    - name: nifi-current
-      hostPath:
-        path: /mission-share/podman/containers/nifi/nifi-current
-        type: DirectoryOrCreate
-
-    - name: nifi-lib
-      hostPath:
-        path: /mission-share/podman/containers/nifi/lib
-        type: DirectoryOrCreate
-
-    - name: nifi-logs
-      hostPath:
-        path: /mission-share/podman/containers/nifi/logs
-        type: DirectoryOrCreate
-
-    - name: nifi-conf
-      hostPath:
-        path: /mission-share/podman/containers/nifi/conf
-        type: DirectoryOrCreate
-
-    - name: nifi-tide
-      hostPath:
-        path: /mission-share/tide
-        type: DirectoryOrCreate
-
-    - name: nifi-tools
-      hostPath:
-        path: /mission-share/tools
-        type: DirectoryOrCreate
-
-    - name: nifi-zfts
-      hostPath:
-        path: /mission-share/zfts
-        type: DirectoryOrCreate
+  restartPolicy: Always
 
   containers:
-  #NIFI container data, basically what image, what environment vars, what host directory mounts, and what ports to map.
-
     - name: nifi
-      #image: registry1.dso.mil/ironbank/opensource/apache/nifi:2.4.0-fips-bc
-      #image: localhost/nifi-custom:2.4.0-fips-bc
-      #above image fails to start, likely needs updated configuration files to work. below is original image.
-      image: docker.io/apache/nifi:tsb_py
+      #image: apache/nifi:latest
+      image: localhost/nifi-custom:2.6.0-fips-bc
+
+      # Security context forces UID/GID matching miadmin (1001)
+      #securityContext:
+      #  runAsUser: 1001
+      #  runAsGroup: 1001
+
       env:
+        - name: NIFI_WEB_HTTPS_PORT
+          value: "8443"
+        - name: SINGLE_USER_CREDENTIALS_USERNAME
+          value: "admin"
+        - name: SINGLE_USER_CREDENTIALS_PASSWORD
+          value: "!Changeme12345"
         - name: NIFI_WEB_PROXY_HOST
-          value: "nifi.ogs18.ogs.mi.ds.army.smil.mil"
-
-        - name: NIFI_PROPERTIES_FILE
-          value: "/tmp/nifi.properties"
-
-      volumeMounts:
-        - name: shared-storage
-          mountPath: /shared-storage
-
-        - name: configs
-          mountPath: /tmp/nifi.properties
-          subPath: nifi.properties
-
-        - name: nifi-logs
-          mountPath: /opt/nifi/nifi-current/logs
-
-        - name: nifi-conf
-          mountPath: /opt/nifi/nifi-current/conf
-
-        - name: nifi-tide
-          mountPath: /mission-share/tide
-
-        - name: nifi-tools
-          mountPath: /mission-share/tools
-
-        - name: nifi-zfts
-          mountPath: /mission-share/zfts
-
+          value: "nifi3.ogs18.ogs.mi.ds.army.smil.mil"
       ports:
         - containerPort: 8443
           hostPort: 8443
+      volumeMounts:
+        - name: nifi-flowfile-repo
+          mountPath: /opt/nifi/nifi-current/flowfile_repository
+        - name: nifi-database-repo
+          mountPath: /opt/nifi/nifi-current/database_repository
+        - name: nifi-content-repo
+          mountPath: /opt/nifi/nifi-current/content_repository
 
-          #unsure if these other ports are needed or not.
-        - containerPort: 8080
-          hostPort: 8080
-        - containerPort: 9092
-          hostPort: 9092
+#having the config files presented on the host, is just not worth the problems it makes            
+#        - name: nifi-conf
+#          mountPath: /opt/nifi/nifi-current/conf
+
+#        - name: shared-storage
+#          mountPath: /shared-storage
+
+#        - name: configs
+          #mountPath: /tmp/nifi.properties
+#          mountPath: /tmp/nifi.properties
+#          subPath: nifi.properties
+
+  volumes:
+    - name: nifi-flowfile-repo
+      hostPath:
+        path: /mission-share/podman/containers/nifi/nifi-current/flowfile_repository
+        type: DirectoryOrCreate
+    - name: nifi-database-repo
+      hostPath:
+        path: /mission-share/podman/containers/nifi/nifi-current/database_repository
+        type: DirectoryOrCreate
+    - name: nifi-content-repo
+      hostPath:
+        path: /mission-share/podman/containers/nifi/nifi-current/content_repository
+        type: DirectoryOrCreate
+
+#    - name: nifi-conf
+#      hostPath:
+#        path: /mission-share/podman/containers/nifi/nifi-current/conf
+#        type: DirectoryOrCreate
+
+#    - name: shared-storage
+#      hostPath:
+#        path: /mission-share/podman/containers
+#        type: DirectoryOrCreate
+#    - name: configs
+#      hostPath:
+#        path: /mission-share/podman/containers/configs
+#        type: DirectoryOrCreate
+

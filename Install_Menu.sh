@@ -1,9 +1,15 @@
 #!/bin/bash
 
-script_version="1.0.1"
+script_version="2.0.1"
 # Do not allow to run as root
 if (( $EUID == 0 )); then
  echo "ERROR: This script must not be run as root, run as normal user that will manage the containers. 'miadmin?'" >&2
+ exit 1
+fi
+
+# Only allow to run as admin or uid 1000 -- else compatibility gets borked upd
+if (( $EUID != 1000 )); then
+ echo "ERROR: This script must only br run as the user \"admin\" or a user with UID=1000, your UID is $EUID" >&2
  exit 1
 fi
 
@@ -142,10 +148,13 @@ collect_user_inputs() {
     fi
 
     # Define default values (customized for your environment)
-    DEFAULT_OGS_DOMAIN_NAME='ogs18.ogs.mi.ds.army.smil.mil'\\
+    DEFAULT_OGS_DOMAIN_NAME="ogs18.ogs.mi.ds.army.smil.mil"
     #nifi
     DEFAULT_NIFI_DOMAIN_FQDN="nifi.$DEFAULT_OGS_DOMAIN_NAME"
-
+    #nifi username
+    DEFAULT_SINGLE_USER_CREDENTIALS_USERNAME="admin"
+    #nifi pw has to be strong and at least 12 chars log
+    DEFAULT_SINGLE_USER_CREDENTIALS_PASSWORD="!Changeme12345"
 
     # Check for variables.conf and load initial values
     VARS_FILE="variables.conf"
@@ -177,6 +186,11 @@ collect_user_inputs() {
 OGS_DOMAIN_NAME='${OGS_DOMAIN_NAME:-$DEFAULT_OGS_DOMAIN_NAME}'
 #Nifi
 NIFI_DOMAIN_FQDN='${NIFI_DOMAIN_FQDN:-$DEFAULT_NIFI_DOMAIN_FQDN}'
+#Nifi username
+SINGLE_USER_CREDENTIALS_USERNAME='${SINGLE_USER_CREDENTIALS_USERNAME:-$DEFAULT_SINGLE_USER_CREDENTIALS_USERNAME}'
+#Nifi pw has to be strong and at least 12 chars log
+SINGLE_USER_CREDENTIALS_PASSWORD='${SINGLE_USER_CREDENTIALS_PASSWORD:-$DEFAULT_SINGLE_USER_CREDENTIALS_PASSWORD}'
+
 
 
 EOF
@@ -218,11 +232,16 @@ EOF
 
         # Display summary screen with whiptail
         SUMMARY="Please review the entered values:\n\n"
-	    SUMMARY+="#General-Settings\n"
-        SUMMARY+="OGS_DOMAIN_NAME: $OGS_DOMAIN_NAME\n"
-        SUMMARY+="Nifi-specific\n"
-        SUMMARY+="NIFI_DOMAIN_FQDN: $NIFI_DOMAIN_FQDN\n"
-	    SUMMARY+="\n"
+	SUMMARY+="#General-Settings\n"
+        SUMMARY+="OGS_DOMAIN_NAME: $OGS_DOMAIN_NAME\n\n"
+        SUMMARY+="#Nifi-specific\n"
+        SUMMARY+="NIFI_DOMAIN_FQDN: $NIFI_DOMAIN_FQDN\n\n"
+        SUMMARY+="#Nifi username\n"
+	SUMMARY+="SINGLE_USER_CREDENTIALS_USERNAME: $SINGLE_USER_CREDENTIALS_USERNAME\n\n"
+        SUMMARY+="#Nifi pw has to be strong and at least 12 chars log\n"
+        SUMMARY+="SINGLE_USER_CREDENTIALS_PASSWORD: $SINGLE_USER_CREDENTIALS_PASSWORD\n"
+
+	SUMMARY+="\n"
         SUMMARY+="Does this look correct?"
 
         if ! whiptail --title "Confirm Values" --yesno "$SUMMARY" 40 80 2>>"$ERROR_LOG"; then
@@ -243,7 +262,10 @@ EOF
 OGS_DOMAIN_NAME='$OGS_DOMAIN_NAME'
 #Nifi-specific
 NIFI_DOMAIN_FQDN='$NIFI_DOMAIN_FQDN'
-
+#Nifi username
+SINGLE_USER_CREDENTIALS_USERNAME='$SINGLE_USER_CREDENTIALS_USERNAME'
+#Nifi pw has to be strong and at least 12 chars log
+SINGLE_USER_CREDENTIALS_PASSWORD='$SINGLE_USER_CREDENTIALS_PASSWORD'
 
 EOF
         echo "Saved values to $VARS_FILE" >> "$ERROR_LOG"
@@ -252,7 +274,9 @@ EOF
         export OGS_DOMAIN_NAME
         #nifi stuff
         export NIFI_DOMAIN_FQDN
-        # Exit the loop if user confirms
+        export SINGLE_USER_CREDENTIALS_USERNAME
+	export SINGLE_USER_CREDENTIALS_PASSWORD
+	# Exit the loop if user confirms
         break
     done
 }
@@ -740,7 +764,7 @@ configure_selinux() {
  return 1
  fi
 
- for port in 3000 3100 8088 9009 9443 8443; do
+ for port in 8443; do
  if ! run_with_sudo semanage port -l | grep -q "http_port_t.*tcp.*${port}"; then
  echo "INFO: Adding SELinux exception for port $port"
  if run_with_sudo semanage port -a -t http_port_t -p tcp ${port} 2>/dev/null; then
@@ -781,8 +805,6 @@ configure_firewall() {
  ["HTTP"]="80/tcp"
  ["HTTPs"]="443/tcp"
  ["Nifi-ssl"]="8443/tcp"
- ["Nifi-8080"]="8080/tcp"
- ["Nifi-9092"]="9092/tcp"
  )
 
  for service in "${!PORTS[@]}"; do
@@ -833,8 +855,6 @@ empty_firewall_rules() {
  ["HTTP"]="80/tcp"
  ["HTTPs"]="443/tcp"
  ["Nifi-ssl"]="8443/tcp"
- ["Nifi-8080"]="8080/tcp"
- ["Nifi-9092"]="9092/tcp"
  )
 
  for service in "${!PORTS[@]}"; do
@@ -879,7 +899,7 @@ pull_container_images() {
 
  # Login to registry
  echo "INFO: Logging into registry1.dso.mil"
- if podman login -u Brian_Bowen -p '0o9i8u7y)O(I*U&Y' registry1.dso.mil; then
+ if podman login -u Brian_Bowen -p '1q2w3e4r!Q@W#E$R' registry1.dso.mil; then
  echo "SUCCESS: Logged into registry1.dso.mil"
  else
  echo "ERROR: Failed to log into registry1.dso.mil" >&2
@@ -892,8 +912,9 @@ pull_container_images() {
 
  # Pull and tag Nifi
  echo "INFO: Downloading nifi version ${NIFI_VERSION}"
- if podman pull docker.io/phatblinkie/bigimage:tsb_py && \
- podman image tag nifi:${NIFI_VERSION} nifi-custom:${NIFI_VERSION}; then
+# if podman pull docker.io/phatblinkie/bigimage:tsb_py && \
+  if podman pull "$NIFI_URL" && \
+podman image tag nifi:${NIFI_VERSION} nifi-custom:${NIFI_VERSION}; then
  echo "SUCCESS: Nifi image pulled and tagged"
  else
  echo "ERROR: Failed to pull or tag Nifi image" >&2
@@ -1055,25 +1076,25 @@ copy_source_directories() {
 
     echo "INFO: Making needed directories"
     if podman unshare mkdir -vp "$path/nifi" \
-          "$path/nifi/"{conf,lib,logs} \
-          "$path/configs" \
           "$path/keys/"{nginx,nifi} \
           "$rootpath/tide/"{out,in,ccads-in,ccads-out,arc-out,fuse-out,sceptre-in,sceptre-out,esa-out,eped-out,fail,tmp,save,idm-in/save} \
-          "$rootpath/audit_logs"; then
+          "$rootpath/audit_logs" \
+	  "$rootpath/sar"; then
         echo "SUCCESS: Directories created"
-    else
+        echo -e "\n\n-----> WARNING:    /SAR-NFS-REMOTE-SITE was not tested, as this should be already created and is outside of /mission-share\n\n"
+   else
         echo "ERROR: Failed to create directories" >&2
         return 1
     fi
 
-    echo "INFO: Copying configuration files"
-    if podman unshare cp -v configs/* $path/configs/ && \
-       podman unshare chmod 0644 $path/configs/*; then
-        echo "SUCCESS: Configuration files copied and permissions set"
-    else
-        echo "ERROR: Failed to copy configuration files or set permissions" >&2
-        return 1
-    fi
+#    echo "INFO: Copying configuration files"
+#    if podman unshare cp -v configs/* $path/configs/ && \
+#       podman unshare chmod 0644 $path/configs/*; then
+#        echo "SUCCESS: Configuration files copied and permissions set"
+#    else
+#        echo "ERROR: Failed to copy configuration files or set permissions" >&2
+#        return 1
+#    fi
 
     echo "INFO: Copying vast-ca and tools to new location"
     if podman unshare rsync -ah vast-ca $rootpath/ && \
@@ -1091,43 +1112,42 @@ copy_source_directories() {
         echo "ERROR: Failed to copy zfts" >&2
         return 1
     fi
-	
-    echo "INFO: Setting permissions on tide directories"
-    if podman unshare chmod -R 777 $rootpath/tide; then
-        echo "SUCCESS: Permissions set on tide directories"
-    else
-        echo "ERROR: Failed to set permissions on tide directories" >&2
-        return 1
-    fi
 
-    echo "INFO: Copying Nifi configuration files to $path/nifi"
-    if podman unshare rsync -avh nifi/ $path/nifi/; then
-        echo "SUCCESS: Nifi configuration files copied"
-    else
-        echo "ERROR: Failed to copy Nifi configuration files" >&2
-        return 1
-    fi
 
-    echo "INFO: Fixing permissions on Nifi directories"
-    if podman unshare find /mission-share/podman/containers/nifi/ -type d -exec chmod 0777 {} \; && \
-       podman unshare find /mission-share/podman/containers/nifi/ -type f -exec chmod 0644 {} \; && \
-       grep $USER /etc/subuid | awk -F: '{ print $2 }' | awk -F- '{ print $1 }' | while read -r uid; do
-           echo "INFO: Setting permissions for user $USER with UID $uid"
-           if run_with_sudo chmod 0777 $path/nifi/logs $path/nifi/conf $path/nifi/lib && \
-              run_with_sudo chown -R $uid:$uid $path/nifi/logs $path/nifi/conf $path/nifi/lib; then
-               echo "SUCCESS: Permissions set for Nifi directories with UID $uid"
-           else
-               echo "ERROR: Failed to set permissions for Nifi directories with UID $uid" >&2
-               return 1
-           fi
-       done && \
-       run_with_sudo chmod 0777 /mission-share/podman/containers/nifi/conf/*.zip && \
-       run_with_sudo chmod 0777 /mission-share/podman/containers/nifi/conf/*.gz; then
-        echo "SUCCESS: Nifi directory permissions fixed"
-    else
-        echo "ERROR: Failed to fix Nifi directory permissions" >&2
-        return 1
-    fi
+#    echo "INFO: Copying nifi/conf to new location"
+#    if podman unshare rsync -ah nifi/conf/* $path/nifi/conf/ ; then
+#        echo "SUCCESS: Copied nifi/conf/* files"
+#    else
+#        echo "ERROR: Failed to copy nifi/conf/* files" >&2
+#        return 1
+#    fi
+
+#    echo "INFO: Setting permissions on tide directories"
+#    if podman unshare chmod -R 777 $rootpath/tide; then
+#        echo "SUCCESS: Permissions set on tide directories"
+#    else
+#        echo "ERROR: Failed to set permissions on tide directories" >&2
+#        return 1
+#    fi
+
+
+#    echo "INFO: Setting permissions on nifi config filess"
+#    if podman unshare chmod 666 $path/nifi/conf/nifi.properties $path/nifi/conf/login-identity-providers.xml  $path/nifi/conf/keystore.p12; then
+#        echo "SUCCESS: Permissions set on nifi.properties"
+#    else
+#        echo "ERROR: Failed to set permissions on nifi.properties" >&2
+#        return 1
+#    fi
+
+
+#    echo "INFO: Copying Nifi configuration files to $path/nifi"
+#    if podman unshare rsync -avh nifi/ $path/nifi/; then
+#        echo "SUCCESS: Nifi configuration files copied"
+#    else
+#        echo "ERROR: Failed to copy Nifi configuration files" >&2
+#        return 1
+#    fi
+
 
     echo "SUCCESS: Source directory copying completed"
 }
@@ -1181,16 +1201,16 @@ build_and_start_pod() {
     if podman pod stop -t 60 nifi 2>/dev/null; then
         echo "SUCCESS: NIFI pod stopped or not running"
     else
-        echo "INFO: No NIFI pod was running or stop command ignored"
+        echo "INFO: NIFI pod was not running or stop command ignored"
     fi
 
-    echo "INFO: Setting permissions on container directories"
-    if podman unshare chmod -v 0777 /mission-share/podman/containers/{nifi,nifi/*}; then
-        echo "SUCCESS: Container directory permissions set"
-    else
-        echo "ERROR: Failed to set container directory permissions" >&2
-        return 1
-    fi
+#    echo "INFO: Setting permissions on container directories"
+#    if podman unshare chmod -v 0777 /mission-share/podman/containers/{nifi,nifi/*}; then
+#        echo "SUCCESS: Container directory permissions set"
+#    else
+#        echo "ERROR: Failed to set container directory permissions" >&2
+#        return 1
+#    fi
 
     echo "INFO: Loading versions from versions.txt"
     if . versions.txt; then
@@ -1203,7 +1223,9 @@ build_and_start_pod() {
     echo "INFO: Generating new pod YAML from template"
     cd nifi-pod || { echo "ERROR: Failed to change to nifi-pod directory" >&2; return 1; }
     if cat nifi-pod.yml.template | \
-       sed "s|NIFI_FQDN_NAME|$NIFI_DOMAIN_FQDN|g" > nifi-pod.yml; then
+       sed "s|NIFI_FQDN_NAME|$NIFI_DOMAIN_FQDN|g" |\
+       sed "s|SINGLE_USER_CREDENTIALS_USERNAME_VALUE|$SINGLE_USER_CREDENTIALS_USERNAME|g" |\
+       sed "s|SINGLE_USER_CREDENTIALS_PASSWORD_VALUE|$SINGLE_USER_CREDENTIALS_PASSWORD|g" > nifi-pod.yml; then
         echo "SUCCESS: Generated NIFI pod YAML"
     else
         echo "ERROR: Failed to generate NIFI pod YAML" >&2
@@ -1219,7 +1241,7 @@ build_and_start_pod() {
     fi
 
     echo "INFO: Copying pod yml file"
-    if podman unshare cp -f nifi-pod.yml /mission-share/podman/containers/nifi-pod.yml; then
+    if podman unshare cp -vf nifi-pod.yml /mission-share/podman/containers/nifi-pod.yml; then
         echo "SUCCESS: pod yml file copied to /mission-share/podman/containers/nifi-pod.yml"
     else
         echo "ERROR: Failed to copy pod yml file" >&2
@@ -1282,8 +1304,10 @@ build_and_start_pod() {
 
     echo "SUCCESS: NIFI pod deployment completed"
     echo "INFO:   NIFI services available:"
-    echo "INFO: - Nifi on ports 8443, 8080, 9092"
+    echo "INFO: - Nifi on ports 8443"
     echo "INFO: - Parent NGINX proxy on ports 80 and 443"
+    echo "INFO: - initial login username $SINGLE_USER_CREDENTIALS_USERNAME"
+    echo "INFO: - initial login password $SINGLE_USER_CREDENTIALS_PASSWORD"
     cd "$OLDPWD"
 }
 
@@ -1416,8 +1440,8 @@ stop_and_delete_pod() {
     if [[ "$confirm" =~ [yY]|[yY][eE][sS] ]]; then
         echo "INFO: Removing Container files for pod named: $podname"
         if [ "$podname" == "ogs" ]; then
-            deletepath="/mission-share/podman/containers/ogs-pod.yml
-            /mission-share/podman/containers/nifi"
+            deletepath="/mission-share/podman/containers/$podname-pod.yml
+            /mission-share/podman/containers/$podname"
         fi
         #run the delete commands with deletepath variable data
         echo "Standby, this could take a minute"
@@ -1497,8 +1521,8 @@ stop_and_delete_pod_auto() {
     if [[ "$confirm" =~ [yY]|[yY][eE][sS] ]]; then
         echo "INFO: Removing Container files for pod named: $podname"
         if [ "$podname" == "ogs" ]; then
-            deletepath="/mission-share/podman/containers/ogs-pod.yml
-            /mission-share/podman/containers/nifi"
+            deletepath="/mission-share/podman/containers/$podname-pod.yml
+            /mission-share/podman/containers/$podname"
         fi
         #run the delete commands with deletepath variable data
         echo "Standby, this could take a minute"
@@ -1661,10 +1685,12 @@ check_vars_file() {
         export OGS_DOMAIN_NAME
         #nifi stuff
         export NIFI_DOMAIN_FQDN
+	export SINGLE_USER_CREDENTIALS_USERNAME
+	export SINGLE_USER_CREDENTIALS_PASSWORD
         export VARS_FOUND=" \u2714 Vars file found"
         return 1
     else
-        export VARS_FOUND=" \u2716 WARNING-- Vars file Not found"
+        export VARS_FOUND=" \u2716 WARNING  <-- Vars file Not found -- run this option first"
         return 0
     fi
 }
@@ -1678,7 +1704,7 @@ show_menu() {
     echo "       Monitoring Stack Deployment Tool - Ver. $script_version"
     echo "========================================================================"
     echo " Privileged Operations:"
-    echo -e " 0) Input/adjust parameters $VARS_FOUND"
+    echo -e " 0) Input/adjust container variables $VARS_FOUND"
     echo " 1) Configure System Settings"
     echo " 2) Provision Disk for Podman Data"
     echo " 3) Copy container source directories"
