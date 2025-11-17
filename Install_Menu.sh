@@ -343,8 +343,7 @@ generate_ssl_keys() {
  #echo "INFO: Please enter msnsvr IP address:"
  #read -r msnsvr_ip
  #echo "INFO: You entered: $msnsvr_ip"
- msnsvr_ip=$LISTEN_IP_ADDRESS
-
+ msnsvr_ip=$(get_default_ip)
  #hostname
  #echo "INFO: Please enter msnsvr FQDN (e.g. msnsvr.army.local):"
  #read -r msnsvr_fqdn
@@ -360,15 +359,32 @@ generate_ssl_keys() {
  echo "DOMAIN=$domain" > /mission-share/podman/containers/keys/DOMAIN
  mkdir -p /mission-share/.tmp 2>/dev/null
  local temp_file=$(mktemp)
- echo "$msnsvr_ip $msnsvr_fqdn msnsvr grafana loki mimir nifi.$domain" > "$temp_file"
+ echo "$msnsvr_ip $msnsvr_fqdn addedbyscript" > "$temp_file"
  echo "INFO: Updating /etc/hosts with msnsvr details"
- if echo "$SUDO_PASSWORD" | sudo -S sh -c "cat '$temp_file' >> /etc/hosts" 2>/dev/null; then
-  echo "SUCCESS: Updated /etc/hosts"
+ 
+ #only inject if its not there, otherwise remove it first, then inject so its not duplicated
+ if [ `grep -c addedbyscript /etc/hosts` -gt 0 ]
+ then
+   #remove old entry
+   echo "$SUDO_PASSWORD" | sudo -S sh -c "sed -i '/addedbyscript/d' /etc/hosts" 2>/dev/null
+   #update with new entry
+   if echo "$SUDO_PASSWORD" | sudo -S sh -c "cat '$temp_file' >> /etc/hosts" 2>/dev/null; then
+    echo "SUCCESS: Updated /etc/hosts"
+   else
+    echo "ERROR: Failed to update /etc/hosts" >&2
+    rm -f "$temp_file"
+    return 1
+   fi
  else
-  echo "ERROR: Failed to update /etc/hosts" >&2
-  rm -f "$temp_file"
-  return 1
+   if echo "$SUDO_PASSWORD" | sudo -S sh -c "cat '$temp_file' >> /etc/hosts" 2>/dev/null; then
+    echo "SUCCESS: Updated /etc/hosts"
+   else
+    echo "ERROR: Failed to update /etc/hosts" >&2
+    rm -f "$temp_file"
+    return 1
+   fi
  fi
+
  rm -f "$temp_file"
  read -p "Press [Enter] to continue..."
  clear
@@ -1153,10 +1169,27 @@ validate_ip() {
     fi
 }
 
+
 # Function to get unique non-loopback IPv4 addresses
+get_default_ip() {
+    # Get the default route next-hop interface
+    local iface
+    iface=$(ip route show default 2>/dev/null | awk '/default/ {print $5; exit}')
+    if [[ -z "$iface" ]]; then
+        echo "No default route found" >&2
+        return 1
+    fi
+
+    # Extract the IP address(es) assigned to that interface (skip 127.*, docker, etc.)
+    ip -o -4 addr show dev "$iface" | awk '{print $4}' | cut -d'/' -f1
+}
+
 get_ip_addresses() {
-    # Use 'ip addr show' to list IP addresses, filter for inet, exclude loopback (127.0.0.1)
-    ip addr show | grep 'inet ' | awk '{print $2}' | cut -d'/' -f1 | grep -v '^127\.' | sort -u
+    ip -o addr show | awk '/inet / {print $2, $4}' \
+    | grep -vE '^(docker|br-|veth|lo)' \
+    | awk '{print $2}' \
+    | cut -d'/' -f1 \
+    | sort -u
 }
 
 

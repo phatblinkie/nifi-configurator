@@ -22,7 +22,7 @@ spec:
         - name: SINGLE_USER_CREDENTIALS_PASSWORD
           value: "!Changeme12345"
         - name: NIFI_WEB_PROXY_HOST
-          value: "nifi3.ogs18.ogs.mi.ds.army.smil.mil"
+          value: "nifi.ogs18.ogs.mi.ds.army.smil.mil"
       ports:
         - containerPort: 8443
           hostPort: 8443
