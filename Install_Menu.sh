@@ -1,6 +1,6 @@
 #!/bin/bash
 
-script_version="2.0.1"
+script_version="20251117.1"
 # Do not allow to run as root
 if (( $EUID == 0 )); then
  echo "ERROR: This script must not be run as root, run as normal user that will manage the containers. 'miadmin?'" >&2
@@ -358,7 +358,7 @@ generate_ssl_keys() {
  domain=$OGS_DOMAIN_NAME
  #used by nginx template
  echo "DOMAIN=$domain" > /mission-share/podman/containers/keys/DOMAIN
- mkdir -p /mission-share/.tmp
+ mkdir -p /mission-share/.tmp 2>/dev/null
  local temp_file=$(mktemp)
  echo "$msnsvr_ip $msnsvr_fqdn msnsvr grafana loki mimir nifi.$domain" > "$temp_file"
  echo "INFO: Updating /etc/hosts with msnsvr details"
@@ -370,8 +370,9 @@ generate_ssl_keys() {
   return 1
  fi
  rm -f "$temp_file"
-
+ read -p "Press [Enter] to continue..."
  clear
+
  # Creating Nifi Certs
  echo "INFO: Creating Nifi certificates"
  printf "$NIFI_DOMAIN_FQDN\n\msnsvr.$OGS_DOMAIN_NAME\n\nUS\nMaryland\nAPG\nFII\n3650\nsilkwave\n" | ./server-cert-gen.sh /mission-share/podman/containers/keys/nifi/
@@ -382,7 +383,7 @@ generate_ssl_keys() {
  echo "ERROR: Failed to create or rename Nifi certificates" >&2
  return 1
  fi
- 
+ read -p "Press [Enter] to continue..."
  clear
  # Creating NGINX proxy certs
  #  ?? maybe we should instead use the nifi certs above? can nginx access them?
@@ -1048,7 +1049,9 @@ install_tarball_images() {
  echo "INFO: Importing tarball container images"
  for i in $(ls /mission-share/upload/*.tar.gz | grep -v part); do
  echo "INFO: Importing container image: $i"
- mkdir -p /mission-share/.tmp >/dev/null
+
+ #have to have local tmp dir created, becase it was defined a little earlier
+ mkdir -p /mission-share/.tmp  >/dev/null 2>&1
 
  # Load versions
  . versions.txt
@@ -1095,7 +1098,7 @@ copy_source_directories() {
 
 
     echo "INFO: Creating TMPDIR"
-    mkdir $rootpath/.tmp
+    mkdir $rootpath/.tmp >/dev/null 2>&1
     echo "INFO: Creating container storage folders"
     run_with_sudo chcon -t -R container_file_t $podmanshare
     echo "SUCCESS: SELinux context set for $podmanshare"
@@ -1113,15 +1116,6 @@ copy_source_directories() {
         return 1
     fi
 
-#    echo "INFO: Copying configuration files"
-#    if podman unshare cp -v configs/* $path/configs/ && \
-#       podman unshare chmod 0644 $path/configs/*; then
-#        echo "SUCCESS: Configuration files copied and permissions set"
-#    else
-#        echo "ERROR: Failed to copy configuration files or set permissions" >&2
-#        return 1
-#    fi
-
     echo "INFO: Copying vast-ca and tools to new location"
     if podman unshare rsync -ah vast-ca $rootpath/ && \
        podman unshare rsync -ah tools $rootpath/; then
@@ -1138,42 +1132,6 @@ copy_source_directories() {
         echo "ERROR: Failed to copy zfts" >&2
         return 1
     fi
-
-
-#    echo "INFO: Copying nifi/conf to new location"
-#    if podman unshare rsync -ah nifi/conf/* $path/nifi/conf/ ; then
-#        echo "SUCCESS: Copied nifi/conf/* files"
-#    else
-#        echo "ERROR: Failed to copy nifi/conf/* files" >&2
-#        return 1
-#    fi
-
-#    echo "INFO: Setting permissions on tide directories"
-#    if podman unshare chmod -R 777 $rootpath/tide; then
-#        echo "SUCCESS: Permissions set on tide directories"
-#    else
-#        echo "ERROR: Failed to set permissions on tide directories" >&2
-#        return 1
-#    fi
-
-
-#    echo "INFO: Setting permissions on nifi config filess"
-#    if podman unshare chmod 666 $path/nifi/conf/nifi.properties $path/nifi/conf/login-identity-providers.xml  $path/nifi/conf/keystore.p12; then
-#        echo "SUCCESS: Permissions set on nifi.properties"
-#    else
-#        echo "ERROR: Failed to set permissions on nifi.properties" >&2
-#        return 1
-#    fi
-
-
-#    echo "INFO: Copying Nifi configuration files to $path/nifi"
-#    if podman unshare rsync -avh nifi/ $path/nifi/; then
-#        echo "SUCCESS: Nifi configuration files copied"
-#    else
-#        echo "ERROR: Failed to copy Nifi configuration files" >&2
-#        return 1
-#    fi
-
 
     echo "SUCCESS: Source directory copying completed"
 }

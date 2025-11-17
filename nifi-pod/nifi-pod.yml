@@ -3,7 +3,8 @@ kind: Pod
 metadata:
   name: nifi
   annotations:
-    # Ensures container runs with the same UID/GID as the pod creator (miadmin)
+    # Ensures container runs with the same UID/GID as the pod creator (admin)
+    # needs to be a user with UID = 1000 else perms get wonky
     io.podman.annotations.userns: keep-id
 
 spec:
@@ -11,14 +12,7 @@ spec:
 
   containers:
     - name: nifi
-      #image: apache/nifi:latest
-      #image: localhost/nifi-custom:2.6.0-fips-bc
       image: localhost/nifi-custom:2.6.0-fips-bc
-
-      # Security context forces UID/GID matching miadmin (1001)
-      #securityContext:
-      #  runAsUser: 1001
-      #  runAsGroup: 1001
 
       env:
         - name: NIFI_WEB_HTTPS_PORT
@@ -32,7 +26,10 @@ spec:
       ports:
         - containerPort: 8443
           hostPort: 8443
+
+      #container volume maps
       volumeMounts:
+        #nifi content repos
         - name: nifi-flowfile-repo
           mountPath: /opt/nifi/nifi-current/flowfile_repository
         - name: nifi-database-repo
@@ -40,18 +37,33 @@ spec:
         - name: nifi-content-repo
           mountPath: /opt/nifi/nifi-current/content_repository
 
-#having the config files presented on the host, is just not worth the problems it makes            
-#        - name: nifi-conf
-#          mountPath: /opt/nifi/nifi-current/conf
+        #custom paths added to container. libs and dirs it needs
+        #sar directory and zfts directory
+        - name: nifi-sar
+          mountPath: /mission-share/sar
+        - name: nifi-zfts
+          mountPath: /mission-share/zfts
 
-#        - name: shared-storage
-#          mountPath: /shared-storage
+        #libs
+        - name: LD_LIBRARY_PATH
+          mountPath: /usr/lib64/libcompression.so.1
+          subPath: libcompression.so.1
+        - name: LD_LIBRARY_PATH
+          mountPath: /usr/lib64/libfftw3f.so.3
+          subPath: libfftw3f.so.3
+        - name: LD_LIBRARY_PATH
+          mountPath: /usr/lib64/libgomp.so.1
+          subPath: libgomp.so.1
 
-#        - name: configs
-          #mountPath: /tmp/nifi.properties
-#          mountPath: /tmp/nifi.properties
-#          subPath: nifi.properties
+        #bins
+        - name: nifi-usr-bin-sarzipnitf
+          mountPath: /usr/bin/sarzipnitf
 
+        #nfs share dir
+        - name: nifi-nfs-share
+          mountPath: /SAR-NFS-REMOTE-SITE
+
+  #host volume maps
   volumes:
     - name: nifi-flowfile-repo
       hostPath:
@@ -66,17 +78,24 @@ spec:
         path: /mission-share/podman/containers/nifi/nifi-current/content_repository
         type: DirectoryOrCreate
 
-#    - name: nifi-conf
-#      hostPath:
-#        path: /mission-share/podman/containers/nifi/nifi-current/conf
-#        type: DirectoryOrCreate
-
-#    - name: shared-storage
-#      hostPath:
-#        path: /mission-share/podman/containers
-#        type: DirectoryOrCreate
-#    - name: configs
-#      hostPath:
-#        path: /mission-share/podman/containers/configs
-#        type: DirectoryOrCreate
-
+    #custom host directory path definitions
+    - name: nifi-sar
+      hostPath:
+        path: /mission-share/sar
+        type: DirectoryOrCreate
+    - name: nifi-zfts
+      hostPath:
+        path: /mission-share/zfts
+        type: DirectoryOrCreate
+    - name: nifi-usr-bin-sarzipnitf
+      hostPath:
+        path: /usr/bin/sarzipnitf
+        type: File
+    - name: nifi-nfs-share
+      hostPath:
+        path: /SAR-NFS-REMOTE-SITE
+        type: DirectoryOrCreate
+    - name: LD_LIBRARY_PATH
+      hostPath:
+        path: /usr/lib64
+        type: Directory
