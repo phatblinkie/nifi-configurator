@@ -93,7 +93,7 @@ spec:
         type: File
     - name: nifi-nfs-share
       hostPath:
-        path: /SAR-NFS-REMOTE-SITE
+        path: /mission-share/SAR-NFS-REMOTE-SITE
         type: DirectoryOrCreate
     - name: LD_LIBRARY_PATH
       hostPath:

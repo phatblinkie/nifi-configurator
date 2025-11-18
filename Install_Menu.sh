@@ -1140,9 +1140,9 @@ copy_source_directories() {
           "$path/keys/"{nginx,nifi} \
           "$rootpath/tide/"{out,in,ccads-in,ccads-out,arc-out,fuse-out,sceptre-in,sceptre-out,esa-out,eped-out,fail,tmp,save,idm-in/save} \
           "$rootpath/audit_logs" \
-	  "$rootpath/sar"; then
+	  "$rootpath/sar" \
+	  "$rootpath/SAR-NFS-REMOTE-SITE"; then
         echo "SUCCESS: Directories created"
-        echo -e "\n\n-----> WARNING:    /SAR-NFS-REMOTE-SITE was not tested, as this should be already created and is outside of /mission-share\n\n"
    else
         echo "ERROR: Failed to create directories" >&2
         return 1
@@ -1164,6 +1164,8 @@ copy_source_directories() {
         echo "ERROR: Failed to copy zfts" >&2
         return 1
     fi
+
+
 
     echo "SUCCESS: Source directory copying completed"
 }
