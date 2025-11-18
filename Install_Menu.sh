@@ -1,6 +1,6 @@
 #!/bin/bash
 
-script_version="20251117.1"
+script_version="20251118.1"
 # Do not allow to run as root
 if (( $EUID == 0 )); then
  echo "ERROR: This script must not be run as root, run as normal user that will manage the containers. 'miadmin?'" >&2
@@ -707,6 +707,22 @@ provision_disk() {
  ;;
  esac
  done
+}
+
+install_sarzip_and_zfts_rpms() {
+echo "INFO: Checking if sarzip and zfts are already installed"
+rpm -q sarzip zfts > /dev/null
+if [ "$?" -eq "0" ]
+then
+	echo "INFO: sarzip and zfts are already installed, skipping installation."
+else
+	echo "INFO: Installing sarzip and zfts rpms"
+	if run_with_sudo dnf install --nogpgcheck -y addon-rpms/*.rpm addon-rpms/zfts/*.rpm; then
+		echo "SUCCESS: rpms installed"
+	else
+		echo "ERROR: Failed to install rpms, cannot continue"
+	fi
+fi
 }
 
 install_nginx() {
@@ -1732,11 +1748,11 @@ show_menu() {
     echo " 4) Generate SSL Certificates - NIFI and Nginx"
     echo " 5) Install and Configure Nginx Proxy"
     echo " 6) Configure Firewall"
-    echo ""
+    echo " 7) Install zfts and sarzip rpms"
     echo "======================== Image Imports ================================="
     echo "     NOTE: Choose based off networking available "
-    echo " 7) Pull Container Images - Internet required"
-    echo " 8) Install Packaged Images - No Internet required"
+    echo " 8i) Pull Container Images - Internet required"
+    echo " 8n) Install Packaged Images - No Internet required"
     echo ""
     echo "========================Pod Options====================================="
     echo " 9) Build and Start NIFI Pod"
@@ -1803,8 +1819,9 @@ while true; do
         4) generate_ssl_keys ;;
         5) install_nginx ;;
         6) configure_firewall ;;
-        7) pull_container_images ;;
-        8) install_tarball_images ;;
+	7) install_sarzip_and_zfts_rpms ;;
+        8i) pull_container_images ;;
+        8n) install_tarball_images ;;
         9) build_and_start_pod ;;
         u1)
             if stop_and_delete_pod "nifi"; then
