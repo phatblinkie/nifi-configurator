@@ -42,11 +42,11 @@ http {
     # -------------------------------------------------------------------------
     #  HTTP → HTTPS redirect
     # -------------------------------------------------------------------------
-    server {
-        listen 80 default_server;
-        server_name _;
-        return 301 https://$host$request_uri;
-    }
+    #server {
+    #    listen 80 default_server;
+    #    server_name _;
+    #    return 301 https://$host$request_uri;
+    #}
 
     # -------------------------------------------------------------------------
     #  Default HTTPS catch‑all  (least privilege)

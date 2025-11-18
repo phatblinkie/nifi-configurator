@@ -836,7 +836,6 @@ configure_firewall() {
  fi
 
  declare -A PORTS=(
- ["HTTP"]="80/tcp"
  ["HTTPs"]="443/tcp"
  ["Nifi-ssl"]="8443/tcp"
  )
@@ -886,7 +885,6 @@ empty_firewall_rules() {
  fi
 
  declare -A PORTS=(
- ["HTTP"]="80/tcp"
  ["HTTPs"]="443/tcp"
  ["Nifi-ssl"]="8443/tcp"
  )
@@ -1344,7 +1342,7 @@ build_and_start_pod() {
     echo "SUCCESS: NIFI pod deployment completed"
     echo "INFO:   NIFI services available:"
     echo "INFO: - Nifi on ports 8443"
-    echo "INFO: - Parent NGINX proxy on ports 80 and 443"
+    echo "INFO: - Parent NGINX proxy on port 443"
     echo "INFO: - initial login username $SINGLE_USER_CREDENTIALS_USERNAME"
     echo "INFO: - initial login password $SINGLE_USER_CREDENTIALS_PASSWORD"
     cd "$OLDPWD"
