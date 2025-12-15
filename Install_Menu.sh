@@ -1546,9 +1546,10 @@ stop_and_delete_pod() {
     read -p "INFO: Confirm you wish to delete the data from pod: $podname (yes/no) " confirm
     if [[ "$confirm" =~ [yY]|[yY][eE][sS] ]]; then
         echo "INFO: Removing Container files for pod named: $podname"
-        if [ "$podname" == "ogs" ]; then
+        if [ "$podname" == "nifi" ]; then
             deletepath="/mission-share/podman/containers/$podname-pod.yml
-            /mission-share/podman/containers/$podname"
+            /mission-share/podman/containers/$podname
+	    "
         fi
         #run the delete commands with deletepath variable data
         echo "Standby, this could take a minute"

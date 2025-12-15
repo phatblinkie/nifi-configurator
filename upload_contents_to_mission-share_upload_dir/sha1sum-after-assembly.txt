@@ -1,1 +1,1 @@
-afefe2153ca242de4b1a1cb66967149b8c36aff0  /mission-share/upload/ironbank-nifi-2.6.0-fips-bc.tar.gz
+bcc2fce66ebb34968899920ca07b0505c9e04518  /mission-share/upload/ironbank-nifi-2.7.1-fips-bc.tar.gz

@@ -12,7 +12,7 @@ spec:
 
   containers:
     - name: nifi
-      image: localhost/nifi-custom:2.6.0-fips-bc
+      image: localhost/nifi-custom:2.7.1-fips-bc
 
       env:
         - name: NIFI_WEB_HTTPS_PORT
