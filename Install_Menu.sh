@@ -583,6 +583,9 @@ configure_system_settings() {
  run_with_sudo groupadd container-admins
  run_with_sudo chown root:container-admins /usr/bin/podman
  run_with_sudo chmod 750 /usr/bin/podman
+ #required for systemctl to run podman after that perm change
+ run_with_sudo setfacl -m g:$(id -gn):rx /usr/bin/podman
+
  run_with_sudo usermod -aG container-admins miadmin
  run_with_sudo usermod -aG container-admins admin
  run_with_sudo usermod -aG container-admins root
@@ -797,10 +800,10 @@ install_nginx() {
 
  if ! command -v nginx &> /dev/null; then
   echo "INFO: Installing nginx"
-  if run_with_sudo dnf install nginx -y; then
+  if run_with_sudo dnf install addon-rpms/nginx/*.rpm -y; then
    echo "SUCCESS: Nginx installed"
   else
-   echo "ERROR: Failed to install nginx, please make sure the system has RHEL repository access configured." >&2
+   echo "ERROR: Failed to install nginx." >&2
    return 1
   fi
  else
