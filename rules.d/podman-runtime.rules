@@ -1,0 +1,8 @@
+-w /etc/containers/containers.conf -p rwxa -k podman_objects
+-w /etc/containers/storage.conf    -p rwxa -k podman_objects
+-w /etc/containers/policy.json     -p rwxa -k podman_objects
+-w /usr/bin/podman                 -p rwxa -k podman_objects
+-w /usr/bin/crun                   -p rwxa -k podman_objects
+-w /usr/bin/runc                   -p rwxa -k podman_objects
+-w /var/lib/containers             -p rwxa -k podman_storage
+-w /var/run/containers             -p rwxa -k podman_runtime

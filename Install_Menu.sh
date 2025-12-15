@@ -1,6 +1,6 @@
 #!/bin/bash
 
-script_version="20251118.1"
+script_version="20251214.1"
 # Do not allow to run as root
 if (( $EUID == 0 )); then
  echo "ERROR: This script must not be run as root, run as normal user that will manage the containers. 'miadmin?'" >&2
@@ -548,25 +548,92 @@ configure_system_settings() {
     return 1
  fi
 
-    #in order for podman image imports to work without the box halting, relax the auditd a little
-    echo "INFO: fixing auditd to be leanient on podman"
-    run_with_sudo cp configs/99-podman-load.rules /etc/audit/rules.d/
-    echo "INFO: regenerating rules"
-    run_with_sudo augenrules
+
+ #several STIGS, including  #v-233270 & v233268
+ echo "INFO: replacing auditd rules"
+ if run_with_sudo rm -f /etc/audit/rules.d/* ; then
+    echo "SUCCESS: removed old rule files"
+ else
+    echo "ERROR: unable to delete files from /etc/audit/rules.d/*"
+    return 1
+ fi
+
+ echo "INFO: inserting new ruleset to /etc/audit/rules.d/"
+ if run_with_sudo cp -vf rules.d/* /etc/audit/rules.d/ ; then
+    echo "SUCCESS: new audit rules placed"
+ else
+    echo "ERROR: unable to move rules to /etc/audit/rules.d/*"
+    return 1
+ fi
+
+    #run_with_sudo augenrules
     #this system has duplicated rules, which prevents it from loading, so be nice and filter them out of the final results
     #too bad augenrules does do this
-    echo "INFO: backing up rules, and removing duplicate rules"
-    run_with_sudo awk '!seen[$0]++' /etc/audit/audit.rules > audit.rules.fixed
-    run_with_sudo cp -f /etc/audit/audit.rules audit.rules.orig
-    run_with_sudo cp -f audit.rules.fixed /etc/audit/audit.rules
-    #now load the rules, which should not log podman stuff, and not have duplicates
-    echo "INFO: loading new ruleset"
-    run_with_sudo augenrules --load
-    #check for rule insertion
+ echo "INFO: loading new ruleset"
+ if run_with_sudo augenrules --load ; then
+	 echo "SUCCESS: new rules accepted"
+ else
+	 echo "ERROR: new rules resulted in an error. aborting... sorry. try as root, augenrules --load and see the error"
+ fi
+ #some rules may not load until a reboot, due to the "-e 2" setting. thats beyond this script.
 
 
+ #V-233185  (only allowed users can run a container)
+ #not adding a whole lot of checks here, they fail or they dont.
+ run_with_sudo groupadd container-admins
+ run_with_sudo chown root:container-admins /usr/bin/podman
+ run_with_sudo chmod 750 /usr/bin/podman
+ run_with_sudo usermod -aG container-admins miadmin
+ run_with_sudo usermod -aG container-admins admin
+ run_with_sudo usermod -aG container-admins root
+ 
+ #v-270875 (control container resource limits)
+ #these dont take effect on existing containers!!!
+ run_with_sudo mv containers.conf /etc/containers/
+
+
+ #v-233192 (deny all, allow by exception registries)
+ run_with_sudo configs/registries.conf
+ 
+ #check if groups were modifed, if so, sadly, I cannot import them without a fresh login.
+ #force info and exits, they can run this a 2nd time and it will not disco them
+ # --- Post-group change notification and session closure ---
+# --- Detect if current process has seen new group membership ---
+USER_TO_CHECK="${SUDO_USER:-$USER}"
+TARGET_GROUP="container-admins"
+
+# group ID of container-admins at system level
+TARGET_GID=$(getent group "$TARGET_GROUP" | awk -F: '{print $3}')
+
+# GIDs actually active for this running shell
+ACTIVE_GIDS=$(grep "^Groups" /proc/self/status | awk '{for(i=2;i<=NF;i++)print $i}')
+
+  if ! grep -q -w "$TARGET_GID" <<< "$ACTIVE_GIDS"; then
+      echo
+      echo "=============================================================="
+      echo "⚠️  NOTICE: Your account ($USER_TO_CHECK) was added to '$TARGET_GROUP'."
+      echo "However, your *current session* does not have this group active yet."
+      echo "You must log out and log back in for changes to take effect."
+      echo "=============================================================="
+      echo
+      read -rp "Press [Enter] to acknowledge and log out of this session..."
+
+      if [[ -n "$SSH_CONNECTION" ]]; then
+          echo "INFO: Closing SSH session..."
+          CUR_TTY=$(who -u | awk -v u="$USER_TO_CHECK" '$1==u{print $2; exit}')
+          [[ -n "$CUR_TTY" ]] && pkill -KILL -t "$CUR_TTY" 2>/dev/null || logout
+      else
+          echo "INFO: Closing local terminal session..."
+          CUR_TTY=$(who am i | awk '{print $2}')
+          [[ -n "$CUR_TTY" ]] && pkill -KILL -t "$CUR_TTY" 2>/dev/null || logout
+      fi
+  else
+      echo "INFO: '$USER_TO_CHECK' session already includes $TARGET_GROUP group."
+  fi
 
 echo "SUCCESS: System settings configured"
+
+ 
 }
 
 provision_disk() {
@@ -1285,11 +1352,11 @@ build_and_start_pod() {
         return 1
     fi
 
-    echo "INFO: Starting initial NIFI pod"
-    if podman kube play --replace --userns=keep-id /mission-share/podman/containers/nifi-pod.yml; then
-        echo "SUCCESS: Initial NIFI pod started"
+    echo "INFO: Creating initial NIFI pod (not starting it yet)"
+    if podman kube play --replace --start=false --userns=keep-id /mission-share/podman/containers/nifi-pod.yml; then
+        echo "SUCCESS: Initial NIFI pod created"
     else
-        echo "ERROR: Failed to start initial NIFI pod" >&2
+        echo "ERROR: Failed to create initial NIFI pod" >&2
         return 1
     fi
 
