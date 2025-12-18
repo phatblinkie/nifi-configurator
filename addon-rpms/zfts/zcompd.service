@@ -1,0 +1,27 @@
+# /etc/systemd/system/zcompd.service
+[Unit]
+Description=Zcompd Compression Daemon
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+#User=admin
+#Group=admin
+ExecStart=/opt/prgsnap/bin/zcompd -c /home/admin/zfts.configs/zfts_zcomp_gnd.ini
+ExecStop=/bin/kill -TERM $MAINPID
+PIDFile=/run/zcompd.pid
+WorkingDirectory=/opt/prgsnap
+Restart=on-failure
+RestartSec=5
+# Optional security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=zcompd
+
+[Install]
+WantedBy=default.target

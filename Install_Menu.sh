@@ -792,7 +792,63 @@ else
 	else
 		echo "ERROR: Failed to install rpms, cannot continue"
 	fi
+#install zcomd and zfts service files
+        #make user systed directories just in case
+	mkdir -p ~/.config/systemd/user >/dev/null 2>&1
+	echo "INFO: Installing zfts and zcompd user service files"
+	if cp -vf addon-rpms/zfts/zcompd.service addon-rpms/zfts/zfts.service ~/.config/systemd/user/; then
+		echo "SUCCESS: service files copied into ~/.config/systemd/user/"
+	else
+		echo "ERROR: Failed to copy service files to ~/.config/systemd/user"
+		return 1
+	fi
+#install the config files
+	echo "INFO: Installing zfts and zcomd ini files to ~/zfts.configs/"
+	if rsync -avh configs/zfts.configs ~/ ; then
+		echo "SUCCESS: zfts and zcompd ini files placed in ~/zfts.configs/"
+	else
+		echo "ERROR: failed to move zfts and zcompd ini files into ~/zfts.configs/"
+		return 1
+	fi
+#reload systemctl with --user and enable and start the services
+	echo "INFO: reloading systemd for current user to load new service entries"
+	if systemctl --user daemon-reload ; then
+		echo "SUCCESS: daemon reloaded"
+	else
+		echo "ERROR: unable to reload systemd with command systemctl --user daemon-reload"
+		return 1
+	fi
+	#enable them
+        echo "INFO: Setting zfts and zcompd services to start at boot up"
+        if systemctl --user enable zfts ; then
+                echo "SUCCESS: zfts is now enabled"
+        else
+                echo "ERROR: unable to enable zfts with command systemctl --user enable zfts"
+                return 1
+        fi
+        if systemctl --user start zfts ; then
+                echo "SUCCESS: zfts is now started"
+        else
+                echo "ERROR: unable to start zfts with command systemctl --user start zfts"
+                return 1
+        fi
+
+
+	if systemctl --user enable zcompd ; then
+                echo "SUCCESS: zcompd is now enabled"
+        else
+                echo "ERROR: unable to enable zcompd with command systemctl --user enable zcompd"
+                return 1
+        fi
+        if systemctl --user start zcompd ; then
+                echo "SUCCESS: zcompd is now started"
+        else
+                echo "ERROR: unable to start zcompd with command systemctl --user start zcompd"
+                return 1
+        fi
+
 fi
+
 }
 
 install_nginx() {
@@ -1819,7 +1875,7 @@ show_menu() {
     echo " 4) Generate SSL Certificates - NIFI and Nginx"
     echo " 5) Install and Configure Nginx Proxy"
     echo " 6) Configure Firewall"
-    echo " 7) Install zfts and sarzip rpms"
+    echo " 7) Install zfts and sarzip rpms & enable & start user services"
     echo "======================== Image Imports ================================="
     echo "     NOTE: Choose based off networking available "
     echo " 8i) Pull Container Images - Internet required"

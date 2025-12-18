@@ -43,6 +43,8 @@ spec:
           mountPath: /mission-share/sar
         - name: nifi-zfts
           mountPath: /mission-share/zfts
+        - name: nifi-tools
+          mountPath: /mission-share/tools
 
         #libs
         - name: LD_LIBRARY_PATH
@@ -79,6 +81,10 @@ spec:
         type: DirectoryOrCreate
 
     #custom host directory path definitions
+    - name: nifi-tools
+      hostPath:
+        path: /mission-share/tools
+        type: DirectoryOrCreate
     - name: nifi-sar
       hostPath:
         path: /mission-share/sar
