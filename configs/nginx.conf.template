@@ -145,8 +145,8 @@ http {
         # ---------------------------------------------------------------------
         #  TLS / FIPS approved configuration
         # ---------------------------------------------------------------------
-        ssl_certificate     /etc/pki/tls/ssl.crt;
-        ssl_certificate_key /etc/pki/tls/ssl.key;
+        ssl_certificate     /etc/pki/tls/ssl.zfts.crt;
+        ssl_certificate_key /etc/pki/tls/ssl.zfts.key;
 
         ssl_protocols TLSv1.3 TLSv1.2;
         ssl_ciphers 'HIGH:!aNULL:!MD5:!3DES:!RC4';
