@@ -63,7 +63,7 @@ http {
         server_name _;
         ssl_certificate     /etc/pki/tls/ssl.crt;
         ssl_certificate_key /etc/pki/tls/ssl.key;
-        return 444;                 # Drop unmatched traffic
+        #return 444;                 # Drop unmatched traffic
     }
 
     # -------------------------------------------------------------------------
