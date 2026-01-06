@@ -350,34 +350,71 @@ rename_ssl() {
  echo "SUCCESS: SSL file renaming completed"
 }
 
+rename_ssl_zfts() {
+ local fqdn="$1"
+ local dir="${2:-.}"
+
+ # Check if fqdn is provided
+ if [[ -z "$fqdn" ]]; then
+ echo "ERROR: fqdn must be provided" >&2
+ return 1
+ fi
+
+ # Check if the directory exists
+ if [[ ! -d "$dir" ]]; then
+ echo "ERROR: Directory '$dir' does not exist" >&2
+ return 1
+ fi
+
+ # Normalize directory path to remove trailing slash
+ dir="${dir%/}"
+
+ # Initialize a flag to track if any files were found
+ local files_found=false
+
+ # Escape dots in fqdn for proper pattern matching
+ local escaped_fqdn
+ escaped_fqdn=$(echo "$fqdn" | sed 's/\./\\./g')
+
+ # Use find to locate files matching the pattern
+ echo "INFO: Renaming SSL files for '$fqdn' in '$dir'"
+ while IFS= read -r file; do
+ if [[ -f "$file" ]]; then
+ local ext="${file##*.}"
+ mv "$file" "$dir/ssl.zfts.$ext"
+ echo "SUCCESS: Renamed $file to ssl.zfts.$ext"
+ files_found=true
+ fi
+ done < <(find "$dir" -maxdepth 1 -type f -name "$escaped_fqdn.*")
+
+ # Check if no files were found and print a warning
+ if [[ "$files_found" == false ]]; then
+ echo "WARNING: No files matching '$fqdn.*' were found in '$dir'"
+ echo "INFO: Debug: Directory contents:"
+ ls -l "$dir"
+ return 1
+ fi
+ echo "SUCCESS: SSL file renaming completed"
+}
+
 
 generate_ssl_keys() {
  cd /mission-share/vast-ca/
  echo "INFO: Creating SSL certificates"
 
- #hostname -i | tr ' ' '\n' | sort | uniq
- #echo "INFO: Please enter msnsvr IP address:"
- #read -r msnsvr_ip
- #echo "INFO: You entered: $msnsvr_ip"
- msnsvr_ip=$(get_default_ip)
- #hostname
- #echo "INFO: Please enter msnsvr FQDN (e.g. msnsvr.army.local):"
- #read -r msnsvr_fqdn
- #echo "INFO: You entered: $msnsvr_fqdn"
+ #msnsvr_ip=$(get_default_ip)
+ msnsvr_ip=$IP_ADDRESS
  msnsvr_fqdn=$NIFI_DOMAIN_FQDN
+ zfts_fqdn=$ZFTS_DOMAIN_FQDN
 
- #cat /etc/resolv.conf
- #echo "INFO: Please enter domain name (e.g. army.local):"
- #read -r domain
- #echo "INFO: You entered: $domain"
  domain=$OGS_DOMAIN_NAME
  #used by nginx template
  echo "DOMAIN=$domain" > /mission-share/podman/containers/keys/DOMAIN
  mkdir -p /mission-share/.tmp 2>/dev/null
  local temp_file=$(mktemp)
- echo "$msnsvr_ip $msnsvr_fqdn addedbyscript" > "$temp_file"
+ echo "$msnsvr_ip $NIFI_DOMAIN_FQDN $ZFTS_DOMAIN_FQDN addedbyscript" > "$temp_file"
  echo "INFO: Updating /etc/hosts with msnsvr details"
- 
+
  #only inject if its not there, otherwise remove it first, then inject so its not duplicated
  if [ `grep -c addedbyscript /etc/hosts` -gt 0 ]
  then
@@ -407,28 +444,51 @@ generate_ssl_keys() {
 
  # Creating Nifi Certs
  echo "INFO: Creating Nifi certificates"
- printf "$NIFI_DOMAIN_FQDN\n\msnsvr.$OGS_DOMAIN_NAME\n\nUS\nMaryland\nAPG\nFII\n3650\nsilkwave\n" | ./server-cert-gen.sh /mission-share/podman/containers/keys/nifi/
+ printf "$NIFI_DOMAIN_FQDN\nmsnsvr.$OGS_DOMAIN_NAME\n$IP_ADDRESS\n\nUS\nMaryland\nAPG\nFII\n3650\nsilkwave\n" | ./server-cert-gen.sh /mission-share/podman/containers/keys/nifi/
  if rename_ssl "$NIFI_DOMAIN_FQDN" "/mission-share/podman/containers/keys/nifi/"; then
- podman unshare chmod 0644 /mission-share/podman/containers/keys/nifi/ssl.*
- echo "SUCCESS: Nifi certificates created and renamed"
+    podman unshare chmod 0644 /mission-share/podman/containers/keys/nifi/ssl.*
+    echo "SUCCESS: Nifi certificates created and renamed"
  else
- echo "ERROR: Failed to create or rename Nifi certificates" >&2
- return 1
+    echo "ERROR: Failed to create or rename Nifi certificates" >&2
+    return 1
  fi
  read -p "Press [Enter] to continue..."
  clear
+
  # Creating NGINX proxy certs
- #  ?? maybe we should instead use the nifi certs above? can nginx access them?
  echo "INFO: Creating NGINX proxy certificates"
- printf "$NIFI_DOMAIN_FQDN\n\\$OGS_DOMAIN_NAME\n\nUS\nMaryland\nAPG\nFII\n3650\nsilkwave\n" | ./server-cert-gen.sh /mission-share/podman/containers/keys/nginx/
+ printf "$NIFI_DOMAIN_FQDN\n$OGS_DOMAIN_NAME\n$IP_ADDRESS\n\nUS\nMaryland\nAPG\nFII\n3650\nsilkwave\n" | ./server-cert-gen.sh /mission-share/podman/containers/keys/nginx/
  if rename_ssl "$NIFI_DOMAIN_FQDN" "/mission-share/podman/containers/keys/nginx/"; then
-  echo "INFO: Copying NGINX certificates to /etc/pki/tls"
-  if run_with_sudo cp -v /mission-share/podman/containers/keys/nginx/ssl.* /etc/pki/tls/; then
-  echo "SUCCESS: NGINX certificates copied to /etc/pki/tls"
- else
-  echo "ERROR: Failed to copy NGINX certificates to /etc/pki/tls" >&2
-  return 1
+    echo "INFO: Copying NGINX certificates to /etc/pki/tls"
+
+    if run_with_sudo cp -v /mission-share/podman/containers/keys/nginx/ssl.* /etc/pki/tls/; then
+        echo "SUCCESS: NGINX certificates copied to /etc/pki/tls"
+    else
+        echo "ERROR: Failed to copy NGINX certificates to /etc/pki/tls" >&2
+        return 1
+    fi
  fi
+ read -p "Press [Enter] to continue..."
+ clear
+
+ echo "INFO: Creating ZFTS proxy certificates"
+ printf "$ZFTS_DOMAIN_FQDN\n$OGS_DOMAIN_NAME\n$IP_ADDRESS\n\nUS\nMaryland\nAPG\nFII\n3650\nsilkwave\n" | ./server-cert-gen.sh /mission-share/podman/containers/keys/zfts/
+ if rename_ssl_zfts "$ZFTS_DOMAIN_FQDN" "/mission-share/podman/containers/keys/zfts/"; then
+    echo "SUCCESS: Copied ZFTS certificates to /etc/pki/tls"
+ else
+    echo "ERROR: Failed to copy ZFTS NGINX certificates to /etc/pki/tls" >&2
+    return 1
+ fi
+
+ if run_with_sudo cp -v /mission-share/podman/containers/keys/nginx/ssl.zfts.* /etc/pki/tls/; then
+    echo "SUCCESS: NGINX ZFTS certificates copied to /etc/pki/tls"
+ else
+    echo "ERROR: Failed to copy NGINX certificates to /etc/pki/tls" >&2
+    return 1
+ fi
+ read -p "Press [Enter] to continue..."
+ clear
+
 
  # copy the dod ca
  cd $OLDPWD
@@ -443,17 +503,17 @@ generate_ssl_keys() {
  echo "INFO: Fixing SELinux context on NGINX keys"
  run_with_sudo semanage fcontext -a -t cert_t "/etc/pki/tls/ssl.crt"
  run_with_sudo semanage fcontext -a -t cert_t "/etc/pki/tls/ssl.key"
+ run_with_sudo semanage fcontext -a -t cert_t "/etc/pki/tls/ssl.zfts.crt"
+ run_with_sudo semanage fcontext -a -t cert_t "/etc/pki/tls/ssl.zfts.key"
  run_with_sudo semanage fcontext -a -t cert_t "/etc/pki/ca-trust/extracted/pem/DOD_CAs.pem"
  run_with_sudo restorecon -v -F "/etc/pki/tls/ssl.crt"
  run_with_sudo restorecon -v -F "/etc/pki/tls/ssl.key"
+ run_with_sudo restorecon -v -F "/etc/pki/tls/ssl.zfts.crt"
+ run_with_sudo restorecon -v -F "/etc/pki/tls/ssl.zfts.key"
  run_with_sudo restorecon -v -F "/etc/pki/ca-trust/extracted/pem/DOD_CAs.pem"
  run_with_sudo chmod 0444 "/etc/pki/ca-trust/extracted/pem/DOD_CAs.pem"
 
  echo "SUCCESS: SELinux context fixed for NGINX keys"
- else
- echo "ERROR: Failed to create or rename NGINX certificates" >&2
- return 1
- fi
 
  #cd "$OLDPWD"
  echo "SUCCESS: SSL certificate generation completed"
@@ -605,7 +665,7 @@ configure_system_settings() {
  run_with_sudo usermod -aG container-admins miadmin
  run_with_sudo usermod -aG container-admins admin
  run_with_sudo usermod -aG container-admins root
- 
+
  #v-270875 (control container resource limits)
  #these dont take effect on existing containers!!!
  run_with_sudo mv containers.conf /etc/containers/
@@ -613,7 +673,7 @@ configure_system_settings() {
 
  #v-233192 (deny all, allow by exception registries)
  run_with_sudo configs/registries.conf
- 
+
  #check if groups were modifed, if so, sadly, I cannot import them without a fresh login.
  #force info and exits, they can run this a 2nd time and it will not disco them
  # --- Post-group change notification and session closure ---
@@ -652,7 +712,7 @@ ACTIVE_GIDS=$(grep "^Groups" /proc/self/status | awk '{for(i=2;i<=NF;i++)print $
 
 echo "SUCCESS: System settings configured"
 
- 
+
 }
 
 provision_disk() {
@@ -1297,7 +1357,7 @@ copy_source_directories() {
 
     echo "INFO: Making needed directories"
     if podman unshare mkdir -vp "$path/nifi" \
-          "$path/keys/"{nginx,nifi} \
+          "$path/keys/"{nginx,nifi,zfts} \
           "$rootpath/tide/"{out,in,ccads-in,ccads-out,arc-out,fuse-out,sceptre-in,sceptre-out,esa-out,eped-out,fail,tmp,save,idm-in/save} \
           "$rootpath/audit_logs" \
 	  "$rootpath/sar" \
@@ -1316,7 +1376,7 @@ copy_source_directories() {
         echo "ERROR: Failed to copy vast-ca or tools" >&2
         return 1
     fi
-	
+
     echo "INFO: Copying zfts to new location"
     if podman unshare rsync -ah zfts $rootpath/ ; then
         echo "SUCCESS: Copied zfts"
