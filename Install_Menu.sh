@@ -1,6 +1,6 @@
 #!/bin/bash
 
-script_version="20251214.1"
+script_version="20260105.0"
 # Do not allow to run as root
 if (( $EUID == 0 )); then
  echo "ERROR: This script must not be run as root, run as normal user that will manage the containers. 'miadmin?'" >&2
@@ -156,6 +156,10 @@ collect_user_inputs() {
     #nifi pw has to be strong and at least 12 chars log
     DEFAULT_SINGLE_USER_CREDENTIALS_PASSWORD="!Changeme12345"
 
+    #zfts defaults
+    DEFAULT_ZFTS_DOMAIN_FQDN="zfts.$DEFAULT_OGS_DOMAIN_NAME"
+    DEFAULT_IP_ADDRESS="Change me the hosts main ip address"
+
     # Check for variables.conf and load initial values
     VARS_FILE="variables.conf"
     if [ -f "$VARS_FILE" ]; then
@@ -191,6 +195,9 @@ SINGLE_USER_CREDENTIALS_USERNAME='${SINGLE_USER_CREDENTIALS_USERNAME:-$DEFAULT_S
 #Nifi pw has to be strong and at least 12 chars log
 SINGLE_USER_CREDENTIALS_PASSWORD='${SINGLE_USER_CREDENTIALS_PASSWORD:-$DEFAULT_SINGLE_USER_CREDENTIALS_PASSWORD}'
 
+#ZFTS-specific
+ZFTS_DOMAIN_FQDN='${ZFTS_DOMAIN_FQDN:-$DEFAULT_ZFTS_DOMAIN_FQDN}'
+IP_ADDRESS='${IP_ADDRESS:-$DEFAULT_IP_ADDRESS}'
 
 
 EOF
@@ -240,7 +247,9 @@ EOF
 	SUMMARY+="SINGLE_USER_CREDENTIALS_USERNAME: $SINGLE_USER_CREDENTIALS_USERNAME\n\n"
         SUMMARY+="#Nifi pw has to be strong and at least 12 chars log\n"
         SUMMARY+="SINGLE_USER_CREDENTIALS_PASSWORD: $SINGLE_USER_CREDENTIALS_PASSWORD\n"
-
+	SUMMARY+="\n"
+	SUMMARY+="ZFTS_DOMAIN_FQDN: $ZFTS_DOMAIN_FQDN\n"
+	SUMMARY+="IP_ADDRESS: $IP_ADDRESS\n"
 	SUMMARY+="\n"
         SUMMARY+="Does this look correct?"
 
@@ -260,6 +269,7 @@ EOF
 
 #general-settings
 OGS_DOMAIN_NAME='$OGS_DOMAIN_NAME'
+
 #Nifi-specific
 NIFI_DOMAIN_FQDN='$NIFI_DOMAIN_FQDN'
 #Nifi username
@@ -267,6 +277,9 @@ SINGLE_USER_CREDENTIALS_USERNAME='$SINGLE_USER_CREDENTIALS_USERNAME'
 #Nifi pw has to be strong and at least 12 chars log
 SINGLE_USER_CREDENTIALS_PASSWORD='$SINGLE_USER_CREDENTIALS_PASSWORD'
 
+#ZFTS-specific
+ZFTS_DOMAIN_FQDN='$ZFTS_DOMAIN_FQDN'
+IP_ADDRESS='$IP_ADDRESS'
 EOF
         echo "Saved values to $VARS_FILE" >> "$ERROR_LOG"
 
@@ -276,6 +289,9 @@ EOF
         export NIFI_DOMAIN_FQDN
         export SINGLE_USER_CREDENTIALS_USERNAME
 	export SINGLE_USER_CREDENTIALS_PASSWORD
+	#zfts stuff
+	export ZFTS_DOMAIN_FQDN
+	export IP_ADDRESS
 	# Exit the loop if user confirms
         break
     done
@@ -872,7 +888,7 @@ install_nginx() {
  #replace the DOMAIN in the nginx.conf template
  echo "substituting domain value in nginx template file"
     if cat configs/nginx.conf.template | \
-       sed "s|nifi.DOMAIN|$NIFI_DOMAIN_FQDN|g" > configs/nginx.conf; then
+       sed "s|nifi.DOMAIN|$NIFI_DOMAIN_FQDN|g" | sed "s|zfts.DOMAIN|$ZFTS_DOMAIN_FQDN|g" | sed "s|IP_ADDRESS|$IP_ADDRESS|g"> configs/nginx.conf; then
        echo "SUCCESS: Generated nginx.conf"
     else
        echo "ERROR: Failed to create nginx.conf file" >&2
@@ -911,6 +927,24 @@ install_nginx() {
  fi
 
  echo "SUCCESS: Nginx configuration completed"
+}
+
+install_zfts_html_files() {
+ ##add zfts_html files for customized dashboard
+ if run_with_sudo rsync -avh /opt/prgsnap/share/zfts/html /opt/prgsnap/share/zfts/html.original ; then
+    echo "SUCCESS: Created backup copy of zfts html files @ /opt/prgsnap/share/zfts/html.original"
+    else
+    echo "ERROR: Failed to create backup or original zfts files to /opt/prgsnap/share/zfts/html.original" >&2
+    return 1
+ fi
+
+ if run_with_sudo rsync -avh zfts_html/ /opt/prgsnap/share/zfts/html/ ; then
+    echo "SUCCESS: Custom zfts interface files copied"
+    else
+    echo "ERROR: Failed to copy Customized zfts files to /opt/prgsnap/share/zfts/html/" >&2
+    return 1
+ fi
+
 }
 
 configure_selinux() {
@@ -964,6 +998,7 @@ configure_firewall() {
  declare -A PORTS=(
  ["HTTPs"]="443/tcp"
  ["Nifi-ssl"]="8443/tcp"
+ ["zfts-listener"]="50001/udp"
  )
 
  for service in "${!PORTS[@]}"; do
@@ -1013,6 +1048,7 @@ empty_firewall_rules() {
  declare -A PORTS=(
  ["HTTPs"]="443/tcp"
  ["Nifi-ssl"]="8443/tcp"
+ ["zfts-listener"]="50001/udp"
  )
 
  for service in "${!PORTS[@]}"; do
@@ -1852,9 +1888,11 @@ check_vars_file() {
 	export SINGLE_USER_CREDENTIALS_USERNAME
 	export SINGLE_USER_CREDENTIALS_PASSWORD
         export VARS_FOUND=" \u2714 Vars file found"
+	export ZFTS_DOMAIN_FQDN
+	export IP_ADDRESS
         return 1
     else
-        export VARS_FOUND=" \u2716 WARNING  <-- Vars file Not found -- run this option first"
+        export VARS_FOUND=" \u2716 ERROR:  <-- Vars file Not found -- run this option first"
         return 0
     fi
 }
@@ -1868,14 +1906,16 @@ show_menu() {
     echo "       Monitoring Stack Deployment Tool - Ver. $script_version"
     echo "========================================================================"
     echo " Privileged Operations:"
-    echo -e " 0) Input/adjust container variables $VARS_FOUND"
-    echo " 1) Configure System Settings"
-    echo " 2) Provision Disk for Podman Data"
-    echo " 3) Copy container source directories"
-    echo " 4) Generate SSL Certificates - NIFI and Nginx"
-    echo " 5) Install and Configure Nginx Proxy"
-    echo " 6) Configure Firewall"
-    echo " 7) Install zfts and sarzip rpms & enable & start user services"
+    echo -e " 0)  Input/adjust container variables $VARS_FOUND"
+    echo " 1)  Configure System Settings"
+    echo " 2)  Provision Disk for Podman Data"
+    echo " 3)  Copy container source directories"
+    echo " 4)  Generate SSL Certificates - NIFI and Nginx"
+    echo " 5)  Install and Configure Nginx Proxy"
+    echo " 6)  Configure Firewall"
+    echo " 7)  Install zfts and sarzip rpms & enable & start user services"
+    echo " 7a) Install zfts customized interface files"
+    echo ""
     echo "======================== Image Imports ================================="
     echo "     NOTE: Choose based off networking available "
     echo " 8i) Pull Container Images - Internet required"
@@ -1947,6 +1987,7 @@ while true; do
         5) install_nginx ;;
         6) configure_firewall ;;
 	7) install_sarzip_and_zfts_rpms ;;
+	7a) install_zfts_html_files ;;
         8i) pull_container_images ;;
         8n) install_tarball_images ;;
         9) build_and_start_pod ;;
