@@ -169,7 +169,7 @@ button[disabled] {
 <h1>Dual Instance File Transfer Monitor</h1>
 
 <div id="userInfo" style="text-align:center;margin-bottom:1em;font-size:0.95rem;">
-  Logged in as: <span id="username" style="font-weight:bold;">(loading…)</span>
+  Logged in as: <span id="username" style="font-weight:bold;">(loading…)</span>
   <span id="userdn" style="font-size:0.9em;color:#666;"></span>
 </div>
 
@@ -184,7 +184,7 @@ button[disabled] {
   <div id="groundControls" style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
     <span id="groundStatus">Ready</span>
     <span id="groundHealth" class="health-ok">🟢 Active</span>
-    <span id="groundLatency" style="margin-left:12px;font-weight:bold;">Ping: N/A</span>
+    <span id="groundLatency" style="margin-left:12px;font-weight:bold;">Ping: N/A</span>
 
     <!-- 🆕 Poll frequency selector -->
     <label for="groundPoll" style="margin-left:15px;">Update every</label>
@@ -209,7 +209,7 @@ button[disabled] {
   <h2>Air Receiver</h2>
   <div id="airControls">
     <label><strong>Host/IP:</strong></label>
-    <input id="airHost" type="text" placeholder="e.g., 192.168.10.213">
+    <input id="airHost" type="text" placeholder="e.g., 192.168.10.213">
     <button id="setAirBtn" onclick="setAirHost()">Connect</button>
     <span id="airStatus">Idle</span>
     <span id="airHealth" class="health-idle">🟦 Idle</span>
@@ -240,11 +240,11 @@ function setTheme(dark){
   if(dark){
     document.body.classList.add('dark');
     localStorage.setItem('theme','dark');
-    btn.textContent='☀️ Light Mode';
+    btn.textContent='☀️ Light Mode';
   }else{
     document.body.classList.remove('dark');
     localStorage.setItem('theme','light');
-    btn.textContent='🌙 Dark Mode';
+    btn.textContent='🌙 Dark Mode';
   }
 }
 function toggleTheme(){

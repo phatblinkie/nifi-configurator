@@ -37,12 +37,12 @@ button:hover { background-color:#0f6ed0; }
 </style>
 </head>
 <body>
-  <h1>Ground ↔ Air Connectivity Health</h1>
-  <label for="airIP"><strong>Air Host/IP</strong></label>
+  <h1>Ground ↔ Air Connectivity Health</h1>
+  <label for="airIP"><strong>Air Host/IP</strong></label>
   <input type="text" id="airIP" placeholder="192.168.10.213">
-  <button onclick="checkHealth()">Check Connection</button>
-  <button onclick="window.location='index.html'">Return to Dashboard</button>
-  <button id="themeToggle" style="float:right">🌙 Dark</button>
+  <button onclick="checkHealth()">Check Connection</button>
+  <button onclick="window.location='index.html'">Return to Dashboard</button>
+  <button id="themeToggle" style="float:right">🌙 Dark</button>
   <div id="result"></div>
 
 <script>
@@ -53,7 +53,7 @@ const themeBtn = document.getElementById('themeToggle');
 themeBtn.onclick = () => {
   document.body.classList.toggle('dark');
   const dark = document.body.classList.contains('dark');
-  themeBtn.textContent = dark ? '☀️ Light' : '🌙 Dark';
+  themeBtn.textContent = dark ? '☀️ Light' : '🌙 Dark';
   localStorage.setItem('darkMode', dark);
 };
 
@@ -61,7 +61,7 @@ themeBtn.onclick = () => {
 window.onload = () => {
   if (localStorage.getItem('darkMode') === 'true') {
     document.body.classList.add('dark');
-    themeBtn.textContent = '☀️ Light';
+    themeBtn.textContent = '☀️ Light';
   }
 };
 
@@ -80,11 +80,11 @@ async function checkHealth() {
     const data = await r.json();
     resBox.style.background = '#d4edda';
     resBox.innerHTML =
-      `✅ Connected to ${data.platform_name || ip}<br>` +
+      `✅ Connected to ${data.platform_name || ip}<br>` +
       `<pre>${JSON.stringify(data, null, 2)}</pre>`;
   } catch (err) {
     resBox.style.background = '#f8d7da';
-    resBox.textContent = `❌ Connection failed: ${err.message}`;
+    resBox.textContent = `❌ Connection failed: ${err.message}`;
   }
 }
 </script>

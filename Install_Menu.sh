@@ -803,7 +803,7 @@ then
 	echo "INFO: sarzip and zfts are already installed, skipping installation."
 else
 	echo "INFO: Installing sarzip and zfts rpms"
-	if run_with_sudo dnf install --nogpgcheck -y addon-rpms/*.rpm addon-rpms/zfts/*.rpm; then
+	if run_with_sudo dnf install --disablerepo="*" --nogpgcheck -y addon-rpms/*.rpm addon-rpms/zfts/*.rpm; then
 		echo "SUCCESS: rpms installed"
 	else
 		echo "ERROR: Failed to install rpms, cannot continue"
@@ -872,7 +872,7 @@ install_nginx() {
 
  if ! command -v nginx &> /dev/null; then
   echo "INFO: Installing nginx"
-  if run_with_sudo dnf install addon-rpms/nginx/*.rpm -y; then
+  if run_with_sudo dnf --disablerepo="*" install addon-rpms/nginx/*.rpm -y; then
    echo "SUCCESS: Nginx installed"
   else
    echo "ERROR: Failed to install nginx." >&2
