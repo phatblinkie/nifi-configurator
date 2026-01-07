@@ -474,13 +474,13 @@ generate_ssl_keys() {
  echo "INFO: Creating ZFTS proxy certificates"
  printf "$ZFTS_DOMAIN_FQDN\n$OGS_DOMAIN_NAME\n$IP_ADDRESS\n\nUS\nMaryland\nAPG\nFII\n3650\nsilkwave\n" | ./server-cert-gen.sh /mission-share/podman/containers/keys/zfts/
  if rename_ssl_zfts "$ZFTS_DOMAIN_FQDN" "/mission-share/podman/containers/keys/zfts/"; then
-    echo "SUCCESS: Copied ZFTS certificates to /etc/pki/tls"
+    echo "SUCCESS: renamed ZFTS certificates"
  else
-    echo "ERROR: Failed to copy ZFTS NGINX certificates to /etc/pki/tls" >&2
+    echo "ERROR: Failed to rename ZFTS NGINX certificates" >&2
     return 1
  fi
 
- if run_with_sudo cp -v /mission-share/podman/containers/keys/nginx/ssl.zfts.* /etc/pki/tls/; then
+ if run_with_sudo cp -v /mission-share/podman/containers/keys/zfts/ssl.zfts.* /etc/pki/tls/; then
     echo "SUCCESS: NGINX ZFTS certificates copied to /etc/pki/tls"
  else
     echo "ERROR: Failed to copy NGINX certificates to /etc/pki/tls" >&2

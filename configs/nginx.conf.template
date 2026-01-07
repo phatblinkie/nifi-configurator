@@ -122,7 +122,7 @@ http {
             proxy_ssl_protocols TLSv1.3 TLSv1.2;
             proxy_ssl_conf_command Ciphersuites TLS_AES_256_GCM_SHA384:TLS_AES_128_GCM_SHA256;
             proxy_ssl_verify off;        # self signed NiFi internal cert
-            proxy_ssl_verify_depth 1; 
+            proxy_ssl_verify_depth 1;
 
             proxy_set_header Host              $host;
             proxy_set_header X-Forwarded-Host  $host;
@@ -283,4 +283,3 @@ http {
         }
     }
 }
-
