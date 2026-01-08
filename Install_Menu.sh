@@ -642,6 +642,26 @@ configure_system_settings() {
     return 1
  fi
 
+ echo "INFO: updating permissions and ownership in /etc/audit/rules.d/"
+ if run_with_sudo chmod 0600 /etc/audit/rules.d/* && run_with_sudo chown root:root /etc/audit/rules.d/* ; then
+    echo "SUCCESS: ownership and permissions set to root and 0600"
+ else
+    echo "ERROR: unable to set ownership and permissions in /etc/audit/rules.d/*"
+    return 1
+ fi
+
+echo "INFO: emptying audit rule file is present  /etc/audit/rules.d/99-podman-load.rules"
+ if [ -e /etc/audit/rules.d/99-podman-load.rules ]; then
+    if run_with_sudo truncate -s 0 /etc/audit/rules.d/99-podman-load.rules; then
+        echo "SUCCESS: emptied /etc/audit/rules.d/99-podman-load.rules"
+    else
+        echo "ERROR: unable to empty /etc/audit/rules.d/99-podman-load.rules"
+        return 1
+    fi
+ else
+    echo "INFO: /etc/audit/rules.d/99-podman-load.rules not present, skipping"
+ fi
+
     #run_with_sudo augenrules
     #this system has duplicated rules, which prevents it from loading, so be nice and filter them out of the final results
     #too bad augenrules does do this
@@ -650,6 +670,8 @@ configure_system_settings() {
 	 echo "SUCCESS: new rules accepted"
  else
 	 echo "ERROR: new rules resulted in an error. aborting... sorry. try as root, augenrules --load and see the error"
+     echo "ERROR: its important to fix this, as auditd will not be compliant without it, re-run this step after debugging the problem"
+     return 1
  fi
  #some rules may not load until a reboot, due to the "-e 2" setting. thats beyond this script.
 
@@ -668,12 +690,14 @@ configure_system_settings() {
 
  #v-270875 (control container resource limits)
  #these dont take effect on existing containers!!!
- run_with_sudo mv containers.conf /etc/containers/
+ run_with_sudo mv configs/containers.conf /etc/containers/
 
 
  #v-233192 (deny all, allow by exception registries)
- run_with_sudo configs/registries.conf
+ run_with_sudo mv configs/registries.conf /etc/containers/registries.conf
 
+ run_with_sudo chown root:root /etc/containers/*.conf
+ run_with_sudo chmod 0644 /etc/containers/*.conf
  #check if groups were modifed, if so, sadly, I cannot import them without a fresh login.
  #force info and exits, they can run this a 2nd time and it will not disco them
  # --- Post-group change notification and session closure ---
@@ -2023,113 +2047,6 @@ remove_disk_from_fstab() {
         echo "ERROR: unable to modify /etc/fstab file"
         return 1
     fi
-}
-
-# --- Function to Change MTU of Network Interface (RHEL9 Persistent + Runtime Sync + Logging) ---
-change_interface_mtu_fails() {
-  echo ""
-  echo "=== Change Interface MTU ==="
-  echo ""
-
-  # Collect non-loopback interfaces
-  mapfile -t ifaces < <(ip -o link show | awk -F': ' '!/lo/ {print $2}')
-  mapfile -t mtus < <(ip -o link show | awk -F': ' '!/lo/ {if (match($0, /mtu [0-9]+/)) print substr($0, RSTART+4, RLENGTH-4)}')
-
-  if [[ ${#ifaces[@]} -eq 0 ]]; then
-    echo "No active network interfaces found (excluding loopback)."
-    read -rp "Press [Enter] to return to the main menu..."
-    return
-  fi
-
-  echo "Available network interfaces (with current MTU):"
-  for i in "${!ifaces[@]}"; do
-    printf "%2d. %-10s (MTU: %s)\n" "$((i+1))" "${ifaces[$i]}" "${mtus[$i]}"
-  done
-  echo ""
-
-  read -rp "Select interface by number or name: " selection
-  if [[ "$selection" =~ ^[0-9]+$ ]] && (( selection >= 1 && selection <= ${#ifaces[@]} )); then
-    iface="${ifaces[$((selection-1))]}"
-  else
-    iface=$(printf "%s\n" "${ifaces[@]}" | grep -m1 -E "^$selection$|^$selection[0-9]*$")
-  fi
-
-  if [[ -z "$iface" ]]; then
-    echo "ERROR: No matching interface found for '$selection'."
-    read -rp "Press [Enter] to return to the main menu..."
-    return
-  fi
-
-  current_mtu=$(ip link show "$iface" 2>/dev/null | grep -oE "mtu [0-9]+" | awk '{print $2}')
-  echo "Selected interface: $iface (Current MTU: ${current_mtu:-unknown})"
-  read -rp "Enter new MTU value [suggested: 1100]: " new_mtu
-  new_mtu=${new_mtu:-1100}
-  if ! [[ "$new_mtu" =~ ^[0-9]+$ ]]; then
-    echo "ERROR: Invalid MTU value. Must be numeric."
-    read -rp "Press [Enter] to return to the main menu..."
-    return
-  fi
-
-  echo ""
-  echo "Checking if $iface is managed by NetworkManager..."
-  if ! nmcli -t -f DEVICE,STATE dev status | grep -q "^$iface:"; then
-    echo "Interface $iface not managed by NetworkManager — applying temporary MTU change."
-    echo "$SUDO_PASSWORD" | sudo -S -k -p "" ip link set dev "$iface" mtu "$new_mtu" 2>/tmp/install_errors_mtu.log
-    return
-  fi
-
-  con_name=$(nmcli -t -f NAME,DEVICE connection show --active | awk -F: -v ifc="$iface" '$2==ifc {print $1}')
-  if [[ -z "$con_name" ]]; then
-    echo "Could not find NetworkManager connection for $iface; applying temporary change only."
-    echo "$SUDO_PASSWORD" | sudo -S -k -p "" ip link set dev "$iface" mtu "$new_mtu" 2>/tmp/install_errors_mtu.log
-    return
-  fi
-
-  echo ""
-  echo "⚠️  WARNING: Changing the active interface '$iface' might momentarily disrupt connectivity."
-  echo "This script will reapply connectivity automatically even if SSH disconnects."
-  echo ""
-  read -rp "Proceed to change MTU to $new_mtu on $iface? (yes/no): " confirm
-  [[ "$confirm" =~ ^[Yy](es)?$ ]] || { echo "Aborted."; return; }
-
-  log_file="/tmp/install_mtu_${iface}_$(date +%s).log"
-  echo "[INFO] Applying persistent configuration to $iface at $(date)" > "$log_file"
-
-  # Apply persistent MTU (IPv4 + IPv6)
-  echo "$SUDO_PASSWORD" | sudo -S -k -p "" nmcli connection modify "$con_name" 802-3-ethernet.mtu "$new_mtu" ipv6.mtu "$new_mtu" >>"$log_file" 2>&1
-
-  # Force NetworkManager reload and reconnect
-  echo "[INFO] Reloading NetworkManager and connection..." >>"$log_file"
-  echo "$SUDO_PASSWORD" | sudo -S -k -p "" nmcli connection down "$con_name" >>"$log_file" 2>&1
-  sleep 2
-  echo "$SUDO_PASSWORD" | sudo -S -k -p "" nmcli connection up "$con_name" >>"$log_file" 2>&1
-  sleep 2
-  echo "$SUDO_PASSWORD" | sudo -S -k -p "" nmcli device reapply "$iface" >>"$log_file" 2>&1
-  sleep 2
-
-  # Final runtime sync (forces kernel setting)
-  echo "$SUDO_PASSWORD" | sudo -S -k -p "" ip link set dev "$iface" mtu "$new_mtu" >>"$log_file" 2>&1
-  sleep 1
-
-  # Verification and fallback (if NetworkManager resisted change)
-  applied_mtu=$(ip link show "$iface" 2>/dev/null | grep -oE "mtu [0-9]+" | awk '{print $2}')
-  if [[ "$applied_mtu" != "$new_mtu" ]]; then
-    echo "[WARN] MTU still $applied_mtu — forcing full NM restart..." >>"$log_file"
-    echo "$SUDO_PASSWORD" | sudo -S -k -p "" systemctl restart NetworkManager >>"$log_file" 2>&1
-    sleep 4
-    echo "$SUDO_PASSWORD" | sudo -S -k -p "" ip link set dev "$iface" mtu "$new_mtu" >>"$log_file" 2>&1
-  fi
-
-  # Final check
-  applied_mtu=$(ip link show "$iface" 2>/dev/null | grep -oE "mtu [0-9]+" | awk '{print $2}')
-  echo ""
-  if [[ "$applied_mtu" == "$new_mtu" ]]; then
-    echo "✅ Verification Passed: $iface MTU is now $applied_mtu."
-  else
-    echo "⚠️  Verification Failed: Expected $new_mtu but current value is $applied_mtu."
-    echo "Check detailed logs at: $log_file"
-  fi
-
 }
 
 # --- Function to Change MTU of Network Interface (Unmanaged + Persistent) ---

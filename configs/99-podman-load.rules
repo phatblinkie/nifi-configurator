@@ -1,2 +1,0 @@
--a always,exclude -F arch=b64 -F exe=/usr/bin/podman
--a always,exclude -F arch=b32 -F exe=/usr/bin/podman
