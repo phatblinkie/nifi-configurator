@@ -210,6 +210,8 @@ button[disabled] {
   <div id="airControls">
     <label><strong>Host/IP:</strong></label>
     <input id="airHost" type="text" placeholder="e.g., 192.168.10.213">
+    <label style="margin-left:8px;"><strong>Port:</strong></label>
+    <input id="airPort" type="number" min="1" max="65535" value="19712" style="width:80px;">
     <button id="setAirBtn" onclick="setAirHost()">Connect</button>
     <span id="airStatus">Idle</span>
     <span id="airHealth" class="health-idle">🟦 Idle</span>

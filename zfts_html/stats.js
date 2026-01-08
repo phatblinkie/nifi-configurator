@@ -1,10 +1,11 @@
 //--------------------------------------------------------------------
 // ZFTS Dual Instance File Transfer Monitor
 // Jan 2026 – Polling + Adjustable Frequency + Intelligent Buttons
-// Includes disconnect-to-clear‑table & safety guard
+// Adds: Air port selector (default 19712) + persist + safety guards
 //--------------------------------------------------------------------
 
 let airHost = null;
+let airPort = 19712;
 let airPingTimer = null, groundPingTimer = null;
 let airUpdateTimer = null, groundUpdateTimer = null;
 let airAvailable = true;
@@ -42,8 +43,6 @@ function showTableError(id,msg){
   c.colSpan=9;c.textContent=msg;
   c.style.textAlign="center";c.style.color="#c00";c.style.fontWeight="bold";
 }
-
-// ---------- New helper: wipe a table clean ----------
 function clearTable(id,label){
   const t=document.getElementById(id);if(!t)return;
   const body=t.tBodies[0]||t.createTBody();
@@ -52,8 +51,7 @@ function clearTable(id,label){
   c.colSpan=9;
   c.textContent=`${label} disconnected — no data`;
   c.style.textAlign="center";
-  c.style.color="#777";
-  c.style.fontStyle="italic";
+  c.style.color="#777";c.style.fontStyle="italic";
 }
 
 // ---------- Health indicators ----------
@@ -94,19 +92,22 @@ function renderInstance(d,tid,label){
   const t=document.getElementById(tid);
   if(!t)return;
   if(d.platform_name){
-    let hid=`${tid}_header`;
-    let h=document.getElementById(hid);
-    if(!h){
-      h=document.createElement("div");
-      h.id=hid;h.style.margin="6px 0";h.style.fontWeight="bold";h.style.color="#1589ff";
-      t.insertAdjacentElement("beforebegin",h);
+    let headerId=`${tid}_header`;
+    let header=document.getElementById(headerId);
+    if(!header){
+      header=document.createElement("div");
+      header.id=headerId;
+      header.style.margin="6px 0";
+      header.style.fontWeight="bold";
+      header.style.color="#1589ff";
+      t.insertAdjacentElement("beforebegin",header);
     }
-    h.textContent=`Sending Platform Name: ${d.platform_name}`;
+    header.textContent=`Sending Platform Name: ${d.platform_name}`;
   }
   if(!t.tHead){
-    const cols=["FileID","File Name","State","Complete (%)","Transfer Rate","Time Remaining","File Size","Priority","Actions"];
+    const h=["FileID","File Name","State","Complete (%)","Transfer Rate","Time Remaining","File Size","Priority","Actions"];
     const thead=t.createTHead();const r=thead.insertRow();
-    cols.forEach(cn=>{const th=document.createElement("th");th.textContent=cn;r.appendChild(th);});
+    h.forEach(c=>{const th=document.createElement("th");th.textContent=c;r.appendChild(th);});
   }
   generateTable(t,d.status||[],label);
 }
@@ -117,19 +118,18 @@ function generateTable(table,data,label){
   body.innerHTML="";
   if(!data||!data.length){
     const r=body.insertRow();const c=r.insertCell();
-    c.colSpan=9;c.textContent="No files currently in the transfer queue";
+    c.colSpan=9;
+    c.textContent="No files currently in the transfer queue";
     c.style.textAlign="center";c.style.color="#666";c.style.fontStyle="italic";
     return;
   }
 
-  const localPending=pendingActions;
   data.forEach(e=>{
     const fid=e.fileID;
     const r=body.insertRow();
     r.insertCell().textContent=fid;
     r.insertCell().textContent=e.file_name;
 
-    // ✅ Correct logic for active transfer
     const inProgress = Number(e.started) === 1;
     r.insertCell().textContent=inProgress?"Running":"Stopped";
     r.insertCell().textContent=e.percent_complete.toFixed(2)+" %";
@@ -149,7 +149,7 @@ function generateTable(table,data,label){
     sel.onchange=()=>handlePriorityChange(e,label);
     pri.appendChild(sel);
 
-    const action=localPending[fid];
+    const action=pendingActions[fid];
     const isStarting=action==="starting";
     const isStopping=action==="stopping";
     const isCancelling=action==="cancelling";
@@ -171,14 +171,6 @@ function generateTable(table,data,label){
     const cancelB=mk(cancelTxt,isCancelling);
     if(isCancelling)cancelB.classList.add("cancelling");
     act.appendChild(cancelB);
-
-    if(isStarting&&inProgress)delete localPending[fid];
-    if(isStopping&&!inProgress)delete localPending[fid];
-  });
-
-  const ids=data.map(x=>x.fileID);
-  Object.keys(localPending).forEach(fid=>{
-    if(localPending[fid]==="cancelling"&&!ids.includes(parseInt(fid)))delete localPending[fid];
   });
 }
 
@@ -199,23 +191,26 @@ function setAirHost(){
   if(btn.textContent==="Disconnect"){disconnectAir();return;}
 
   const host=document.getElementById("airHost").value.trim();
+  const portVal=document.getElementById("airPort").value||19712;
   const msg=document.getElementById("airStatus");
   const ping=getOrCreatePingDisplay();
 
   if(!host){
     msg.textContent="⚠ Enter hostname/IP";
     setAirHealth("idle","🟦 Idle");
-    ping.textContent="Ping: N/A";
-    return;
+    ping.textContent="Ping: N/A";return;
   }
 
-  airHost=host;localStorage.setItem("airHost",host);
+  airHost=host;airPort=portVal;
+  localStorage.setItem("airHost",host);
+  localStorage.setItem("airPort",portVal);
+
   msg.textContent="Connecting…";
   setAirHealth("connecting","🟨 Connecting…");
   setConnectBtn(false,"Connecting…");
   ping.textContent="Ping: ...";
 
-  const base=`/airproxy?target=${airHost}:19712&path=files`;
+  const base=`/airproxy?target=${airHost}:${airPort}&path=files`;
   const startT=performance.now();
 
   fetch(base)
@@ -244,17 +239,16 @@ function disconnectAir(){
   document.getElementById("airStatus").textContent="Disconnected";
   setAirHealth("idle","🟦 Idle");
   airAvailable=false;
-  if(airPingTimer)clearInterval(airPingTimer);
-  if(airUpdateTimer)clearInterval(airUpdateTimer);
+  [airPingTimer,airUpdateTimer].forEach(t=>{if(t)clearInterval(t);});
   airPingTimer=airUpdateTimer=null;
   airHost=null;
-  clearTable("airTable","Air"); // ⬅️ new clear behavior
+  clearTable("airTable","Air");
   const p=document.getElementById("latencyDisplay");
   if(p)p.textContent="Ping: N/A";
   setConnectBtn(true,"Connect");
 }
 
-// ---------- Poll updaters ----------
+// ---------- Polling updaters ----------
 function startAirUpdater(base){
   if(airUpdateTimer)clearInterval(airUpdateTimer);
   airUpdateTimer=setInterval(()=>fetchInstance(base,"airTable","Air"),airPollInterval);
@@ -264,11 +258,14 @@ function startGroundUpdater(){
   groundUpdateTimer=setInterval(()=>fetchInstance("/files","groundTable","Ground"),groundPollInterval);
 }
 
-// ---------- Poll frequency dropdowns ----------
+// ---------- Dropdown change listeners ----------
 document.addEventListener("change",e=>{
   if(e.target.id==="airPoll"){
     airPollInterval=parseInt(e.target.value)*1000;
-    if(airHost)startAirUpdater(`/airproxy?target=${airHost}:19712&path=files`);
+    if(airHost){
+      const port=document.getElementById("airPort").value||19712;
+      startAirUpdater(`/airproxy?target=${airHost}:${port}&path=files`);
+    }
   }
   if(e.target.id==="groundPoll"){
     groundPollInterval=parseInt(e.target.value)*1000;
@@ -300,7 +297,6 @@ function startAirPinger(base,pingEl){
     }finally{act=false;}
   },10000);
 }
-
 function startGroundPinger(){
   if(groundPingTimer)clearInterval(groundPingTimer);
   let act=false;
@@ -340,19 +336,17 @@ function initGround(){
 
 // ---------- Actions ----------
 async function handleAction(e,action,label,btn){
-  // Safety guard against disconnected side
   if(label==="Air" && !airHost){
-    alert("Air connection is not active — reconnect before sending commands.");
-    return;
+    alert("Air connection not active — reconnect first.");return;
   }
   if(label==="Ground" && !groundAvailable){
-    alert("Ground service not available.");
-    return;
+    alert("Ground service not available.");return;
   }
 
   const fid=e.fileID;
   const isAir=(label==="Air"&&airHost);
-  const base=isAir?`/airproxy?target=${airHost}:19712`:"";
+  const port=document.getElementById("airPort").value||19712;
+  const base=isAir?`/airproxy?target=${airHost}:${port}`:"";
   const url=isAir?`${base}&path=files/${fid}`:`/files/${fid}`;
 
   const priSel=document.getElementById(`${label}_${fid}_priSelect`);
@@ -365,9 +359,7 @@ async function handleAction(e,action,label,btn){
 
   pendingActions[fid]=action.toLowerCase()+"ing";
   btn.classList.remove("sending","stopping","cancelling");
-  btn.classList.add(
-    action==="Start"?"sending":action==="Stop"?"stopping":"cancelling"
-  );
+  btn.classList.add(action==="Start"?"sending":action==="Stop"?"stopping":"cancelling");
   btn.disabled=true;
   btn.textContent=
     action==="Start"?"Sending…":action==="Stop"?"Stopping…":"Cancelling…";
@@ -379,9 +371,8 @@ async function handleAction(e,action,label,btn){
 
 async function handlePriorityChange(e,label){
   const isAir=(label==="Air"&&airHost);
-  const url=isAir
-    ?`/airproxy?target=${airHost}:19712&path=files/${e.fileID}`
-    :`/files/${e.fileID}`;
+  const port=document.getElementById("airPort").value||19712;
+  const url=isAir?`/airproxy?target=${airHost}:${port}&path=files/${e.fileID}`:`/files/${e.fileID}`;
   const s=document.getElementById(`${label}_${e.fileID}_priSelect`);
   const p=parseInt(s.value);
   await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({started:"true",priority:p})});
@@ -414,6 +405,9 @@ function loadUserInfo(){
 document.addEventListener("DOMContentLoaded",loadUserInfo);
 document.addEventListener("DOMContentLoaded",initGround);
 document.addEventListener("DOMContentLoaded",()=>{
-  const saved=localStorage.getItem("airHost");
-  if(saved){document.getElementById("airHost").value=saved;setTimeout(()=>setAirHost(),600);}
+  const savedH=localStorage.getItem("airHost");
+  const savedP=localStorage.getItem("airPort");
+  if(savedH){document.getElementById("airHost").value=savedH;}
+  if(savedP){document.getElementById("airPort").value=savedP;}
+  if(savedH){setTimeout(()=>setAirHost(),600);}
 });
