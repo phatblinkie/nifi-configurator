@@ -239,18 +239,18 @@ EOF
 
         # Display summary screen with whiptail
         SUMMARY="Please review the entered values:\n\n"
-	SUMMARY+="#General-Settings\n"
+        SUMMARY+="#General-Settings\n"
         SUMMARY+="OGS_DOMAIN_NAME: $OGS_DOMAIN_NAME\n\n"
         SUMMARY+="#Nifi-specific\n"
         SUMMARY+="NIFI_DOMAIN_FQDN: $NIFI_DOMAIN_FQDN\n\n"
         SUMMARY+="#Nifi username\n"
-	SUMMARY+="SINGLE_USER_CREDENTIALS_USERNAME: $SINGLE_USER_CREDENTIALS_USERNAME\n\n"
+        SUMMARY+="SINGLE_USER_CREDENTIALS_USERNAME: $SINGLE_USER_CREDENTIALS_USERNAME\n\n"
         SUMMARY+="#Nifi pw has to be strong and at least 12 chars log\n"
         SUMMARY+="SINGLE_USER_CREDENTIALS_PASSWORD: $SINGLE_USER_CREDENTIALS_PASSWORD\n"
-	SUMMARY+="\n"
-	SUMMARY+="ZFTS_DOMAIN_FQDN: $ZFTS_DOMAIN_FQDN\n"
-	SUMMARY+="IP_ADDRESS: $IP_ADDRESS\n"
-	SUMMARY+="\n"
+        SUMMARY+="\n"
+        SUMMARY+="ZFTS_DOMAIN_FQDN: $ZFTS_DOMAIN_FQDN\n"
+        SUMMARY+="IP_ADDRESS: $IP_ADDRESS\n"
+        SUMMARY+="\n"
         SUMMARY+="Does this look correct?"
 
         if ! whiptail --title "Confirm Values" --yesno "$SUMMARY" 40 80 2>>"$ERROR_LOG"; then
@@ -288,11 +288,11 @@ EOF
         #nifi stuff
         export NIFI_DOMAIN_FQDN
         export SINGLE_USER_CREDENTIALS_USERNAME
-	export SINGLE_USER_CREDENTIALS_PASSWORD
-	#zfts stuff
-	export ZFTS_DOMAIN_FQDN
-	export IP_ADDRESS
-	# Exit the loop if user confirms
+        export SINGLE_USER_CREDENTIALS_PASSWORD
+        #zfts stuff
+        export ZFTS_DOMAIN_FQDN
+        export IP_ADDRESS
+        # Exit the loop if user confirms
         break
     done
 }
@@ -1968,6 +1968,7 @@ show_menu() {
     echo " Privileged Operations:"
     echo -e " 0)  Input/adjust container variables $VARS_FOUND"
     echo " 1)  Configure System Settings"
+    echo " 1a) Change Network Interface MTU to 1100"
     echo " 2)  Provision Disk for Podman Data"
     echo " 3)  Copy container source directories"
     echo " 4)  Generate SSL Certificates - NIFI and Nginx"
@@ -2024,7 +2025,194 @@ remove_disk_from_fstab() {
     fi
 }
 
+# --- Function to Change MTU of Network Interface (RHEL9 Persistent + Runtime Sync + Logging) ---
+change_interface_mtu_fails() {
+  echo ""
+  echo "=== Change Interface MTU ==="
+  echo ""
 
+  # Collect non-loopback interfaces
+  mapfile -t ifaces < <(ip -o link show | awk -F': ' '!/lo/ {print $2}')
+  mapfile -t mtus < <(ip -o link show | awk -F': ' '!/lo/ {if (match($0, /mtu [0-9]+/)) print substr($0, RSTART+4, RLENGTH-4)}')
+
+  if [[ ${#ifaces[@]} -eq 0 ]]; then
+    echo "No active network interfaces found (excluding loopback)."
+    read -rp "Press [Enter] to return to the main menu..."
+    return
+  fi
+
+  echo "Available network interfaces (with current MTU):"
+  for i in "${!ifaces[@]}"; do
+    printf "%2d. %-10s (MTU: %s)\n" "$((i+1))" "${ifaces[$i]}" "${mtus[$i]}"
+  done
+  echo ""
+
+  read -rp "Select interface by number or name: " selection
+  if [[ "$selection" =~ ^[0-9]+$ ]] && (( selection >= 1 && selection <= ${#ifaces[@]} )); then
+    iface="${ifaces[$((selection-1))]}"
+  else
+    iface=$(printf "%s\n" "${ifaces[@]}" | grep -m1 -E "^$selection$|^$selection[0-9]*$")
+  fi
+
+  if [[ -z "$iface" ]]; then
+    echo "ERROR: No matching interface found for '$selection'."
+    read -rp "Press [Enter] to return to the main menu..."
+    return
+  fi
+
+  current_mtu=$(ip link show "$iface" 2>/dev/null | grep -oE "mtu [0-9]+" | awk '{print $2}')
+  echo "Selected interface: $iface (Current MTU: ${current_mtu:-unknown})"
+  read -rp "Enter new MTU value [suggested: 1100]: " new_mtu
+  new_mtu=${new_mtu:-1100}
+  if ! [[ "$new_mtu" =~ ^[0-9]+$ ]]; then
+    echo "ERROR: Invalid MTU value. Must be numeric."
+    read -rp "Press [Enter] to return to the main menu..."
+    return
+  fi
+
+  echo ""
+  echo "Checking if $iface is managed by NetworkManager..."
+  if ! nmcli -t -f DEVICE,STATE dev status | grep -q "^$iface:"; then
+    echo "Interface $iface not managed by NetworkManager — applying temporary MTU change."
+    echo "$SUDO_PASSWORD" | sudo -S -k -p "" ip link set dev "$iface" mtu "$new_mtu" 2>/tmp/install_errors_mtu.log
+    return
+  fi
+
+  con_name=$(nmcli -t -f NAME,DEVICE connection show --active | awk -F: -v ifc="$iface" '$2==ifc {print $1}')
+  if [[ -z "$con_name" ]]; then
+    echo "Could not find NetworkManager connection for $iface; applying temporary change only."
+    echo "$SUDO_PASSWORD" | sudo -S -k -p "" ip link set dev "$iface" mtu "$new_mtu" 2>/tmp/install_errors_mtu.log
+    return
+  fi
+
+  echo ""
+  echo "⚠️  WARNING: Changing the active interface '$iface' might momentarily disrupt connectivity."
+  echo "This script will reapply connectivity automatically even if SSH disconnects."
+  echo ""
+  read -rp "Proceed to change MTU to $new_mtu on $iface? (yes/no): " confirm
+  [[ "$confirm" =~ ^[Yy](es)?$ ]] || { echo "Aborted."; return; }
+
+  log_file="/tmp/install_mtu_${iface}_$(date +%s).log"
+  echo "[INFO] Applying persistent configuration to $iface at $(date)" > "$log_file"
+
+  # Apply persistent MTU (IPv4 + IPv6)
+  echo "$SUDO_PASSWORD" | sudo -S -k -p "" nmcli connection modify "$con_name" 802-3-ethernet.mtu "$new_mtu" ipv6.mtu "$new_mtu" >>"$log_file" 2>&1
+
+  # Force NetworkManager reload and reconnect
+  echo "[INFO] Reloading NetworkManager and connection..." >>"$log_file"
+  echo "$SUDO_PASSWORD" | sudo -S -k -p "" nmcli connection down "$con_name" >>"$log_file" 2>&1
+  sleep 2
+  echo "$SUDO_PASSWORD" | sudo -S -k -p "" nmcli connection up "$con_name" >>"$log_file" 2>&1
+  sleep 2
+  echo "$SUDO_PASSWORD" | sudo -S -k -p "" nmcli device reapply "$iface" >>"$log_file" 2>&1
+  sleep 2
+
+  # Final runtime sync (forces kernel setting)
+  echo "$SUDO_PASSWORD" | sudo -S -k -p "" ip link set dev "$iface" mtu "$new_mtu" >>"$log_file" 2>&1
+  sleep 1
+
+  # Verification and fallback (if NetworkManager resisted change)
+  applied_mtu=$(ip link show "$iface" 2>/dev/null | grep -oE "mtu [0-9]+" | awk '{print $2}')
+  if [[ "$applied_mtu" != "$new_mtu" ]]; then
+    echo "[WARN] MTU still $applied_mtu — forcing full NM restart..." >>"$log_file"
+    echo "$SUDO_PASSWORD" | sudo -S -k -p "" systemctl restart NetworkManager >>"$log_file" 2>&1
+    sleep 4
+    echo "$SUDO_PASSWORD" | sudo -S -k -p "" ip link set dev "$iface" mtu "$new_mtu" >>"$log_file" 2>&1
+  fi
+
+  # Final check
+  applied_mtu=$(ip link show "$iface" 2>/dev/null | grep -oE "mtu [0-9]+" | awk '{print $2}')
+  echo ""
+  if [[ "$applied_mtu" == "$new_mtu" ]]; then
+    echo "✅ Verification Passed: $iface MTU is now $applied_mtu."
+  else
+    echo "⚠️  Verification Failed: Expected $new_mtu but current value is $applied_mtu."
+    echo "Check detailed logs at: $log_file"
+  fi
+
+}
+
+# --- Function to Change MTU of Network Interface (Unmanaged + Persistent) ---
+change_interface_mtu() {
+  echo ""
+  echo "=== Change Interface MTU (NetworkManager Unmanaged Mode) ==="
+  echo ""
+
+  # Collect non-loopback interfaces and their MTU
+  mapfile -t ifaces < <(ip -o link show | awk -F': ' '!/lo/ {print $2}')
+  mapfile -t mtus < <(ip -o link show | awk -F': ' '!/lo/ {if (match($0, /mtu [0-9]+/)) print substr($0, RSTART+4, RLENGTH-4)}')
+
+  if [[ ${#ifaces[@]} -eq 0 ]]; then
+    echo "No active network interfaces found (excluding loopback)."
+    read -rp "Press [Enter] to return to the main menu..."
+    return
+  fi
+
+  echo "Available network interfaces (with current MTU):"
+  for i in "${!ifaces[@]}"; do
+    printf "%2d. %-10s (MTU: %s)\n" "$((i+1))" "${ifaces[$i]}" "${mtus[$i]}"
+  done
+  echo ""
+
+  # User selects target interface
+  read -rp "Select interface by number or name: " selection
+  if [[ "$selection" =~ ^[0-9]+$ ]] && (( selection >= 1 && selection <= ${#ifaces[@]} )); then
+    iface="${ifaces[$((selection-1))]}"
+  else
+    iface=$(printf "%s\n" "${ifaces[@]}" | grep -m1 -E "^$selection$")
+  fi
+
+  if [[ -z "$iface" ]]; then
+    echo "ERROR: Invalid selection."
+    read -rp "Press [Enter] to return to the main menu..."
+    return
+  fi
+
+  current_mtu=$(ip link show "$iface" | grep -oE "mtu [0-9]+" | awk '{print $2}')
+  echo "Selected interface: $iface (Current MTU: ${current_mtu:-unknown})"
+
+  read -rp "Enter new MTU value [suggested: 1100]: " new_mtu
+  new_mtu=${new_mtu:-1100}
+  if ! [[ "$new_mtu" =~ ^[0-9]+$ ]]; then
+    echo "ERROR: Invalid MTU. Must be numeric."
+    read -rp "Press [Enter] to return to the main menu..."
+    return
+  fi
+
+  echo ""
+  echo "Disabling NetworkManager control for $iface..."
+  echo "$SUDO_PASSWORD" | sudo -S -k -p "" mkdir -p /etc/NetworkManager/conf.d
+  echo "$SUDO_PASSWORD" | sudo -S -k -p "" bash -c \
+    "echo -e '[keyfile]\nunmanaged-devices=interface-name:$iface' > /etc/NetworkManager/conf.d/10-unmanaged-$iface.conf"
+  echo "$SUDO_PASSWORD" | sudo -S -k -p "" systemctl restart NetworkManager
+  sleep 3
+
+  echo "Applying MTU $new_mtu to $iface..."
+  if echo "$SUDO_PASSWORD" | sudo -S -k -p "" ip link set dev "$iface" mtu "$new_mtu" 2>/tmp/install_errors_mtu.log; then
+    echo "Successfully applied MTU $new_mtu to $iface."
+  else
+    echo "ERROR: Failed to set MTU. See /tmp/install_errors_mtu.log."
+    read -rp "Press [Enter] to return to the main menu..."
+    return
+  fi
+
+  # Make persistent via rc.local
+  echo "Updating /etc/rc.d/rc.local for persistence..."
+  echo "$SUDO_PASSWORD" | sudo -S -k -p "" chmod +x /etc/rc.d/rc.local
+  if ! echo "$SUDO_PASSWORD" | sudo -S -k -p "" grep -q "ip link set dev $iface mtu" /etc/rc.d/rc.local; then
+    echo "$SUDO_PASSWORD" | sudo -S -k -p "" bash -c \
+      "echo 'ip link set dev $iface mtu $new_mtu' >> /etc/rc.d/rc.local"
+  fi
+
+  echo ""
+  applied_mtu=$(ip link show "$iface" | grep -oE "mtu [0-9]+" | awk '{print $2}')
+  if [[ "$applied_mtu" == "$new_mtu" ]]; then
+    echo "✅ Verification Passed: $iface MTU is now $applied_mtu."
+  else
+    echo "⚠️  Verification Failed: Expected $new_mtu but current is $applied_mtu."
+  fi
+
+}
 
 # ---------- Main Execution ----------
 
@@ -2041,13 +2229,14 @@ while true; do
     case $choice in
         0) collect_user_inputs && show_menu ;;
         1) configure_system_settings ;;
+        1a) change_interface_mtu ;;
         2) provision_disk ;;
         3) copy_source_directories ;;
         4) generate_ssl_keys ;;
         5) install_nginx ;;
         6) configure_firewall ;;
-	7) install_sarzip_and_zfts_rpms ;;
-	7a) install_zfts_html_files ;;
+        7) install_sarzip_and_zfts_rpms ;;
+        7a) install_zfts_html_files ;;
         8i) pull_container_images ;;
         8n) install_tarball_images ;;
         9) build_and_start_pod ;;
