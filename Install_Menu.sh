@@ -675,6 +675,15 @@ echo "INFO: emptying audit rule file is present  /etc/audit/rules.d/99-podman-lo
  fi
  #some rules may not load until a reboot, due to the "-e 2" setting. thats beyond this script.
 
+#double check perms on .so files globally
+echo "INFO: Finding 0777 shared object and static library files and fixing permissions"
+if run_with_sudo find / -type f -perm 0777 \( -name "*.so" -o -name "*.a" \) -exec chmod 0644 {} \; ; then
+    echo "SUCCESS: Fixed permissions on shared object and static library files"
+else
+    echo "ERROR: Failed to fix permissions on some shared object or static library files"
+    return 1
+fi
+
 
  #V-233185  (only allowed users can run a container)
  #not adding a whole lot of checks here, they fail or they dont.
