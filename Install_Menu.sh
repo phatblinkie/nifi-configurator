@@ -566,6 +566,41 @@ append_to_fstab() {
  fi
 }
 
+# --- Function to Replace auditd Rules Safely ---
+replace_auditd_rules() {
+  echo ""
+  echo "=== Replace auditd Rules ==="
+  echo ""
+
+  # Stop auditd first (this releases file locks)
+  echo "Stopping auditd..."
+  echo "$SUDO_PASSWORD" | sudo -S -k -p "" systemctl stop auditd
+
+  echo "Deleting old rule files..."
+  echo "$SUDO_PASSWORD" | sudo -S -k -p "" rm -f /etc/audit/rules.d/*.rules
+
+  echo "Installing new rule files..."
+  # Example: assumes files are in ./audit_rules/ relative to your script
+  if [[ -d "./rules.d" ]]; then
+    echo "$SUDO_PASSWORD" | sudo -S -k -p "" cp -f ./rules.d/*.rules /etc/audit/rules.d/
+  else
+    echo "WARNING: ./rules.d directory not found; no new rules copied."
+  fi
+
+  # Ensure correct permissions
+  echo "$SUDO_PASSWORD" | sudo -S -k -p "" chmod 0600 /etc/audit/rules.d/*.rules
+
+  echo "Restarting auditd..."
+  echo "$SUDO_PASSWORD" | sudo -S -k -p "" systemctl start auditd
+
+  echo ""
+  echo "Verifying active audit rules..."
+  echo "$SUDO_PASSWORD" | sudo -S -k -p "" auditctl -l || echo "auditctl not available or auditd inactive."
+
+  echo ""
+  read -rp "Press [Enter] to return to the main menu..."
+}
+
 configure_system_settings() {
  echo "INFO: Configuring system settings"
 
@@ -625,7 +660,10 @@ configure_system_settings() {
  fi
 
 
+
  #several STIGS, including  #v-233270 & v233268
+ replace_auditd_rules
+ exit
  echo "INFO: replacing auditd rules"
  if run_with_sudo rm -f /etc/audit/rules.d/* ; then
     echo "SUCCESS: removed old rule files"
@@ -642,11 +680,20 @@ configure_system_settings() {
     return 1
  fi
 
- echo "INFO: updating permissions and ownership in /etc/audit/rules.d/"
- if run_with_sudo chmod 0600 /etc/audit/rules.d/* && run_with_sudo chown root:root /etc/audit/rules.d/* ; then
-    echo "SUCCESS: ownership and permissions set to root and 0600"
+
+ echo "INFO: updating permissions in /etc/audit/rules.d/"
+ if run_with_sudo systemctl stop fapolicyd && run_with_sudo chmod 0600 /etc/audit/rules.d/* ; then
+    echo "SUCCESS: permissions set to 0600"
  else
-    echo "ERROR: unable to set ownership and permissions in /etc/audit/rules.d/*"
+    echo "ERROR: unable to set permissions in /etc/audit/rules.d/*"
+    return 1
+ fi
+
+ echo "INFO: updating ownership in /etc/audit/rules.d/"
+ if run_with_sudo chown root:root /etc/audit/rules.d/* ; then
+    echo "SUCCESS: ownership set to root"
+ else
+    echo "ERROR: unable to set ownership in /etc/audit/rules.d/*"
     return 1
  fi
 
