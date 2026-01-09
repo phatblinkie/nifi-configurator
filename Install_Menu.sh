@@ -574,31 +574,45 @@ replace_auditd_rules() {
 
   # Stop auditd first (this releases file locks)
   echo "Stopping auditd..."
-  echo "$SUDO_PASSWORD" | sudo -S -k -p "" systemctl stop auditd
+  # dont show message about cant stop it, because its immutable until reboot
+  run_with_sudo systemctl stop auditd 2>&1 >/dev/null
 
   echo "Deleting old rule files..."
-  echo "$SUDO_PASSWORD" | sudo -S -k -p "" rm -f /etc/audit/rules.d/*.rules
+  run_with_sudo rm -f /etc/audit/rules.d/*.rules
 
   echo "Installing new rule files..."
   # Example: assumes files are in ./audit_rules/ relative to your script
   if [[ -d "./rules.d" ]]; then
-    echo "$SUDO_PASSWORD" | sudo -S -k -p "" cp -f ./rules.d/*.rules /etc/audit/rules.d/
+    run_with_sudo cp -f ./rules.d/*.rules /etc/audit/rules.d/
   else
     echo "WARNING: ./rules.d directory not found; no new rules copied."
   fi
 
+echo "INFO: emptying audit rule file is present  /etc/audit/rules.d/99-podman-load.rules"
+ if [ -e /etc/audit/rules.d/99-podman-load.rules ]; then
+    if run_with_sudo truncate -s 0 /etc/audit/rules.d/99-podman-load.rules; then
+        echo "SUCCESS: emptied /etc/audit/rules.d/99-podman-load.rules"
+    else
+        echo "ERROR: unable to empty /etc/audit/rules.d/99-podman-load.rules"
+        return 1
+    fi
+ else
+    echo "INFO: /etc/audit/rules.d/99-podman-load.rules not present, skipping"
+ fi
+
   # Ensure correct permissions
-  echo "$SUDO_PASSWORD" | sudo -S -k -p "" chmod 0600 /etc/audit/rules.d/*.rules
+  run_with_sudo find /etc/audit/rules.d/ -type f -name "*.rules" -exec chmod 0600 {} \;
 
   echo "Restarting auditd..."
-  echo "$SUDO_PASSWORD" | sudo -S -k -p "" systemctl start auditd
+  run_with_sudo systemctl start auditd
 
   echo ""
-  echo "Verifying active audit rules..."
-  echo "$SUDO_PASSWORD" | sudo -S -k -p "" auditctl -l || echo "auditctl not available or auditd inactive."
-
+  echo "=== Replace auditd Rules ==="
+  echo "SUCCESS: Auditd rules replaced."
+  echo "=== Be advised, a system restart will be required to load new rules due to immutable settings ==="
+  #good enough, it will have the right rules on restart, best we can do with script automation at a bash level.
+  read -rp "Press [Enter] to acknowledge and continue..."
   echo ""
-  read -rp "Press [Enter] to return to the main menu..."
 }
 
 configure_system_settings() {
@@ -663,63 +677,7 @@ configure_system_settings() {
 
  #several STIGS, including  #v-233270 & v233268
  replace_auditd_rules
- exit
- echo "INFO: replacing auditd rules"
- if run_with_sudo rm -f /etc/audit/rules.d/* ; then
-    echo "SUCCESS: removed old rule files"
- else
-    echo "ERROR: unable to delete files from /etc/audit/rules.d/*"
-    return 1
- fi
 
- echo "INFO: inserting new ruleset to /etc/audit/rules.d/"
- if run_with_sudo cp -vf rules.d/* /etc/audit/rules.d/ ; then
-    echo "SUCCESS: new audit rules placed"
- else
-    echo "ERROR: unable to move rules to /etc/audit/rules.d/*"
-    return 1
- fi
-
-
- echo "INFO: updating permissions in /etc/audit/rules.d/"
- if run_with_sudo systemctl stop fapolicyd && run_with_sudo chmod 0600 /etc/audit/rules.d/* ; then
-    echo "SUCCESS: permissions set to 0600"
- else
-    echo "ERROR: unable to set permissions in /etc/audit/rules.d/*"
-    return 1
- fi
-
- echo "INFO: updating ownership in /etc/audit/rules.d/"
- if run_with_sudo chown root:root /etc/audit/rules.d/* ; then
-    echo "SUCCESS: ownership set to root"
- else
-    echo "ERROR: unable to set ownership in /etc/audit/rules.d/*"
-    return 1
- fi
-
-echo "INFO: emptying audit rule file is present  /etc/audit/rules.d/99-podman-load.rules"
- if [ -e /etc/audit/rules.d/99-podman-load.rules ]; then
-    if run_with_sudo truncate -s 0 /etc/audit/rules.d/99-podman-load.rules; then
-        echo "SUCCESS: emptied /etc/audit/rules.d/99-podman-load.rules"
-    else
-        echo "ERROR: unable to empty /etc/audit/rules.d/99-podman-load.rules"
-        return 1
-    fi
- else
-    echo "INFO: /etc/audit/rules.d/99-podman-load.rules not present, skipping"
- fi
-
-    #run_with_sudo augenrules
-    #this system has duplicated rules, which prevents it from loading, so be nice and filter them out of the final results
-    #too bad augenrules does do this
- echo "INFO: loading new ruleset"
- if run_with_sudo augenrules --load ; then
-	 echo "SUCCESS: new rules accepted"
- else
-	 echo "ERROR: new rules resulted in an error. aborting... sorry. try as root, augenrules --load and see the error"
-     echo "ERROR: its important to fix this, as auditd will not be compliant without it, re-run this step after debugging the problem"
-     return 1
- fi
  #some rules may not load until a reboot, due to the "-e 2" setting. thats beyond this script.
 
 #double check perms on .so files globally
@@ -746,11 +704,11 @@ fi
 
  #v-270875 (control container resource limits)
  #these dont take effect on existing containers!!!
- run_with_sudo mv configs/containers.conf /etc/containers/
+ run_with_sudo cp -fv configs/containers.conf /etc/containers/
 
 
  #v-233192 (deny all, allow by exception registries)
- run_with_sudo mv configs/registries.conf /etc/containers/registries.conf
+ run_with_sudo cp -fv configs/registries.conf /etc/containers/registries.conf
 
  run_with_sudo chown root:root /etc/containers/*.conf
  run_with_sudo chmod 0644 /etc/containers/*.conf
@@ -2106,7 +2064,93 @@ remove_disk_from_fstab() {
 }
 
 # --- Function to Change MTU of Network Interface (Unmanaged + Persistent) ---
+# --- Function: Change MTU (Full IP + Route Persistence, Unmanaged Mode) ---
 change_interface_mtu() {
+  echo ""
+  echo "=== Change Interface MTU (Persistent, Full IP + Route Reapply) ==="
+  echo ""
+
+  # Gather non-loopback interfaces
+  mapfile -t ifaces < <(ip -o link show | awk -F': ' '!/lo/ {print $2}')
+  mapfile -t mtus   < <(ip -o link show | awk -F': ' '!/lo/ {if (match($0, /mtu [0-9]+/)) print substr($0, RSTART+4, RLENGTH-4)}')
+  [[ ${#ifaces[@]} -eq 0 ]] && { echo "No active network interfaces"; return; }
+
+  echo "Available interfaces (current MTU):"
+  for i in "${!ifaces[@]}"; do
+    printf "%2d. %-10s (MTU: %s)\n" "$((i+1))" "${ifaces[$i]}" "${mtus[$i]}"
+  done
+  echo ""
+  read -rp "Select interface by number or name: " selection
+
+  [[ "$selection" =~ ^[0-9]+$ ]] && ((selection>=1 && selection<=${#ifaces[@]})) && iface="${ifaces[$((selection-1))]}" || iface="$selection"
+  [[ -z "$iface" ]] && { echo "Invalid interface."; return; }
+
+  current_mtu=$(ip link show "$iface" | grep -oE "mtu [0-9]+" | awk '{print $2}')
+  echo "Selected interface: $iface (Current MTU: ${current_mtu:-unknown})"
+
+  read -rp "Enter new MTU value [suggested: 1100]: " new_mtu
+  new_mtu=${new_mtu:-1100}
+  [[ ! "$new_mtu" =~ ^[0-9]+$ ]] && { echo "Invalid entry."; return; }
+
+  echo ""
+  echo "Collecting IP addresses and routes for $iface..."
+  mapfile -t ipv4_addrs < <(ip -4 -o addr show "$iface" | awk '{print $4}')
+  mapfile -t ipv6_addrs < <(ip -6 -o addr show "$iface" | awk '{print $4}')
+  mapfile -t route_lines < <(ip route show dev "$iface")
+
+  echo "  • IPv4: ${ipv4_addrs[*]:-none}"
+  echo "  • IPv6: ${ipv6_addrs[*]:-none}"
+  echo "  • Routes: ${#route_lines[@]}"
+
+  echo ""
+  echo "Disabling NetworkManager control for $iface..."
+  echo "$SUDO_PASSWORD" | sudo -S -k -p "" mkdir -p /etc/NetworkManager/conf.d
+  echo "$SUDO_PASSWORD" | sudo -S -k -p "" bash -c \
+    "echo -e '[keyfile]\nunmanaged-devices=interface-name:$iface' > /etc/NetworkManager/conf.d/10-unmanaged-$iface.conf"
+  echo "$SUDO_PASSWORD" | sudo -S -k -p "" systemctl restart NetworkManager
+  sleep 3
+
+  echo "Applying MTU $new_mtu now..."
+  echo "$SUDO_PASSWORD" | sudo -S -k -p "" ip link set dev "$iface" mtu "$new_mtu"
+  echo "$SUDO_PASSWORD" | sudo -S -k -p "" ip link set dev "$iface" up
+
+    echo ""
+    echo "Constructing persistent /etc/rc.d/rc.local..."
+    tmpfile=$(mktemp)
+    {
+    echo "#!/bin/bash"
+    echo "# Auto‑up script generated $(date)"
+    echo "ip link set dev $iface mtu $new_mtu"
+    echo "ip link set dev $iface up"
+    for ip4 in "${ipv4_addrs[@]}"; do
+        echo "ip addr add $ip4 dev $iface"
+    done
+    for ip6 in "${ipv6_addrs[@]}"; do
+        echo "ip addr add $ip6 dev $iface"
+    done
+    for route in "${route_lines[@]}"; do
+        echo "ip route add $route"
+    done
+    echo "exit 0"
+    } >"$tmpfile"
+
+    # Properly copy file as root
+    echo "$SUDO_PASSWORD" | sudo -S -k -p "" cp "$tmpfile" /etc/rc.d/rc.local
+    rm -f "$tmpfile"
+    echo "$SUDO_PASSWORD" | sudo -S -k -p "" chmod +x /etc/rc.d/rc.local
+
+  echo ""
+  applied_mtu=$(ip link show "$iface" | grep -oE "mtu [0-9]+" | awk '{print $2}')
+  if [[ "$applied_mtu" == "$new_mtu" ]]; then
+    echo "✅ MTU applied successfully: $iface MTU = $applied_mtu"
+  else
+    echo "⚠️ Expected MTU $new_mtu; current $applied_mtu"
+  fi
+
+  echo "Persistent rc.local updated; will restore interface, addresses, and routes on next boot."
+}
+
+change_interface_mtuold() {
   echo ""
   echo "=== Change Interface MTU (NetworkManager Unmanaged Mode) ==="
   echo ""
