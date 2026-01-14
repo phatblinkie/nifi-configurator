@@ -690,6 +690,53 @@ else
 fi
 
 
+ #V-272496
+ run_with_sudo cp -fv configs/sudoers.d.v-272496 /etc/sudoers.d/v-272496
+# V-257929 *****************************
+#set sticky bit on world writable direcotires)
+#find / -type d \( -perm -0002 -a ! -perm -1000 \)
+#chmod a+t [World-Writable Directory]
+## too dangerous to automate, leaving for information only. do not chmod container file systems
+
+#V-257965
+#reverse path filter for ipv4
+#/usr/lib/sysctl.d/50-default.conf
+
+#************************V-257832**************************
+#gssproxy
+#This software is needed for nfs mounts and some samba calls. if it is not installed, install it along with nfs-utils
+#as root
+ #dnf install -y nfs-utils
+
+#************************V-257830**************************
+#(remove anything from epel repos)
+#only ansible was installed from epel
+   #run_with_sudo dnf erase ansible -y
+   echo "INFO: Disabling epel repo"
+   run_with_sudo dnf config-manager --set-disabled epel
+   echo "INFO: Disabling epel-cisco-openh264 repo"
+   run_with_sudo dnf config-manager --set-disabled epel-cisco-openh264
+#***********************************************************
+
+#***********************V-257811****************************
+#(dont allow ptrace except on subordinate commands)
+#1. grep -r kernel.yama.ptrace_scope /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf
+#anywhere it show up as a 0, edit that file and change it to a 1
+#then run 
+#2. sysctl --system
+#***********************************************************
+
+
+#*************************V-257803***************************
+#(disable core dumps)
+#edit as root "/usr/lib/sysctl.d/50-coredump.conf"
+#
+#change kernel.core_pattern=|/usr/lib/systemd/systemd-coredump %P %u %g %s %t %c %h
+#to
+#kernel.core_pattern=|/bin/false
+#************************************************************
+
+
  #V-233185  (only allowed users can run a container)
  #not adding a whole lot of checks here, they fail or they dont.
  run_with_sudo groupadd container-admins

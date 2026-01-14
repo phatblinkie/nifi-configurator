@@ -1,0 +1,1 @@
+%sudoers ALL=(ALL) TYPE=sysadm_t ROLE=sysadm_r ALL
