@@ -1118,6 +1118,12 @@ install_zfts_html_files() {
     return 1
  fi
 
+echo "INFO: Fixing permissions on /usr/share/nginx/html"
+run_with_sudo find /usr/share/nginx/html -type f -exec chmod -v 0644 {} \;
+run_with_sudo find /usr/share/nginx/html -type f -exec chown -v root:root {} \;
+run_with_sudo find /usr/share/nginx/html -type d -exec chmod -v 0755 {} \;
+run_with_sudo find /usr/share/nginx/html -type d -exec chown -v root:root {} \;
+
 }
 
 configure_selinux() {
