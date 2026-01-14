@@ -782,15 +782,43 @@ ACTIVE_GIDS=$(grep "^Groups" /proc/self/status | awk '{for(i=2;i<=NF;i++)print $
       echo
       read -rp "Press [Enter] to acknowledge and log out of this session..."
 
-      if [[ -n "$SSH_CONNECTION" ]]; then
-          echo "INFO: Closing SSH session..."
-          CUR_TTY=$(who -u | awk -v u="$USER_TO_CHECK" '$1==u{print $2; exit}')
-          [[ -n "$CUR_TTY" ]] && pkill -KILL -t "$CUR_TTY" 2>/dev/null || logout
-      else
-          echo "INFO: Closing local terminal session..."
-          CUR_TTY=$(who am i | awk '{print $2}')
-          [[ -n "$CUR_TTY" ]] && pkill -KILL -t "$CUR_TTY" 2>/dev/null || logout
-      fi
+if [[ -n "$SSH_CONNECTION" ]]; then
+    echo "INFO: Closing SSH session..."
+
+    # Get the parent sshd process for the current shell
+    SSHD_PID=$(ps -o ppid= -p $$ | tr -d ' ')
+
+    if [[ -n "$SSHD_PID" ]]; then
+        # Try graceful termination first
+        kill -TERM "$SSHD_PID" 2>/dev/null
+        sleep 2
+        # Force kill if still active
+        kill -KILL "$SSHD_PID" 2>/dev/null
+    else
+        # Fallback: detect sshd tied to this terminal and kill it
+        CUR_TTY=$(tty | sed 's#/dev/##')
+        ps -t "$CUR_TTY" -o pid=,comm= 2>/dev/null | awk '/sshd/ {print $1}' | xargs -r kill -KILL 2>/dev/null
+    fi
+
+else
+    echo "INFO: Closing local terminal session..."
+    CUR_TTY=$(who am i 2>/dev/null | awk '{print $2}')
+    if [[ -n "$CUR_TTY" ]]; then
+        pkill -KILL -t "$CUR_TTY" 2>/dev/null
+    else
+        logout
+    fi
+fi
+
+#if [[ -n "$SSH_CONNECTION" ]]; then
+#          echo "INFO: Closing SSH session..."
+#          CUR_TTY=$(who -u | awk -v u="$USER_TO_CHECK" '$1==u{print $2; exit}')
+#          [[ -n "$CUR_TTY" ]] && pkill -KILL -t "$CUR_TTY" 2>/dev/null || logout
+#      else
+#          echo "INFO: Closing local terminal session..."
+#          CUR_TTY=$(who am i | awk '{print $2}')
+#          [[ -n "$CUR_TTY" ]] && pkill -KILL -t "$CUR_TTY" 2>/dev/null || logout
+#      fi
   else
       echo "INFO: '$USER_TO_CHECK' session already includes $TARGET_GROUP group."
   fi
