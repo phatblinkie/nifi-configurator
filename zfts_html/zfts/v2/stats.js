@@ -255,7 +255,7 @@ function startAirUpdater(base){
 }
 function startGroundUpdater(){
   if(groundUpdateTimer)clearInterval(groundUpdateTimer);
-  groundUpdateTimer=setInterval(()=>fetchInstance("/files","groundTable","Ground"),groundPollInterval);
+  groundUpdateTimer=setInterval(()=>fetchInstance("../api/files","groundTable","Ground"),groundPollInterval);
 }
 
 // ---------- Dropdown change listeners ----------
@@ -308,7 +308,7 @@ function startGroundPinger(){
     const to=setTimeout(()=>ctrl.abort(),8000);
     try{
       const t0=performance.now();
-      const r=await fetch("/files",{cache:"no-store",signal:ctrl.signal});
+      const r=await fetch("../api/files",{cache:"no-store",signal:ctrl.signal});
       clearTimeout(to);
       const ms=Math.round(performance.now()-t0);
       if(!r.ok)throw new Error();
@@ -329,7 +329,7 @@ function startGroundPinger(){
 
 // ---------- Init ----------
 function initGround(){
-  fetchInstance("/files","groundTable","Ground");
+  fetchInstance("../api/files","groundTable","Ground");
   startGroundPinger();
   startGroundUpdater();
 }
