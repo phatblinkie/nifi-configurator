@@ -691,7 +691,9 @@ fi
 
 
  #V-272496
+ echo -e "\nINFO: V-272496: fixing sudoers"
  run_with_sudo cp -fv configs/sudoers.d.v-272496 /etc/sudoers.d/v-272496
+
 # V-257929 *****************************
 #set sticky bit on world writable direcotires)
 #find / -type d \( -perm -0002 -a ! -perm -1000 \)
@@ -701,6 +703,8 @@ fi
 #V-257965
 #reverse path filter for ipv4
 #/usr/lib/sysctl.d/50-default.conf
+echo -e "\nINFO: V-257965: fixing net.ipv4.conf.default.rp_filter = 1"
+echo -e "$SUDO_PASSWORD" |  sudo -S sh -c "sed -i 's/^net\.ipv4\.conf\.default\.rp_filter *= *2/net.ipv4.conf.default.rp_filter = 1/' /usr/lib/sysctl.d/50-default.conf" 2>/dev/null
 
 #************************V-257832**************************
 #gssproxy
@@ -712,9 +716,9 @@ fi
 #(remove anything from epel repos)
 #only ansible was installed from epel
    #run_with_sudo dnf erase ansible -y
-   echo "INFO: Disabling epel repo"
+   echo -e "\nINFO: V-257830 Disabling epel repo"
    run_with_sudo dnf config-manager --set-disabled epel
-   echo "INFO: Disabling epel-cisco-openh264 repo"
+   echo -e "\nINFO: V-257830 Disabling epel-cisco-openh264 repo"
    run_with_sudo dnf config-manager --set-disabled epel-cisco-openh264
 #***********************************************************
 
@@ -724,6 +728,8 @@ fi
 #anywhere it show up as a 0, edit that file and change it to a 1
 #then run 
 #2. sysctl --system
+echo -e "\nINFO: V-257811: limit scope of ptrace to child processes"
+echo -e "$SUDO_PASSWORD" |  sudo -S sh -c "sed -i 's/^kernel\.yama\.ptrace_scope *= *0/kernel.yama.ptrace_scope = 1/' /usr/lib/sysctl.d/10-default-yama-scope.conf" 2>/dev/null
 #***********************************************************
 
 
@@ -734,29 +740,36 @@ fi
 #change kernel.core_pattern=|/usr/lib/systemd/systemd-coredump %P %u %g %s %t %c %h
 #to
 #kernel.core_pattern=|/bin/false
+echo -e "\nINFO: V-257803: Disable coredumps"
+echo -e "$SUDO_PASSWORD" |  sudo -S sh -c "sed -i 's|^kernel\.core_pattern=.*|kernel.core_pattern=\|/bin/false|' /usr/lib/sysctl.d/50-coredump.conf" 2>/dev/null
 #************************************************************
 
 
  #V-233185  (only allowed users can run a container)
  #not adding a whole lot of checks here, they fail or they dont.
+ echo -e "\nINFO: adding group named container-admins"
  run_with_sudo groupadd container-admins
- run_with_sudo chown root:container-admins /usr/bin/podman
- run_with_sudo chmod 750 /usr/bin/podman
+ echo -e "\nINFO: applying group ownership and perms to /usr/bin/podman"
+ run_with_sudo chown -v root:container-admins /usr/bin/podman
+ run_with_sudo chmod -v 750 /usr/bin/podman
  #required for systemctl to run podman after that perm change
+ echo -e "\nINFO: applying facl to /usr/bin/podman"
  run_with_sudo setfacl -m g:$(id -gn):rx /usr/bin/podman
-
+ echo -e "\nINFO: adding root, admin, miadmin to group container-admins"
  run_with_sudo usermod -aG container-admins miadmin
  run_with_sudo usermod -aG container-admins admin
  run_with_sudo usermod -aG container-admins root
 
  #v-270875 (control container resource limits)
  #these dont take effect on existing containers!!!
+ echo -e "\nINFO: V-270875 (container runtime stigs): place limits on containers"
  run_with_sudo cp -fv configs/containers.conf /etc/containers/
 
 
  #v-233192 (deny all, allow by exception registries)
+ echo -e "\nINFO: V-233192 (container runtime stigs): limit registries"
  run_with_sudo cp -fv configs/registries.conf /etc/containers/registries.conf
-
+ echo -e "\nINFO: Fixing permissions on container config files"
  run_with_sudo chown root:root /etc/containers/*.conf
  run_with_sudo chmod 0644 /etc/containers/*.conf
  #check if groups were modifed, if so, sadly, I cannot import them without a fresh login.
@@ -820,10 +833,10 @@ fi
 #          [[ -n "$CUR_TTY" ]] && pkill -KILL -t "$CUR_TTY" 2>/dev/null || logout
 #      fi
   else
-      echo "INFO: '$USER_TO_CHECK' session already includes $TARGET_GROUP group."
+      echo -e "\nINFO: '$USER_TO_CHECK' session already includes $TARGET_GROUP group."
   fi
 
-echo "SUCCESS: System settings configured"
+echo -e "\nSUCCESS: System settings configured"
 
 
 }
