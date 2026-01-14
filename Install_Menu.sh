@@ -1028,15 +1028,15 @@ install_nginx() {
 }
 
 install_zfts_html_files() {
- ##add zfts_html files for customized dashboard
- if run_with_sudo rsync -avh /opt/prgsnap/share/zfts/html /opt/prgsnap/share/zfts/html.original ; then
-    echo "SUCCESS: Created backup copy of zfts html files @ /opt/prgsnap/share/zfts/html.original"
+ ##remove symbolic links if present
+ if run_with_sudo rm -fv /usr/share/nginx/html/index.html ; then
+    echo "SUCCESS: removed default nginx index.html"
     else
-    echo "ERROR: Failed to create backup or original zfts files to /opt/prgsnap/share/zfts/html.original" >&2
+    echo "ERROR: failed to remove /usr/share/nginx/html/index.html" >&2
     return 1
  fi
 
- if run_with_sudo rsync -avh zfts_html/ /opt/prgsnap/share/zfts/html/ ; then
+ if run_with_sudo rsync -avh zfts_html/ /usr/share/nginx/html/ ; then
     echo "SUCCESS: Custom zfts interface files copied"
     else
     echo "ERROR: Failed to copy Customized zfts files to /opt/prgsnap/share/zfts/html/" >&2
