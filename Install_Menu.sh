@@ -918,7 +918,7 @@ provision_disk() {
 
  echo "INFO: Creating mount point /mission-share"
  run_with_sudo mkdir -p /mission-share
- run_with_sudo chmod 0777 /mission-share
+ run_with_sudo chmod 1777 /mission-share
 
  echo "INFO: Mounting $selected_disk to /mission-share"
  if run_with_sudo mount "$selected_disk" /mission-share; then
@@ -1583,7 +1583,13 @@ copy_source_directories() {
         return 1
     fi
 
-
+    echo "INFO: chmod 1777 /mission-share/zfts/{send, receive}"
+    if podman unshare chmod 1777 $rootpath/zfts $rootpath/zfts/send  $rootpath/zfts/receive ; then
+        echo "SUCCESS: chmod 1777 /mission-share/zfts /mission-share/zfts/send /mission-share/zfts/receive"
+    else
+        echo "ERROR: Failed to chmod 1777 /mission-share/zfts /mission-share/zfts/send /mission-share/zfts/receive" >&2
+        return 1
+    fi
 
     echo "SUCCESS: Source directory copying completed"
 }
