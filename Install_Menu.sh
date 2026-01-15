@@ -1,6 +1,6 @@
 #!/bin/bash
 
-script_version="20260105.0"
+script_version="20260115.0"
 # Do not allow to run as root
 if (( $EUID == 0 )); then
  echo "ERROR: This script must not be run as root, run as normal user that will manage the containers. 'miadmin?'" >&2
@@ -1115,6 +1115,66 @@ install_nginx() {
  echo "SUCCESS: Nginx configuration completed"
 }
 
+install_nginx_no_pki() {
+ echo "INFO: Installing and configuring Nginx without pki"
+
+ if ! command -v nginx &> /dev/null; then
+  echo "INFO: Installing nginx"
+  if run_with_sudo dnf --disablerepo="*" install addon-rpms/nginx/*.rpm -y; then
+   echo "SUCCESS: Nginx installed"
+  else
+   echo "ERROR: Failed to install nginx." >&2
+   return 1
+  fi
+ else
+  echo "INFO: Nginx is already installed"
+ fi
+
+ #replace the DOMAIN in the nginx.conf template
+ echo "substituting domain value in nginx template file"
+    if cat configs/nginx.conf.nopki.template | \
+       sed "s|nifi.DOMAIN|$NIFI_DOMAIN_FQDN|g" | sed "s|zfts.DOMAIN|$ZFTS_DOMAIN_FQDN|g" | sed "s|IP_ADDRESS|$IP_ADDRESS|g"> configs/nginx.conf; then
+       echo "SUCCESS: Generated nginx.conf"
+    else
+       echo "ERROR: Failed to create nginx.conf file" >&2
+       return 1
+    fi
+
+ config_source="configs/nginx.conf"
+ config_dest="/etc/nginx/nginx.conf"
+
+ if [ ! -f "$config_source" ]; then
+  echo "ERROR: Source config file $config_source not found" >&2
+  return 1
+ fi
+
+
+ echo "INFO: Copying Nginx configuration"
+ if run_with_sudo cp -vf "$config_source" "$config_dest" && \
+ run_with_sudo chmod -v 0644 "/etc/nginx/nginx.conf"; then
+    echo "SUCCESS: Nginx configuration and files copied"
+    else
+    echo "ERROR: Failed to copy Nginx configuration or files" >&2
+    return 1
+ fi
+
+ run_with_sudo chmod -v 644 "$config_dest"
+ echo "SUCCESS: Nginx configuration permissions set"
+
+ configure_selinux
+
+ echo "INFO: Enabling and starting Nginx service"
+ if run_with_sudo systemctl enable nginx && run_with_sudo systemctl restart nginx; then
+    echo "SUCCESS: Nginx service enabled and started"
+    else
+    echo "ERROR: Failed to enable or start Nginx service" >&2
+    return 1
+ fi
+
+ echo "SUCCESS: Nginx (no pki for zfts) configuration completed"
+}
+
+
 install_zfts_html_files() {
  ##remove symbolic links if present
  if run_with_sudo rm -fv /usr/share/nginx/html/index.html ; then
@@ -2110,7 +2170,8 @@ show_menu() {
     echo " 2)  Provision Disk for Podman Data"
     echo " 3)  Copy container source directories"
     echo " 4)  Generate SSL Certificates - NIFI and Nginx"
-    echo " 5)  Install and Configure Nginx Proxy"
+    echo " 5)  Install and Configure Nginx Proxy -- with pki on zfts"
+    echo " 5a) Install and Configure Nginx Proxy -- no pki on zfts"
     echo " 6)  Configure Firewall"
     echo " 7)  Install zfts and sarzip rpms & enable & start user services"
     echo " 7a) Install zfts customized interface files"
@@ -2351,6 +2412,7 @@ while true; do
         3) copy_source_directories ;;
         4) generate_ssl_keys ;;
         5) install_nginx ;;
+	5a) install_nginx_no_pki ;;
         6) configure_firewall ;;
         7) install_sarzip_and_zfts_rpms ;;
         7a) install_zfts_html_files ;;
