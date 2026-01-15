@@ -1189,9 +1189,15 @@ configure_firewall() {
 
  declare -A PORTS=(
  ["HTTPs"]="443/tcp"
- ["Nifi-ssl"]="8443/tcp"
  ["zfts-listener"]="50001/udp"
  )
+
+#8443 is internal proxy, no need to expose
+# declare -A PORTS=(
+# ["HTTPs"]="443/tcp"
+# ["Nifi-ssl"]="8443/tcp"
+# ["zfts-listener"]="50001/udp"
+# )
 
  for service in "${!PORTS[@]}"; do
  port=${PORTS[$service]}
