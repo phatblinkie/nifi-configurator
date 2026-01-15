@@ -346,9 +346,15 @@ async function handleAction(e,action,label,btn){
   const fid=e.fileID;
   const isAir=(label==="Air"&&airHost);
   const port=document.getElementById("airPort").value||19712;
-  const base=isAir?`/airproxy?target=${airHost}:${port}`:"";
-  const url=isAir?`${base}&path=files/${fid}`:`/files/${fid}`;
-
+  // --- NEW: conditional base/URL per side -------------------
+  let base, url;
+  if (isAir) {
+    base = `/airproxy?target=${airHost}:${port}`;
+    url = `${base}&path=files/${fid}`;            // Air stays the same
+  } else {
+    base = "/api/files";                           // 👈 new ground endpoint
+    url = `${base}/${fid}`;
+  }
   const priSel=document.getElementById(`${label}_${fid}_priSelect`);
   const p=priSel?parseInt(priSel.value):e.priority;
 
@@ -372,7 +378,11 @@ async function handleAction(e,action,label,btn){
 async function handlePriorityChange(e,label){
   const isAir=(label==="Air"&&airHost);
   const port=document.getElementById("airPort").value||19712;
-  const url=isAir?`/airproxy?target=${airHost}:${port}&path=files/${e.fileID}`:`/files/${e.fileID}`;
+  // --- NEW: conditional URL per side -------------------
+  const url = isAir
+    ? `/airproxy?target=${airHost}:${port}&path=files/${e.fileID}`  // Air
+    : `/api/files/${e.fileID}`;                                     // Ground
+  // ----------------------------------------------------
   const s=document.getElementById(`${label}_${e.fileID}_priSelect`);
   const p=parseInt(s.value);
   await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({started:"true",priority:p})});
