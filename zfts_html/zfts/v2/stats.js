@@ -113,64 +113,81 @@ function renderInstance(d,tid,label){
 }
 
 // ---------- Table generation ----------
-function generateTable(table,data,label){
-  const body=table.tBodies[0]||table.createTBody();
-  body.innerHTML="";
-  if(!data||!data.length){
-    const r=body.insertRow();const c=r.insertCell();
-    c.colSpan=9;
-    c.textContent="No files currently in the transfer queue";
-    c.style.textAlign="center";c.style.color="#666";c.style.fontStyle="italic";
+function generateTable(table, data, label) {
+  const body = table.tBodies[0] || table.createTBody();
+  body.innerHTML = "";
+  if (!data || !data.length) {
+    const row = body.insertRow();
+    const cell = row.insertCell();
+    cell.colSpan = 9;
+    cell.textContent = "No files currently in the transfer queue";
+    cell.style.textAlign = "center";
+    cell.style.color = "#666";
+    cell.style.fontStyle = "italic";
     return;
   }
 
-  data.forEach(e=>{
-    const fid=e.fileID;
-    const r=body.insertRow();
-    r.insertCell().textContent=fid;
-    r.insertCell().textContent=e.file_name;
+  data.forEach(e => {
+    const fid = e.fileID;
+    const key = `${label}_${fid}`;          // NEW unique key
+    const row = body.insertRow();
 
+    row.insertCell().textContent = fid;
+    row.insertCell().textContent = e.file_name;
     const inProgress = Number(e.started) === 1;
-    r.insertCell().textContent=inProgress?"Running":"Stopped";
-    r.insertCell().textContent=e.percent_complete.toFixed(2)+" %";
-    const rateNum=typeof e.rate==="object"?parseFloat(e.rate.parsedValue||0):e.rate;
-    r.insertCell().textContent=getRateText(rateNum);
-    r.insertCell().textContent=getRemainingTime(e);
-    r.insertCell().textContent=formatFileSize(e.file_size);
+    row.insertCell().textContent = inProgress ? "Running" : "Stopped";
+    row.insertCell().textContent = e.percent_complete.toFixed(2) + " %";
+    row.insertCell().textContent = getRateText(
+      typeof e.rate === "object" ? parseFloat(e.rate.parsedValue || 0) : e.rate
+    );
+    row.insertCell().textContent = getRemainingTime(e);
+    row.insertCell().textContent = formatFileSize(e.file_size);
 
-    const pri=r.insertCell();
-    const sel=document.createElement("select");
-    sel.id=`${label}_${fid}_priSelect`;
-    for(let i=1;i<=5;i++){
-      const o=document.createElement("option");o.value=i;o.text=i;if(i===e.priority)o.selected=true;sel.add(o);
+    // Priority select
+    const priCell = row.insertCell();
+    const sel = document.createElement("select");
+    sel.id = `${label}_${fid}_priSelect`;
+    for (let i = 1; i <= 5; i++) {
+      const o = document.createElement("option");
+      o.value = i;
+      o.text = i;
+      if (i === e.priority) o.selected = true;
+      sel.add(o);
     }
-    const unavailable=(label==="Air"&&!airAvailable)||(label==="Ground"&&!groundAvailable);
-    if(unavailable){sel.disabled=true;sel.style.opacity=0.5;}
-    sel.onchange=()=>handlePriorityChange(e,label);
-    pri.appendChild(sel);
+    const unavailable = (label === "Air" && !airAvailable) || (label === "Ground" && !groundAvailable);
+    if (unavailable) { sel.disabled = true; sel.style.opacity = 0.5; }
+    sel.onchange = () => handlePriorityChange(e, label);
+    priCell.appendChild(sel);
 
-    const action=pendingActions[fid];
-    const isStarting=action==="starting";
-    const isStopping=action==="stopping";
-    const isCancelling=action==="cancelling";
+    // Determine button states using prefixed key
+    const action = pendingActions[key];
+    const isStarting = action === "starting";
+    const isStopping = action === "stopping";
+    const isCancelling = action === "cancelling";
 
-    const act=r.insertCell();
-    const mk=(txt,dis)=>{const b=document.createElement("button");b.textContent=txt;b.disabled=dis;b.onclick=()=>handleAction(e,txt,label,b);return b;};
+    const act = row.insertCell();
+    const mk = (txt, dis) => {
+      const b = document.createElement("button");
+      b.textContent = txt;
+      b.disabled = dis;
+      b.onclick = () => handleAction(e, txt, label, b);
+      return b;
+    };
 
-    const sTxt=isStarting?"Sending…":"Start";
-    const startB=mk(sTxt,inProgress||isStarting);
-    if(isStarting)startB.classList.add("sending");
+    const startB = mk(isStarting ? "Sending…" : "Start", inProgress || isStarting);
+    if (isStarting) startB.classList.add("sending");
     act.appendChild(startB);
 
-    const stopTxt=isStopping?"Stopping…":"Stop";
-    const stopB=mk(stopTxt,!inProgress||isStopping);
-    if(isStopping)stopB.classList.add("stopping");
+    const stopB = mk(isStopping ? "Stopping…" : "Stop", !inProgress || isStopping);
+    if (isStopping) stopB.classList.add("stopping");
     act.appendChild(stopB);
 
-    const cancelTxt=isCancelling?"Cancelling…":"Cancel";
-    const cancelB=mk(cancelTxt,isCancelling);
-    if(isCancelling)cancelB.classList.add("cancelling");
+    const cancelB = mk(isCancelling ? "Cancelling…" : "Cancel", isCancelling);
+    if (isCancelling) cancelB.classList.add("cancelling");
     act.appendChild(cancelB);
+
+    if (isStarting && inProgress) delete pendingActions[key];
+    if (isStopping && !inProgress) delete pendingActions[key];
   });
 }
 
@@ -335,57 +352,70 @@ function initGround(){
 }
 
 // ---------- Actions ----------
-async function handleAction(e,action,label,btn){
-  if(label==="Air" && !airHost){
-    alert("Air connection not active — reconnect first.");return;
+async function handleAction(e, action, label, btn) {
+  if (label === "Air" && !airHost) {
+    alert("Air connection not active — reconnect first."); return;
   }
-  if(label==="Ground" && !groundAvailable){
-    alert("Ground service not available.");return;
+  if (label === "Ground" && !groundAvailable) {
+    alert("Ground service not available."); return;
   }
 
-  const fid=e.fileID;
-  const isAir=(label==="Air"&&airHost);
-  const port=document.getElementById("airPort").value||19712;
-  // --- NEW: conditional base/URL per side -------------------
+  const fid = e.fileID;
+  const key = `${label}_${fid}`;                // unique key
+  const isAir = label === "Air" && airHost;
+  const port = document.getElementById("airPort").value || 19712;
+
   let base, url;
   if (isAir) {
     base = `/airproxy?target=${airHost}:${port}`;
-    url = `${base}&path=files/${fid}`;            // Air stays the same
+    url  = `${base}&path=files/${fid}`;
   } else {
-    base = "/api/files";                           // 👈 new ground endpoint
-    url = `${base}/${fid}`;
+    base = "/api/files";
+    url  = `${base}/${fid}`;
   }
-  const priSel=document.getElementById(`${label}_${fid}_priSelect`);
-  const p=priSel?parseInt(priSel.value):e.priority;
 
-  const payload=
-    action==="Start"?{started:"true",priority:p}:
-    action==="Stop"?{started:"false",cancel:"false"}:
-    {started:"false",cancel:"true"};
+  const priSel = document.getElementById(`${label}_${fid}_priSelect`);
+  const p = priSel ? parseInt(priSel.value) : e.priority;
 
-  pendingActions[fid]=action.toLowerCase()+"ing";
+  const payload =
+    action === "Start" ? { started: "true", priority: p } :
+    action === "Stop"  ? { started: "false", cancel: "false" } :
+                         { started: "false", cancel: "true" };
+
+  pendingActions[key] = action.toLowerCase() + "ing";
   btn.classList.remove("sending","stopping","cancelling");
-  btn.classList.add(action==="Start"?"sending":action==="Stop"?"stopping":"cancelling");
-  btn.disabled=true;
-  btn.textContent=
-    action==="Start"?"Sending…":action==="Stop"?"Stopping…":"Cancelling…";
+  btn.classList.add(action === "Start" ? "sending" : action === "Stop" ? "stopping" : "cancelling");
+  btn.disabled = true;
+  btn.textContent =
+    action === "Start" ? "Sending…" :
+    action === "Stop"  ? "Stopping…" : "Cancelling…";
 
-  try{
-    await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
-  }catch(err){console.warn(`${label} ${action} failed:`,err);}
+  try {
+    await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+  } catch (err) {
+    console.warn(`${label} ${action} failed:`, err);
+  }
 }
 
-async function handlePriorityChange(e,label){
-  const isAir=(label==="Air"&&airHost);
-  const port=document.getElementById("airPort").value||19712;
-  // --- NEW: conditional URL per side -------------------
+async function handlePriorityChange(e, label) {
+  const isAir = label === "Air" && airHost;
+  const port = document.getElementById("airPort").value || 19712;
+
   const url = isAir
-    ? `/airproxy?target=${airHost}:${port}&path=files/${e.fileID}`  // Air
-    : `/api/files/${e.fileID}`;                                     // Ground
-  // ----------------------------------------------------
-  const s=document.getElementById(`${label}_${e.fileID}_priSelect`);
-  const p=parseInt(s.value);
-  await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({started:"true",priority:p})});
+    ? `/airproxy?target=${airHost}:${port}&path=files/${e.fileID}`
+    : `/api/files/${e.fileID}`;
+
+  const s = document.getElementById(`${label}_${e.fileID}_priSelect`);
+  const p = parseInt(s.value);
+  await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ started: "true", priority: p })
+  });
 }
 
 // ---------- User info ----------
