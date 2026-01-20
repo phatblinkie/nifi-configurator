@@ -726,7 +726,7 @@ echo -e "$SUDO_PASSWORD" |  sudo -S sh -c "sed -i 's/^net\.ipv4\.conf\.default\.
 #(dont allow ptrace except on subordinate commands)
 #1. grep -r kernel.yama.ptrace_scope /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf
 #anywhere it show up as a 0, edit that file and change it to a 1
-#then run 
+#then run
 #2. sysctl --system
 echo -e "\nINFO: V-257811: limit scope of ptrace to child processes"
 echo -e "$SUDO_PASSWORD" |  sudo -S sh -c "sed -i 's/^kernel\.yama\.ptrace_scope *= *0/kernel.yama.ptrace_scope = 1/' /usr/lib/sysctl.d/10-default-yama-scope.conf" 2>/dev/null
@@ -1337,47 +1337,56 @@ empty_firewall_rules() {
 
 
 pull_container_images() {
- echo "INFO: Pulling container images"
+    echo "INFO: Pulling container images"
 
- if [ ! -f "versions.txt" ]; then
- echo "ERROR: versions.txt file not found" >&2
- return 1
- fi
+    if [ ! -f "versions.txt" ]; then
+        echo "ERROR: versions.txt file not found" >&2
+        return 1
+    fi
 
- if [ $(grep -c /mission-share /etc/mtab) -eq 0 ]; then
- echo "ERROR: Please add the 2nd disk and run the mount option in this script first" >&2
- return 1
- fi
+    if [ "$(grep -c /mission-share /etc/mtab)" -eq 0 ]; then
+        echo "ERROR: Please add the 2nd disk and run the mount option in this script first" >&2
+        return 1
+    fi
 
- # Login to registry
- echo "INFO: Logging into registry1.dso.mil"
- if podman login -u Brian_Bowen -p '1q2w3e4r!Q@W#E$R' registry1.dso.mil; then
- echo "SUCCESS: Logged into registry1.dso.mil"
- else
- echo "ERROR: Failed to log into registry1.dso.mil" >&2
- return 1
- fi
+    # Prompt for registry credentials securely
+    echo "===================================================="
+    echo " Secure Login to registry1.dso.mil"
+    echo "===================================================="
+    read -r -p "Username: " REGISTRY_USERNAME
+    read -r -s -p "Password: " REGISTRY_PASSWORD
+    echo ""
+    echo "INFO: Attempting login..."
 
- # Load versions
- . versions.txt
+    # Perform login securely using password-stdin
+    if printf "%s\n" "$REGISTRY_PASSWORD" | podman login --username "$REGISTRY_USERNAME" --password-stdin registry1.dso.mil; then
+        echo "SUCCESS: Logged into registry1.dso.mil"
+    else
+        echo "ERROR: Failed to log into registry1.dso.mil" >&2
+        unset REGISTRY_USERNAME REGISTRY_PASSWORD
+        return 1
+    fi
 
+    # Immediately clear sensitive info from memory
+    unset REGISTRY_USERNAME REGISTRY_PASSWORD
 
- # Pull and tag Nifi
- echo "INFO: Downloading nifi version ${NIFI_VERSION}"
-# if podman pull docker.io/phatblinkie/bigimage:tsb_py && \
-  if podman pull "$NIFI_URL" && \
-podman image tag nifi:${NIFI_VERSION} nifi-custom:${NIFI_VERSION}; then
- echo "SUCCESS: Nifi image pulled and tagged"
- else
- echo "ERROR: Failed to pull or tag Nifi image" >&2
- return 1
- fi
+    # Load versions file
+    . versions.txt
 
- echo "INFO: Listing custom images"
- podman images | egrep "custom|TAG"
- echo "SUCCESS: Image download process completed"
+    # Pull and tag NiFi container image
+    echo "INFO: Downloading NiFi version ${NIFI_VERSION}"
+    if podman pull "$NIFI_URL" && \
+       podman image tag nifi:${NIFI_VERSION} nifi-custom:${NIFI_VERSION}; then
+        echo "SUCCESS: NiFi image pulled and tagged"
+    else
+        echo "ERROR: Failed to pull or tag NiFi image" >&2
+        return 1
+    fi
+
+    echo "INFO: Listing custom images"
+    podman images | egrep "custom|TAG"
+    echo "SUCCESS: Image download process completed"
 }
-
 split_large_files() {
  local dir="${1:-.}"
 
