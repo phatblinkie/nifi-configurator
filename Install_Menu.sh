@@ -157,7 +157,7 @@ collect_user_inputs() {
     DEFAULT_SINGLE_USER_CREDENTIALS_PASSWORD="!Changeme12345"
 
     #zfts defaults
-    DEFAULT_ZFTS_DOMAIN_FQDN="zfts.$DEFAULT_OGS_DOMAIN_NAME"
+    #DEFAULT_ZFTS_DOMAIN_FQDN="zfts.$DEFAULT_OGS_DOMAIN_NAME"
     DEFAULT_IP_ADDRESS="Change me the hosts main ip address"
 
     # Check for variables.conf and load initial values
@@ -195,8 +195,6 @@ SINGLE_USER_CREDENTIALS_USERNAME='${SINGLE_USER_CREDENTIALS_USERNAME:-$DEFAULT_S
 #Nifi pw has to be strong and at least 12 chars log
 SINGLE_USER_CREDENTIALS_PASSWORD='${SINGLE_USER_CREDENTIALS_PASSWORD:-$DEFAULT_SINGLE_USER_CREDENTIALS_PASSWORD}'
 
-#ZFTS-specific
-ZFTS_DOMAIN_FQDN='${ZFTS_DOMAIN_FQDN:-$DEFAULT_ZFTS_DOMAIN_FQDN}'
 IP_ADDRESS='${IP_ADDRESS:-$DEFAULT_IP_ADDRESS}'
 
 
@@ -248,7 +246,7 @@ EOF
         SUMMARY+="#Nifi pw has to be strong and at least 12 chars log\n"
         SUMMARY+="SINGLE_USER_CREDENTIALS_PASSWORD: $SINGLE_USER_CREDENTIALS_PASSWORD\n"
         SUMMARY+="\n"
-        SUMMARY+="ZFTS_DOMAIN_FQDN: $ZFTS_DOMAIN_FQDN\n"
+        #SUMMARY+="ZFTS_DOMAIN_FQDN: $ZFTS_DOMAIN_FQDN\n"
         SUMMARY+="IP_ADDRESS: $IP_ADDRESS\n"
         SUMMARY+="\n"
         SUMMARY+="Does this look correct?"
@@ -277,8 +275,6 @@ SINGLE_USER_CREDENTIALS_USERNAME='$SINGLE_USER_CREDENTIALS_USERNAME'
 #Nifi pw has to be strong and at least 12 chars log
 SINGLE_USER_CREDENTIALS_PASSWORD='$SINGLE_USER_CREDENTIALS_PASSWORD'
 
-#ZFTS-specific
-ZFTS_DOMAIN_FQDN='$ZFTS_DOMAIN_FQDN'
 IP_ADDRESS='$IP_ADDRESS'
 EOF
         echo "Saved values to $VARS_FILE" >> "$ERROR_LOG"
@@ -290,7 +286,7 @@ EOF
         export SINGLE_USER_CREDENTIALS_USERNAME
         export SINGLE_USER_CREDENTIALS_PASSWORD
         #zfts stuff
-        export ZFTS_DOMAIN_FQDN
+        #export ZFTS_DOMAIN_FQDN
         export IP_ADDRESS
         # Exit the loop if user confirms
         break
@@ -405,14 +401,15 @@ generate_ssl_keys() {
  #msnsvr_ip=$(get_default_ip)
  msnsvr_ip=$IP_ADDRESS
  msnsvr_fqdn=$NIFI_DOMAIN_FQDN
- zfts_fqdn=$ZFTS_DOMAIN_FQDN
+ #zfts_fqdn=$ZFTS_DOMAIN_FQDN
 
  domain=$OGS_DOMAIN_NAME
  #used by nginx template
  echo "DOMAIN=$domain" > /mission-share/podman/containers/keys/DOMAIN
  mkdir -p /mission-share/.tmp 2>/dev/null
  local temp_file=$(mktemp)
- echo "$msnsvr_ip $NIFI_DOMAIN_FQDN $ZFTS_DOMAIN_FQDN addedbyscript" > "$temp_file"
+ #echo "$msnsvr_ip $NIFI_DOMAIN_FQDN $ZFTS_DOMAIN_FQDN addedbyscript" > "$temp_file"
+ echo "$msnsvr_ip $NIFI_DOMAIN_FQDN addedbyscript" > "$temp_file"
  echo "INFO: Updating /etc/hosts with msnsvr details"
 
  #only inject if its not there, otherwise remove it first, then inject so its not duplicated
@@ -471,23 +468,23 @@ generate_ssl_keys() {
  read -p "Press [Enter] to continue..."
  clear
 
- echo "INFO: Creating ZFTS proxy certificates"
- printf "$ZFTS_DOMAIN_FQDN\n$OGS_DOMAIN_NAME\n$IP_ADDRESS\n\nUS\nMaryland\nAPG\nFII\n3650\nsilkwave\n" | ./server-cert-gen.sh /mission-share/podman/containers/keys/zfts/
- if rename_ssl_zfts "$ZFTS_DOMAIN_FQDN" "/mission-share/podman/containers/keys/zfts/"; then
-    echo "SUCCESS: renamed ZFTS certificates"
- else
-    echo "ERROR: Failed to rename ZFTS NGINX certificates" >&2
-    return 1
- fi
+# echo "INFO: Creating ZFTS proxy certificates"
+# printf "$ZFTS_DOMAIN_FQDN\n$OGS_DOMAIN_NAME\n$IP_ADDRESS\n\nUS\nMaryland\nAPG\nFII\n3650\nsilkwave\n" | ./server-cert-gen.sh /mission-share/podman/containers/keys/zfts/
+# if rename_ssl_zfts "$ZFTS_DOMAIN_FQDN" "/mission-share/podman/containers/keys/zfts/"; then
+#    echo "SUCCESS: renamed ZFTS certificates"
+# else
+#    echo "ERROR: Failed to rename ZFTS NGINX certificates" >&2
+#    return 1
+# fi
 
- if run_with_sudo cp -v /mission-share/podman/containers/keys/zfts/ssl.zfts.* /etc/pki/tls/; then
-    echo "SUCCESS: NGINX ZFTS certificates copied to /etc/pki/tls"
- else
-    echo "ERROR: Failed to copy NGINX certificates to /etc/pki/tls" >&2
-    return 1
- fi
- read -p "Press [Enter] to continue..."
- clear
+# if run_with_sudo cp -v /mission-share/podman/containers/keys/zfts/ssl.zfts.* /etc/pki/tls/; then
+#    echo "SUCCESS: NGINX ZFTS certificates copied to /etc/pki/tls"
+# else
+#    echo "ERROR: Failed to copy NGINX certificates to /etc/pki/tls" >&2
+#    return 1
+# fi
+# read -p "Press [Enter] to continue..."
+# clear
 
 
  # copy the dod ca
@@ -503,13 +500,13 @@ generate_ssl_keys() {
  echo "INFO: Fixing SELinux context on NGINX keys"
  run_with_sudo semanage fcontext -a -t cert_t "/etc/pki/tls/ssl.crt"
  run_with_sudo semanage fcontext -a -t cert_t "/etc/pki/tls/ssl.key"
- run_with_sudo semanage fcontext -a -t cert_t "/etc/pki/tls/ssl.zfts.crt"
- run_with_sudo semanage fcontext -a -t cert_t "/etc/pki/tls/ssl.zfts.key"
+# run_with_sudo semanage fcontext -a -t cert_t "/etc/pki/tls/ssl.zfts.crt"
+# run_with_sudo semanage fcontext -a -t cert_t "/etc/pki/tls/ssl.zfts.key"
  run_with_sudo semanage fcontext -a -t cert_t "/etc/pki/ca-trust/extracted/pem/DOD_CAs.pem"
  run_with_sudo restorecon -v -F "/etc/pki/tls/ssl.crt"
  run_with_sudo restorecon -v -F "/etc/pki/tls/ssl.key"
- run_with_sudo restorecon -v -F "/etc/pki/tls/ssl.zfts.crt"
- run_with_sudo restorecon -v -F "/etc/pki/tls/ssl.zfts.key"
+# run_with_sudo restorecon -v -F "/etc/pki/tls/ssl.zfts.crt"
+# run_with_sudo restorecon -v -F "/etc/pki/tls/ssl.zfts.key"
  run_with_sudo restorecon -v -F "/etc/pki/ca-trust/extracted/pem/DOD_CAs.pem"
  run_with_sudo chmod 0444 "/etc/pki/ca-trust/extracted/pem/DOD_CAs.pem"
 
@@ -1808,9 +1805,9 @@ build_and_start_pod() {
     fi
 
     echo "SUCCESS: NIFI pod deployment completed"
-    echo "INFO:   NIFI services available:"
-    echo "INFO: - Nifi on ports 8443"
-    echo "INFO: - Parent NGINX proxy on port 443"
+    echo "INFO:   NIFI services configured:"
+    echo "INFO: - Nifi container on port 8443 (no proxy for debugging)"
+    echo "INFO: - Parent NGINX proxy on port 443 @  https://$NIFI_DOMAIN_FQDN/nifi"
     echo "INFO: - initial login username $SINGLE_USER_CREDENTIALS_USERNAME"
     echo "INFO: - initial login password $SINGLE_USER_CREDENTIALS_PASSWORD"
     cd "$OLDPWD"
@@ -2194,7 +2191,7 @@ check_vars_file() {
 	export SINGLE_USER_CREDENTIALS_USERNAME
 	export SINGLE_USER_CREDENTIALS_PASSWORD
         export VARS_FOUND=" \u2714 Vars file found"
-	export ZFTS_DOMAIN_FQDN
+	#export ZFTS_DOMAIN_FQDN
 	export IP_ADDRESS
         return 1
     else
@@ -2226,15 +2223,15 @@ show_menu() {
     echo " 2)  Provision Disk for Podman Data"
     echo " 3)  Copy container source directories"
     echo " 4)  Generate SSL Certificates - NIFI and Nginx"
-    echo " 5) *disabled  Install and Configure Nginx Proxy -- with pki on zfts"
+    echo " 5) *disabled*     Install and Configure Nginx Proxy -- with pki on zfts"
     echo " 5a) Install and Configure Nginx Proxy -- no pki or zfts"
     echo " 6)  Configure Firewall"
     echo " 7)  Install zfts and sarzip rpms & enable & start user services"
-    echo " 7a) *disabled Install zfts customized interface files"
+    echo " 7a) *disabled*     Install zfts customized interface files"
     echo ""
     echo "======================== Image Imports ================================="
     echo "     NOTE: Choose based off networking available "
-    echo " 8i) *disabled Pull Container Images - Internet required"
+    echo " 8i) *disabled*    Pull Container Images - Internet required"
     echo " 8n) Install Packaged Images - No Internet required"
     echo ""
     echo "========================Pod Options====================================="
