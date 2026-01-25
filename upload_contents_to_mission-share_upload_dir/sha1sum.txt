@@ -1,3 +1,6 @@
-ca37a6e8e7b67e5534242001d0bccef385ea1bfd  /mission-share/upload/ironbank-nifi-2.7.1-fips-bc.tar.gz.part.aa
-ed7d7acda8e66ac648aa772e245f69e5df90695e  /mission-share/upload/ironbank-nifi-2.7.1-fips-bc.tar.gz.part.ab
-de1ac200756d40f5beba85fbc5e5594440dfb212  /mission-share/upload/ironbank-nifi-2.7.1-fips-bc.tar.gz.part.ac
+bddb9af3cb3fc98143389cecf3de33a124c0bc6b  /mission-share/upload/nifi-1.24-py.tar.gz.part.aa
+30547d642fa89c183d7d49903b5ba9c154d885fd  /mission-share/upload/nifi-1.24-py.tar.gz.part.ab
+1b79c44dbaadf163de6ea101d6d1d24c48b6ecf8  /mission-share/upload/nifi-1.24-py.tar.gz.part.ac
+3dbaaa0038c3d424dd4062698d5bec96bfb325e0  /mission-share/upload/nifi-1.24-py.tar.gz.part.ad
+5dbbb9bf12031c9f35f223448e642fae270a835d  /mission-share/upload/nifi-1.24-py.tar.gz.part.ae
+00a1321229fa968f72ccd0ea7ca6dc5b65071063  /mission-share/upload/nifi-1.24-py.tar.gz.part.af

@@ -1,13 +1,13 @@
 #!/bin/bash
 
-script_version="20260115.0"
+script_version="1.5"
 # Do not allow to run as root
 if (( $EUID == 0 )); then
- echo "ERROR: This script must not be run as root, run as normal user that will manage the containers. 'miadmin?'" >&2
+ echo "ERROR: This script must not be run as root, run as normal user that will manage the containers. 'admin?'" >&2
  exit 1
 fi
 
-# Only allow to run as admin or uid 1000 -- else compatibility gets borked upd
+# Only allow to run as admin or uid 1000 -- else compatibility gets borked up
 if (( $EUID != 1000 )); then
  echo "ERROR: This script must only br run as the user \"admin\" or a user with UID=1000, your UID is $EUID" >&2
  exit 1
@@ -1305,7 +1305,6 @@ empty_firewall_rules() {
 
  declare -A PORTS=(
  ["HTTPs"]="443/tcp"
- ["Nifi-ssl"]="8443/tcp"
  ["zfts-listener"]="50001/udp"
  )
 
@@ -1643,9 +1642,36 @@ get_ip_addresses() {
     | sort -u
 }
 
+remove_miadmin_pod_and_systemd() {
+#we really need this, so ports dont conflict, since it might have been previously run as the user miadmin.
+#first check if evidence suggests that
+    echo "INFO: checking if miadmin was previously using podman"
+    count=$(run_with_sudo ls /home/miadmin/.config/systemd/user/|grep -c service)
+    if [ $count -gt 0 ]
+    then
+	    echo -e "\nINFO: found $count systemctl files found for user miadmin!\n"
+	    echo -e "\nINFO: stopping pod-ogs service found running as user miadmin\n"
+	    echo -e "$SUDO_PASSWORD\n" | sudo -S su - miadmin -c "XDG_RUNTIME_DIR=/run/user/1001 systemctl --user disable --now pod-ogs.service" 2>/dev/null
+	    echo -e "\nINFO: removing service files for user miadmin \n"
+	    run_with_sudo rm -rfv /home/miadmin/.config/systemd/user/
+	    #recheck the count
+	    count2=$(run_with_sudo ls /home/miadmin/.config/systemd/user/|grep -c service)
+	    if [ $count2 -eq 0 ] ; then
+		   echo -e "SUCCESS: disabled and stopped pod-ogs.service\n"
+		   #service is disabled and stopped, removing the files so its not detected on subsequent runs
+	    else
+		   echo -e "WARNING: unexpectedly found $count2 service files left. unknown if ogs-pod.service was disabled or stopped\n"
+	    fi
+
+    else
+	    echo -e "INFO: no systemctl files found for user miadmin, skipping removal of them\n"
+    fi
+}
+
 
 build_and_start_pod() {
-    echo "INFO: Building and starting NIFI pod"
+    remove_miadmin_pod_and_systemd
+    echo -e "\nINFO: Building and starting NIFI pod\n"
 
     podmanshare="/mission-share/podman"
     echo "INFO: Setting SELinux context for $podmanshare"
@@ -1701,7 +1727,8 @@ build_and_start_pod() {
 	echo "---> image name: $NIFI_IMAGENAME, image version: $NIFI_VERSION"
     else
         echo "ERROR: Failed to generate NIFI pod YAML" >&2
-        return 1
+        cd $OLDPWD
+	return 1
     fi
 
     echo "INFO: Creating Systemd directories"
@@ -1717,6 +1744,7 @@ build_and_start_pod() {
         echo "SUCCESS: pod yml file copied to /mission-share/podman/containers/nifi-pod.yml"
     else
         echo "ERROR: Failed to copy pod yml file" >&2
+	cd $OLDPWD
         return 1
     fi
 
@@ -1725,6 +1753,7 @@ build_and_start_pod() {
         echo "SUCCESS: Initial NIFI pod created"
     else
         echo "ERROR: Failed to create initial NIFI pod" >&2
+	cd $OLDPWD
         return 1
     fi
 
@@ -1734,6 +1763,7 @@ build_and_start_pod() {
         echo "SUCCESS: Systemd service files generated and moved"
     else
         echo "ERROR: Failed to generate or move systemd service files" >&2
+	cd $OLDPWD
         return 1
     fi
 
@@ -1742,6 +1772,7 @@ build_and_start_pod() {
         echo "SUCCESS: Systemd user daemon reloaded"
     else
         echo "ERROR: Failed to reload systemd user daemon" >&2
+	cd $OLDPWD
         return 1
     fi
 
@@ -1757,6 +1788,7 @@ build_and_start_pod() {
         echo "SUCCESS: pod-nifi.service enabled and started"
     else
         echo "ERROR: Failed to enable or start pod-nifi.service" >&2
+	cd $OLDPWD
         return 1
     fi
 
@@ -1771,6 +1803,7 @@ build_and_start_pod() {
         echo "SUCCESS: Linger enabled for user $USER"
     else
         echo "ERROR: Failed to enable linger for user $USER" >&2
+	cd $OLDPWD
         return 1
     fi
 
@@ -2170,6 +2203,13 @@ check_vars_file() {
     fi
 }
 
+check_mission_share_ownership() {
+#we need to make sure, since we are possibly changing users, that /mission-share is not owned my miadmin, if so freakout and make them run option u2
+if [ "$(stat -c %U /mission-share/podman 2>/dev/null)" = "miadmin" ]; then
+      echo -e "\n\n\n\n[[[[[ EXTREME WARNING!!! - ownership of /mission-share/podman is detected as owned by user miadmin. ]]]]]]\n[[[[[ Please run uninstall option U2 first to clean up this problem before proceeding, or it will surely fail ]]]]]]\n\n\n\n"
+fi
+}
+
 # ---------- Menu System ----------
 
 show_menu() {
@@ -2178,6 +2218,7 @@ show_menu() {
     echo "========================================================================"
     echo "       Monitoring Stack Deployment Tool - Ver. $script_version"
     echo "========================================================================"
+    check_mission_share_ownership
     echo " Privileged Operations:"
     echo -e " 0)  Input/adjust container variables $VARS_FOUND"
     echo " 1)  Configure System Settings"
@@ -2185,15 +2226,15 @@ show_menu() {
     echo " 2)  Provision Disk for Podman Data"
     echo " 3)  Copy container source directories"
     echo " 4)  Generate SSL Certificates - NIFI and Nginx"
-    echo " 5)  Install and Configure Nginx Proxy -- with pki on zfts"
-    echo " 5a) Install and Configure Nginx Proxy -- no pki on zfts"
+    echo " 5) *disabled  Install and Configure Nginx Proxy -- with pki on zfts"
+    echo " 5a) Install and Configure Nginx Proxy -- no pki or zfts"
     echo " 6)  Configure Firewall"
     echo " 7)  Install zfts and sarzip rpms & enable & start user services"
-    echo " 7a) Install zfts customized interface files"
+    echo " 7a) *disabled Install zfts customized interface files"
     echo ""
     echo "======================== Image Imports ================================="
     echo "     NOTE: Choose based off networking available "
-    echo " 8i) Pull Container Images - Internet required"
+    echo " 8i) *disabled Pull Container Images - Internet required"
     echo " 8n) Install Packaged Images - No Internet required"
     echo ""
     echo "========================Pod Options====================================="
@@ -2426,12 +2467,12 @@ while true; do
         2) provision_disk ;;
         3) copy_source_directories ;;
         4) generate_ssl_keys ;;
-        5) install_nginx ;;
+        5disabled) install_nginx ;;
 	5a) install_nginx_no_pki ;;
         6) configure_firewall ;;
         7) install_sarzip_and_zfts_rpms ;;
-        7a) install_zfts_html_files ;;
-        8i) pull_container_images ;;
+        7adisabled) install_zfts_html_files ;;
+        8idisabled) pull_container_images ;;
         8n) install_tarball_images ;;
         9) build_and_start_pod ;;
         u1)

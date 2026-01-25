@@ -1,3 +1,4 @@
 NIFI_IMAGENAME="localhost/nifi-custom"
-NIFI_VERSION="2.7.1-fips-bc"
+#NIFI_VERSION="2.7.1-fips-bc"
+NIFI_VERSION="tsb_py"
 NIFI_URL="registry1.dso.mil/ironbank/opensource/apache/nifi:$NIFI_VERSION"

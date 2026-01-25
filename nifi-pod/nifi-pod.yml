@@ -12,7 +12,7 @@ spec:
 
   containers:
     - name: nifi
-      image: localhost/nifi-custom:2.7.1-fips-bc
+      image: localhost/nifi-custom:tsb_py
 
       env:
         - name: NIFI_WEB_HTTPS_PORT
@@ -45,6 +45,8 @@ spec:
           mountPath: /mission-share/zfts
         - name: nifi-tools
           mountPath: /mission-share/tools
+        - name: nifi-tide
+          mountPath: /mission-share/tide
 
         #libs
         - name: LD_LIBRARY_PATH
@@ -84,6 +86,10 @@ spec:
     - name: nifi-tools
       hostPath:
         path: /mission-share/tools
+        type: DirectoryOrCreate
+    - name: nifi-tide
+      hostPath:
+        path: /mission-share/tide
         type: DirectoryOrCreate
     - name: nifi-sar
       hostPath:
