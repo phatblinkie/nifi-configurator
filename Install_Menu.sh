@@ -1168,7 +1168,7 @@ install_nginx_no_pki() {
     return 1
  fi
 
- echo "SUCCESS: Nginx (no pki for zfts) configuration completed"
+ echo "SUCCESS: Nginx (no pki or zfts) configuration completed"
 }
 
 
@@ -2215,7 +2215,6 @@ show_menu() {
     echo "========================================================================"
     echo "       Monitoring Stack Deployment Tool - Ver. $script_version"
     echo "========================================================================"
-    check_mission_share_ownership
     echo " Privileged Operations:"
     echo -e " 0)  Input/adjust container variables $VARS_FOUND"
     echo " 1)  Configure System Settings"
@@ -2246,6 +2245,7 @@ show_menu() {
     echo "      -- containers, keys, files and images on /mission-share"
     echo "      -- takes /mission-share back to empty state"
     echo " u3) Remove Container Firewall rules"
+    check_mission_share_ownership
 }
 
 
