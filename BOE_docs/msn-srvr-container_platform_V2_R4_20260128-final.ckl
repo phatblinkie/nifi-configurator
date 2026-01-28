@@ -4,7 +4,7 @@
 	<ASSET>
 		<ROLE>Workstation</ROLE>
 		<ASSET_TYPE>Computing</ASSET_TYPE>
-		<HOST_NAME>aap-ui</HOST_NAME>
+		<HOST_NAME>msn-svr</HOST_NAME>
 		<HOST_IP></HOST_IP>
 		<HOST_MAC></HOST_MAC>
 		<HOST_FQDN></HOST_FQDN>
@@ -152,7 +152,7 @@ If TLS 1.2 or greater is not being used for secure container image transport, th
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>6563c239-2b8f-46e4-bf2f-2044e407193f</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>f6ac87c2-1eca-4548-b88f-fcd7016d40a9</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -260,7 +260,7 @@ If TLS 1.2 or greater is not being used for secure communication, this is a find
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>83f9c438-a0e8-4240-97ee-b39b64f3d4c0</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>5ff7e69b-bcf7-48ad-a740-c459710ec2dc</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -375,7 +375,7 @@ If the container platform is not using a centralized user management system for 
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>c336b601-2c65-4eb2-81fe-6a3916f03396</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>54d4c980-5da9-4b41-a21a-dbe8c6855e32</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -487,7 +487,7 @@ If temporary user accounts are not automatically removed or disabled after 72 ho
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>b8b3e6ca-48df-46c8-b99a-7b9374d235b7</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>aa59b9ea-3e68-4dc6-b280-cad7ca5574d1</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -599,7 +599,7 @@ If the container platform does not automatically disable accounts after a 35-day
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>f5c73664-b98c-4d60-8a37-df8869afa948</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>1fae2497-714d-4cfe-acb1-5ca78d20eb9b</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -709,7 +709,7 @@ If audit records are not automatically created upon account creation, this is a 
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>a63e9254-bad4-4179-8851-a085a17aea2c</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>ce396e86-47b7-4b8e-8050-53bb9529b924</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -819,7 +819,7 @@ If account modification is not automatically audited, this is a finding.</ATTRIB
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>0d316e07-71cd-4775-b2a1-80c83b73320e</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>0efbb0cf-34b6-4a58-8281-60638d512f6d</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -929,7 +929,7 @@ If account disabling is not automatically audited, this is a finding.</ATTRIBUTE
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>ce5f67d1-41e0-44db-a5dd-3911591ef0c6</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>9b06f0e4-ebbb-4629-a616-34d998025bfe</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -1039,7 +1039,7 @@ If account removal is not automatically audited, this is a finding.</ATTRIBUTE_D
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>f27e9a5b-78ce-45df-b380-bab0424720de</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>75a87625-20af-4c0d-a2f1-75225fe91633</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -1150,7 +1150,7 @@ If least privilege and need-to-know access is not being used for container platf
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>d62f9924-c1db-4278-b20e-cb7f95306ae2</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>aec9efb8-4ae3-47cc-aea3-2971b4930c06</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -1260,7 +1260,7 @@ If users have access to the container platform runtime that do not have runtime 
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>a0298ed8-6e8c-41b4-b748-b2b37c65965e</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>cde72c76-35ad-41bb-82e2-bd0faae6a682</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -1371,7 +1371,7 @@ If users have access to the container platform keystore that do not have keystor
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>fb1a7859-d5ff-4656-aebf-ef8104e6757b</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>706d3503-47f7-4d6d-b6d2-b270a9043eb0</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -1481,7 +1481,7 @@ If the organization-defined information flow policies are not being enforced, th
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>2f7ffb9d-3e05-4820-81c0-bd8a948f12b3</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>c646ceeb-968f-4e95-b926-2538781b67ad</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -1592,7 +1592,7 @@ If information flow controls are not implemented, this is a finding.</ATTRIBUTE_
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>025ba4d0-b581-4e00-bce3-336fd97cb9f5</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>803b3324-a365-4f36-b8da-680dca83dbab</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -1701,7 +1701,7 @@ If the container platform is not configured to enforce the limit of three consec
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>d9028a0b-8a7d-4189-a095-621a1c7bb753</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>9295f7cd-6b2f-453a-87cd-b32fd1195f46</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -1811,7 +1811,7 @@ If the Standard Mandatory DoD Notice and Consent Banner is not configured or is 
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>6ee27b46-3e08-4226-bdab-a7fa7b369d68</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>d65cb30f-eb61-4644-ba75-9b942eb6bb9f</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -1919,7 +1919,7 @@ If the Standard Mandatory DoD Notice and Consent Banner does not stay on the scr
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>940de4b7-4815-4746-ade2-d2184b8d390f</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>2e2f9b48-d059-418d-b8cd-e473d0769372</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -2027,7 +2027,7 @@ If the container platform is not configured to generate audit records for all Do
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>903e9ba8-ca37-46c9-962e-5b0b0598b5a2</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>afc4c5ec-cae1-49d8-b663-ccb301a574e9</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -2137,7 +2137,7 @@ If the container platform is not configured to only allow the ISSM (or individua
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>bbbe34e2-40d1-44f6-a284-1ab2129bc2ab</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>3f907cf0-8248-480f-931c-a2165a506990</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -2245,7 +2245,7 @@ If the container platform is not configured to generate audit records on success
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>4442489c-3e9c-43f5-a3d3-9e53d84d11ae</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>99213528-5b84-4949-b421-e4a8ab1e7609</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -2359,7 +2359,7 @@ If the container platform is not configured to meet this requirement, this is a 
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>df7478b3-41b0-47a3-9741-174a938f405a</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>7366ffc4-6970-4f40-8223-b3de4749fb28</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -2471,7 +2471,7 @@ If log data does not show the type of event, this is a finding.</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>a2662653-bc78-4363-a1e5-f89e9eae9abf</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>00ab8790-80ce-47c4-88b7-81c9d9814b1c</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -2585,7 +2585,7 @@ If the date and time are not included, this is a finding.</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>35b060bc-3c4c-4ccf-ac4c-a5348c3f2c16</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>ebd670d4-a593-4e20-b076-4db93fd8ddc2</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -2695,7 +2695,7 @@ If the container platform is not configured to generate audit records that ident
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>8b4b2afd-d214-40b7-a823-f08765808697</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>918b84d3-51c1-46a2-b468-f8ab49f2753d</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -2807,7 +2807,7 @@ If the source of the event cannot be determined, this is a finding.</ATTRIBUTE_D
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>3485863d-a6a7-4bce-9012-1f62c27ecfbd</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>13e44a57-f2d1-4baf-9df7-a8f1bb1b1d4d</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -2917,7 +2917,7 @@ If the container platform is not configured to generate audit records with  the 
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>d5894e8a-f378-43e2-baee-442363a0da53</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>0a82a124-d780-4212-97c6-d2608af0e8a4</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -3025,7 +3025,7 @@ If the container platform does not produce logs that establish the identity of t
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>ba7857a4-f2f4-445e-8a84-d104779f637b</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>4637b3d3-8df4-41e0-a8e7-059950456211</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -3135,7 +3135,7 @@ If the container platform is not configured to generate audit records containing
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>975e9e50-da6f-4e62-b168-96e75c5b8e45</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>458f353b-8863-447b-bcde-a6ab9411a2eb</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -3249,7 +3249,7 @@ If the container platform is not meeting this requirement, this is a finding.</A
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>bd1c9198-e51f-4f67-8e89-1bc850fe21f0</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>a71755da-49db-4430-bce2-8bff70cea4a9</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -3357,7 +3357,7 @@ If the container platform is not configured to send audit events to central mana
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>43e5f4aa-3109-4e61-8a66-758fe5e8c164</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>6b952218-e1df-48e7-85c4-b7a062750d50</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -3467,7 +3467,7 @@ If the container platform does not use the internal system clock to generate tim
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>70049aab-d10d-4dd9-a58a-cc54cbddb873</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>be189522-9c44-44a4-a330-f998b9f3ef9f</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -3583,7 +3583,7 @@ If the audit information is not protected from any type of unauthorized read acc
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>db777383-22b8-4091-ae43-ac4216ec0271</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>049a74e8-e5b5-420b-b3bc-5f893a0bd68a</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -3699,7 +3699,7 @@ If the audit log data is not protected from unauthorized modification, this is a
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>7016b037-c026-4847-80fb-85e79a0d839a</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>3c5e46db-09b6-4d22-a6bf-a4eb079398a1</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -3815,7 +3815,7 @@ If the audit log data is not protected from unauthorized deletion, this is a fin
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>6a4cf579-05a3-4c03-baeb-4095e38934cf</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>8546fb97-53e4-4f71-9bb5-c0411009346e</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -3927,7 +3927,7 @@ If the audit tools are not protected from unauthorized access, this is a finding
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>ef7a2b4b-5d6f-4389-a361-b256d2008731</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>d7dde7f1-d280-479c-ab4c-d2dbdfb836cc</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -4039,7 +4039,7 @@ If the audit tools are not protected from unauthorized modification, this is a f
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>8faae3bf-d43d-45b8-8208-369de862bc7d</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>060ed377-98a8-430c-a613-21d91361908f</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -4151,7 +4151,7 @@ If the audit tools are not protected from unauthorized deletion, this is a findi
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>a007911e-b498-407d-9ac1-48776e3ef9f9</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>68a29c8b-5456-4404-ab7e-01f4afd4e7ec</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -4261,7 +4261,7 @@ If FIPS-validated cryptographic mechanisms are not being used to protect the int
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>d006601b-c581-4aa7-b583-2bac1321d76b</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>1e4ec2a0-df65-419a-ab0b-1de7ad4097ad</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -4369,7 +4369,7 @@ If the container platform was built from packages that are not digitally signed 
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>dc4ca8a6-7142-4c14-9c47-92f989e7a8cc</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>625d95ab-2b3a-49ca-9d09-3f58e66aa591</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -4476,7 +4476,7 @@ If container images are not verified or the signature is not verified as a recog
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>bae34f03-c24e-403e-9bf7-0914105d283b</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>55ebcc77-b494-418a-b063-42fdd7bc534c</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -4585,7 +4585,7 @@ If the container platform registry is not limited through user privileges or the
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>9ac90082-fcec-410c-b01e-5c0cd3b0967a</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>1d05f845-de67-402c-8d39-53efbcb41708</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -4695,7 +4695,7 @@ If the container platform runtime is not limited through user privileges or the 
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>3d06fd7e-7723-4501-9d62-b6cdb8bf074d</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>8b3c46c0-1095-4db7-8491-9c199ed347b0</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -4810,7 +4810,7 @@ If the container platform keystore is not limited through user privileges or the
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>50d05f81-6f0e-492d-a9f1-1157da5ef41d</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>3c908a44-6754-4132-ac67-05ca4118b13e</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -4918,7 +4918,7 @@ If non-privileged users can modify configuration files, this is a finding.</ATTR
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>5476c6d1-0500-4133-a39f-97dc6ec69016</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>9417444d-02fd-4719-8123-fd60184c7021</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -5028,7 +5028,7 @@ If non-privileged users can modify key and certificate files, this is a finding.
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>b2cbc230-c2d0-4eb5-ba33-c2fc5f34eec2</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>270a056f-2364-459b-bfda-346c0fb1a66a</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -5136,7 +5136,7 @@ If components are installed that are not used for the intended purpose of the or
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>725670e2-ee27-4ed1-9b2e-ed860609d227</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>f7a573a6-4671-4ffb-921a-16fd9f3834d5</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -5243,7 +5243,7 @@ If container images are stored in the registry and are not being used to offer c
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>cd4e356d-3533-44ac-8fba-040c484d0eeb</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>e44683f4-d4f6-46c6-8c2c-cfc0a120e349</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -5351,7 +5351,7 @@ If any of the ports or protocols is prohibited or not necessary for the operatio
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>baff0199-2f2f-479a-ac47-0958c7b76bd2</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>3dc78f08-9d4e-4fab-9515-f89b254e6c97</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -5465,7 +5465,7 @@ If the container platform allows containers to be instantiated that use privileg
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>fb631f6a-c459-4a58-9e62-e19e544c3865</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>9388a264-1ae6-4440-ba78-23eca24aa4c6</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -5571,7 +5571,7 @@ If users are not uniquely identified or are not authenticated, this is a finding
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>d43357ba-9969-491d-8488-41072d2167ce</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>22f152cc-dc24-47e9-af81-83c3476e583d</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -5677,7 +5677,7 @@ If users are not uniquely identified or are not authenticated, this is a finding
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>6bdb910b-90aa-4c43-b155-0c68fabcfe56</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>65230a40-8f0f-4e75-ab46-7bb031c05408</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -5783,7 +5783,7 @@ If processes acting on behalf of users are not uniquely identified or are not au
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>b0d0f419-8c74-4475-acae-9b0c98688980</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>b631d4c0-5b70-4a2b-8e7a-36559b96aee9</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -5889,7 +5889,7 @@ If processes acting on behalf of users are not uniquely identified or are not au
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>7553de61-ee35-4293-a3eb-b9e5dde6027a</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>7cc0a58c-6ea0-4fb9-977a-246922beb177</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -6006,7 +6006,7 @@ If the container platform does not use multifactor authentication for network ac
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>4f1f05cd-2132-45b7-90fb-0d88b4ed4e45</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>081efa56-8c0d-454e-9413-0d49867ed40d</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -6127,7 +6127,7 @@ If the container platform does not use multifactor authentication for network ac
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>22d2b56f-f832-4d02-8ddf-d3bc283490f7</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>1e8efd5b-4e20-47ff-84e7-1a0c1a680cd7</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -6246,7 +6246,7 @@ If multifactor authentication for local access to privileged accounts is not bei
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>e8ee5955-9f41-4749-b50c-88aa5b5231b0</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>92eb780f-d4e3-4907-994f-12192782697d</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -6365,7 +6365,7 @@ If multifactor authentication for local access to nonprivileged accounts is not 
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>11492b8c-2455-4e93-bf99-acb55d4fea76</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>bd0eff18-a842-4598-89f0-c49eead81d84</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -6481,7 +6481,7 @@ If the container platform is not configured to ensure users are authenticated wi
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>f3f91b8a-4bd8-4551-9f7e-06a4de574ca6</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>f91ceed2-2945-4449-a318-ab84404ec141</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -6593,7 +6593,7 @@ If the container platform is not configured to use FIPS-validated SHA-1 or highe
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>10678ccb-eae7-49de-9278-bb1b5ce0b30c</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>619ea0ea-8e65-4a9c-acd6-df4650e708b8</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -6707,7 +6707,7 @@ If the container platform is not configured to provide replay-resistant authenti
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>df59628d-5f4a-4e57-8631-ef6e6e55cc15</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>c8b3b480-e4a3-42b0-9ea0-620a40491ace</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -6815,7 +6815,7 @@ If the container platform is not configured to uniquely identify all nodes befor
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>14a62a01-ad9a-43f1-9e6a-6527064a282f</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>a51d964c-9ede-49fb-8d5c-da6463e70c56</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -6927,7 +6927,7 @@ If identifiers are not disabled after 35 days of inactivity, this is a finding.<
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>035d2690-1d4a-421c-956c-598dfdbf96f9</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>fe8070b2-69ca-4277-b42b-e230b2a33a70</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -7040,7 +7040,7 @@ If the container platform does not enforce a 15-character password length, this 
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>6ed5612d-34c3-480e-86f6-1051b2d88d88</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>311b72cb-38d2-4a13-92ac-f25b34e52c0c</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -7148,7 +7148,7 @@ If the container platform does not enforce password complexity by requiring that
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>0ef03b49-940b-42cc-a27b-a120bff2a7b5</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>831b3047-d539-419e-bfb4-737180bd8857</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -7256,7 +7256,7 @@ If the container platform does not enforce password complexity by requiring that
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>25fd573a-39f8-49d8-bf3a-2067efcc3bed</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>03752d11-ca77-48c9-8f24-acb2c947633a</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -7364,7 +7364,7 @@ If the container platform does not enforce password complexity by requiring that
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>19a683b2-20f7-4c34-be95-5b0767b20344</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>e5a33e7c-6c3e-4226-a289-cf596ab5e5e7</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -7474,7 +7474,7 @@ If the container platform does not enforce password complexity by requiring that
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>8b6be9d1-4bf1-4cb0-b585-178962050a98</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>5ca5eeaf-0372-4133-9972-bec51d0dae76</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -7582,7 +7582,7 @@ If the container platform does not require the change of at least eight of the t
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>b720ff17-3e44-4281-9529-0f7203d2ebd6</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>ea4ae0a9-3995-4fb1-bb90-f6af035e0e7d</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -7591,10 +7591,10 @@ If the container platform does not require the change of at least eight of the t
 				<STATUS>NotAFinding</STATUS>
 				<FINDING_DETAILS>bbowen 11-20-2025&#xD;
 The podman command runs as user level execution event. This requires them to login to the machine locally or over ssh. The machine itself is hardened to DOD standards for pw complexity and account limits.</FINDING_DETAILS>
-				<COMMENTS>[root@mirhel9 ~]# cat /etc/security/pwquality.conf|grep dif&#xD;
-# difok = 1&#xD;
-# Per CCE-83564-5: Set difok = 8 in /etc/security/pwquality.conf&#xD;
-difok = 8&#xD;
+				<COMMENTS>[root@msn-svr ~]# cat /etc/security/pwquality.conf|grep dif
+# difok = 1
+# Per CCE-83564-5: Set difok = 8 in /etc/security/pwquality.conf
+difok = 8
 </COMMENTS>
 				<SEVERITY_OVERRIDE></SEVERITY_OVERRIDE>
 				<SEVERITY_JUSTIFICATION></SEVERITY_JUSTIFICATION>
@@ -7713,7 +7713,7 @@ If the container platform is using password authentication and does not store on
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>3dc56983-1a30-4f4d-a6cb-1f453cedd7d6</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>638e156c-9761-4c27-8ac5-bc0d779a2a67</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -7821,7 +7821,7 @@ If the container platform is not configured to meet this requirement, this is a 
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>fa2d2ce9-6fdf-47dc-94d2-415b03c1d48c</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>06506b1a-348e-4f4f-b478-12b1b719f04d</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -7929,7 +7929,7 @@ If the container platform does not enforce 24 hours/1 day as the minimum passwor
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>3b69bb51-423d-48d3-88f2-005d8c9b1212</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>2772110d-a6e2-43fa-89c6-9fcdf1fb666a</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -8041,7 +8041,7 @@ If the container platform does not enforce a 60-day maximum password lifetime re
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>5be3da9a-5179-4089-9f64-5c362304c968</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>2baeb814-454e-417a-986b-b4373c236b72</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -8152,7 +8152,7 @@ If the container platform is not configured to meet this requirement, this is a 
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>d175c4b4-c748-4b1b-b657-827f4d5e6a08</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>97eb39b6-1ea9-45e6-8901-fcc8ed8cc157</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -8262,7 +8262,7 @@ If authentication information is not obfuscated when entered, this is a finding.
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>908a3c7d-5912-4c4f-8f91-6adaaffc8bb1</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>716b3a37-e4ae-48fc-8e17-0f8ea8630340</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -8372,7 +8372,7 @@ If the container platform is not configured to support on-demand reporting requi
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>328e70e9-4016-43a4-873b-6e566d6d6c23</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>a5e16676-022a-4822-8094-9c3784fcd4f5</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -8482,7 +8482,7 @@ If the container platform is not configured to employ strong authenticators in t
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>63c823c3-e332-49c1-9b65-cbe782d490af</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>170ec6b3-1ae1-475d-ab15-60a13b73e548</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -8590,7 +8590,7 @@ If the container platform is not configured or cannot be configured to disconnec
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>26e30511-b085-40c2-ab73-7e7afd94e60e</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>95019335-5a40-428e-b2a1-74973adc75c1</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -8705,7 +8705,7 @@ If the container platform is not configured to separate management and user func
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>f2fbed11-865f-46e3-b6a8-ed850d77985c</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>5b234a91-e77c-42d6-b1c0-8f7316707b00</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -8814,7 +8814,7 @@ If FIPS-validated 140-2 or 140-3 cryptographic modules are not being use, this i
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>633f99ad-31d1-4e32-974c-0b3da4411f88</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>7d22af18-a53f-451a-9531-94889a6ae66f</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -8826,12 +8826,12 @@ podman does not host container registries itself. when it pulls containers it us
 &#xD;
 &#xD;
 </FINDING_DETAILS>
-				<COMMENTS>Podman is FIPS compliant&#xD;
-only when the host system is in FIPS mode and other security requirements are met, as Podman itself does not provide FIPS compliance but relies on the host's FIPS-validated cryptographic modules&#xD;
-&#xD;
-[admin@mirhel9 ~]$ fips-mode-setup --check&#xD;
-FIPS mode is enabled.&#xD;
-[admin@mirhel9 ~]$</COMMENTS>
+				<COMMENTS>Podman is FIPS compliant
+only when the host system is in FIPS mode and other security requirements are met, as Podman itself does not provide FIPS compliance but relies on the host's FIPS-validated cryptographic modules
+
+[admin@msn-svr ~]$ fips-mode-setup --check
+FIPS mode is enabled.
+</COMMENTS>
 				<SEVERITY_OVERRIDE></SEVERITY_OVERRIDE>
 				<SEVERITY_JUSTIFICATION></SEVERITY_JUSTIFICATION>
 			</VULN>
@@ -8928,7 +8928,7 @@ If the container platform runtime cannot be configured to fail securely, this is
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>eaeab9de-fd31-479b-a01c-8405d165e070</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>a0e9f7b7-0faa-4993-a798-54adcad0d795</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -9034,7 +9034,7 @@ If the information is not preserved, this is a finding.</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>eb680aa5-c965-4b8b-9533-9e1e0eb4fe5d</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>b5e3e1cb-7fee-4d92-80de-9d91556913c7</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -9144,7 +9144,7 @@ If security-related functions are not separate, this is a finding.</ATTRIBUTE_DA
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>1f414354-c9b6-4512-8451-0420078c88f7</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>9c70eade-d560-4bcd-8748-6fb8855cef67</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -9258,7 +9258,7 @@ If emergency accounts are automatically removed or disabled, this is a finding.<
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>152c7eb8-b48d-4ea9-bd46-951af15f6823</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>23ebcf75-4624-4f0d-bd0a-f032aa174389</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -9370,7 +9370,7 @@ If the container platform does not block containers requesting host system privi
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>56bb8ed0-1764-4995-b333-b37d0718cbdb</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>91408283-f30d-4adf-9dee-39e4b9e38dee</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -9480,7 +9480,7 @@ If the container platform configuration settings do not effectively implement th
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>82cb9e81-8c97-4228-9746-70f42179f14f</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>5a08f0d5-50e6-4296-a087-99f5679caa21</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -9586,7 +9586,7 @@ If the container platform is not configured to restrict this ability, this is a 
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>32362d15-5a31-46f9-8d7b-36868ac18e78</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>3ece0f38-77bc-4596-8c3b-b3e722500308</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -9702,7 +9702,7 @@ If the container platform writes sensitive or potentially harmful information in
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>0587de60-427e-4442-81ed-bc37ad040a28</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>9bdc5996-d47b-4189-8f48-4a1c9956bdff</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -9814,7 +9814,7 @@ If audit tools are not protected through cryptographic mechanisms, this is a fin
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>5f231546-b31c-404a-8d3d-578afcd0592a</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>4b3ea206-c2b9-4494-bc4f-a0d2666311fa</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -9922,7 +9922,7 @@ If SAs and ISSO are not notified, this is a finding.</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>c9c9535f-f2af-4386-818b-cf9362b13254</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>5bf929cb-7538-447b-8980-1e8a8917367e</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -10030,7 +10030,7 @@ If system administrators and ISSO are not notified, this is a finding.</ATTRIBUT
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>f8d13a9c-9459-4052-9b78-ec3c8d033138</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>4abe4154-3731-4dde-8815-f76872c93595</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -10138,7 +10138,7 @@ If system administrators and ISSO are not notified, this is a finding.</ATTRIBUT
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>e2d377f2-2464-49e0-a775-42aa5fd7b1c8</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>3b82e24a-752f-44d1-b4ad-40fe0a0c6a34</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -10246,7 +10246,7 @@ If system administrators and ISSO are not notified, this is a finding.</ATTRIBUT
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>ef2ec9ae-1d55-4aec-b17f-6791277a4463</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>717163f7-a7ec-4857-9681-c19ec9c71755</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -10352,7 +10352,7 @@ If the container platform does not display a logout message, this is a finding.<
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>3e28f5b4-2cf0-489c-9721-0dbfc75c2387</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>ad229d9d-0a7c-4dd9-8c95-652836c39824</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -10458,7 +10458,7 @@ If the container platform does not terminated shared/group account credentials w
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>44cd7f02-6ac2-4853-a3a4-ccd51a383964</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>ecf3bbc3-47d5-4e2d-b768-dc1dac25396a</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -10566,7 +10566,7 @@ If the container platform is not configured to automatically audit account-enabl
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>952fafe5-563e-4413-a0b2-d2bf6f8b5c59</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>5aab4238-a274-4b54-8c35-21dcf1a1fe50</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -10676,7 +10676,7 @@ If the container platform is not configured to notify the SA and ISSO of account
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>dae5801a-b7db-46c2-8eb4-d78753e10789</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>50419f1b-f3de-4a79-8ffb-86763d439d55</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -10784,7 +10784,7 @@ If the configuration does not protect all of the actions defined as privileged, 
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>880fbf35-4d5e-425f-a02a-712815ad09a4</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>e6a0e31d-5f5a-4701-b06a-b78438afc26e</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -10894,7 +10894,7 @@ If the container platform does not block containers requesting privileged permis
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>2af4f2e8-ce2b-4d7e-bef7-096610e0cb65</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>ef80f497-36e1-40cf-80fc-5f671a3c2736</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -11000,7 +11000,7 @@ If the container platform is not configured to log privileged activity, this is 
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>3f806534-e46b-45b5-8e13-68ad0e3af707</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>8645e227-a522-4080-944c-d9eda43ec389</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -11106,7 +11106,7 @@ If the container platform is not configured to lock the account, this is a findi
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>9c8369eb-22bd-464b-a9bc-88953e111766</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>0950965f-9ebd-4f34-bb02-f48a846948ad</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -11216,7 +11216,7 @@ If changes in audit configuration cannot take effect until after a certain time 
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>ec2001db-f30b-40d4-a6e1-4e9ea4a24572</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>8ebc6dd7-41c4-4303-bba1-d968f4e4e187</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -11324,7 +11324,7 @@ If audit record storage capacity is not allocated in accordance with organizatio
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>00144245-f8da-459e-8509-d3cee2a16094</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>ad6d2fc1-10a1-4cb9-8a39-a01469edff6d</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -11431,7 +11431,7 @@ If logs are not being off-loaded, this is a finding.</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>dbc7e37f-4e52-4742-9361-8053d39df00b</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>cd3da0cc-695a-4795-8a2b-2bb95e81a7c6</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -11537,7 +11537,7 @@ If the container platform is not configured to provide an immediate real-time al
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>f26698e8-0361-4329-aa53-dfaaf1022ab4</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>fc73339f-e405-45d3-9038-c5bb94dc0630</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -11645,7 +11645,7 @@ If the container platform is not configured to provide an immediate real-time al
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>619d3181-b0c0-4dfb-8ed0-dbe51bc8d96a</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>548f0d65-a343-4481-97f3-c21177f3e95d</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -11753,7 +11753,7 @@ If the time stamp cannot be mapped to UTC or GMT, this is a finding.</ATTRIBUTE_
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>034a9d9e-fed9-4c21-99a6-2c6c8953145f</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>306458a7-7cf8-4898-a1a2-13735ec018f7</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -11861,7 +11861,7 @@ If the time stamp cannot generate to a one-second granularity, this is a finding
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>826d3a51-6454-4d8e-8b67-24cd32838099</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>f0aa79f9-147c-4abf-94a4-4b0f6b142fe5</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -11969,7 +11969,7 @@ If patches or updates can be installed using a nonprivileged account or the cont
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>01ea4909-f958-47a5-8f77-c568dcf55fa2</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>c307f352-35c0-492f-ae41-d682042ad523</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -12077,32 +12077,32 @@ If container images can be instantiated using an account without the proper priv
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>d24423b2-b473-4107-8008-5a348650df1b</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>074c4606-91a4-45c2-ad19-8b1f274794cb</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
 					<ATTRIBUTE_DATA>CCI-003980</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STATUS>NotAFinding</STATUS>
-				<FINDING_DETAILS>bbowen 11-20-2025&#xD;
-This is handled by linux group membership, if your not in the group named container-admins you cannot run a podman binary&#xD;
-&#xD;
-&#xD;
-[miadmin@mirhel9 ~]$ podman&#xD;
--bash: /usr/bin/podman: Permission denied&#xD;
-[miadmin@mirhel9 ~]$&#xD;
-&#xD;
-&#xD;
-&#xD;
-&#xD;
-&#xD;
-[miadmin@mirhel9 ~]$ podman&#xD;
--bash: /usr/bin/podman: Permission denied&#xD;
-[miadmin@mirhel9 ~]$&#xD;
+				<FINDING_DETAILS>bbowen 11-20-2025
+This is handled by linux group membership, if your not in the group named container-admins you cannot run a podman binary
+
+
+[miadmin@msn-svr ~]$ podman
+-bash: /usr/bin/podman: Permission denied
+
+
+
+
+
+
+[miadmin@mirhel9 ~]$ podman
+-bash: /usr/bin/podman: Permission denied
+[miadmin@mirhel9 ~]$
 </FINDING_DETAILS>
-				<COMMENTS>[root@mirhel9 ~]# ll /usr/bin/podman&#xD;
--rwxr-x---. 1 root container-admins 52475488 Jun 25 10:45 /usr/bin/podman&#xD;
-[root@mirhel9 ~]#&#xD;
+				<COMMENTS>[root@msn-svr ~]# ll /usr/bin/podman
+-rwxr-x---. 1 root container-admins 52475488 Jun 25 10:45 /usr/bin/podman
+
 </COMMENTS>
 				<SEVERITY_OVERRIDE></SEVERITY_OVERRIDE>
 				<SEVERITY_JUSTIFICATION></SEVERITY_JUSTIFICATION>
@@ -12200,7 +12200,7 @@ If any such permissions exist and are not documented and approved, this is a fin
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>0570ea38-99ab-482a-82a2-8f2c4496d0a4</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>3b2dd9c7-19cd-46ee-a538-05f7ddd71a80</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -12306,7 +12306,7 @@ If the container platform does not enforce such access restrictions, this is a f
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>eb3612bf-158f-4ecd-bbb8-639369182f65</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>a106894c-e1d1-48e0-a672-df18c6f65f93</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -12417,7 +12417,7 @@ If these actions are not logged, this is a finding.</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>e8f0c16c-2488-472e-9354-2fec47b82562</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>70645261-ccc6-47fe-9cde-36517d803743</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -12525,7 +12525,7 @@ If additional services or capabilities are present on the system, this is a find
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>d3cf2d7f-979e-4c5c-96ea-3e3f7433bba7</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>0591c5d3-9f86-4b55-9536-ab047f6b14b5</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -12635,7 +12635,7 @@ If the container platform components are not disabled or removed according to th
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>8e911a9c-ed16-4726-b53a-dcb9eaa73f03</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>74d56691-357f-4388-b73d-14e0ed5d3455</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -12747,7 +12747,7 @@ If container platform whitelisting is not utilized or does not follow a deny-all
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>1fcc033f-89b6-4526-9d42-0cb828637ab2</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>839ad91b-d980-4f50-9384-743ff08536ff</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -12884,7 +12884,7 @@ If the container platform does not meet this requirement, this is a finding.</AT
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>e9367456-1653-441f-953b-54251747e61f</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>cb67cc7a-7599-40f8-81a9-43fd6fd6979a</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -12992,7 +12992,7 @@ If multifactor authentication is not configured, this is a finding.</ATTRIBUTE_D
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>21dca0c3-fffc-48f2-86a0-885e8b3c59cb</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>48d2cef4-d84a-400f-8ef7-a7033a1aa250</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -13098,7 +13098,7 @@ If the container platform is not configured to prohibit the use of cached authen
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>37663480-e4a0-44a4-9dfc-4ed9c95ca530</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>a4ebe13e-2a7c-421c-93c4-b7884288af37</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -13204,7 +13204,7 @@ Podman does not handle any authentication or identification subroutines. these a
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>3f015641-5758-4129-822e-2bf43a85daf8</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>e4e38834-83f3-407d-872e-2d86317a61f8</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -13312,7 +13312,7 @@ If the container platform does not accept other federal agency PIV credentials, 
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>266b8ee8-219d-4edd-8690-204abd7805be</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>14f39e08-4754-4ca8-92b1-4ea066a8852e</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -13418,7 +13418,7 @@ If the container platform is not auditing non-local maintenance and diagnostic s
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>410f818d-4fdf-4333-9069-c8e724a1c7ed</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>6062b0e0-48a6-4d72-8c66-c3968d13758d</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -13530,7 +13530,7 @@ If the sessions are not using FIPS-validated HMAC, this is a finding.</ATTRIBUTE
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>54b15833-3855-4977-8881-45b64512542b</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>cdc1631f-ff9d-4714-9f90-60323cf192ef</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -13638,7 +13638,7 @@ If the web management tools and API are not configured to use FIPS-validated Adv
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>af78f8bc-09bb-4e15-aa93-f1b403407c7a</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>b4956ea4-fc87-4d8e-b925-6df74f11e37c</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -13746,7 +13746,7 @@ If privileged access is not given to the scanning application, this is a finding
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>0980a252-d5b4-4d11-9728-0a382fef9331</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>d70c0591-8d3a-4ffc-98fd-bca8bc0f7e5d</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -13852,7 +13852,7 @@ If the container platform is not using NSA-approved cryptography for classified 
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>7d1e0c91-3769-4ff3-89e5-474d62fdb635</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>1c1c6e7c-6fc8-4de3-bfec-189d139b48e9</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -13960,7 +13960,7 @@ If the container platform keystore encryption configuration does not meet system
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>aacc2fd9-ffc4-4c91-b133-272f14c2d1ec</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>6c6eed34-6396-4e3b-89b4-c201918c22ec</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -14072,7 +14072,7 @@ If namespaces use defaults, this is a finding.</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>0683882b-9d8a-4717-9946-3818e17ca1ca</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>88b48a82-da8f-4519-a65a-2656a09a4cc1</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -14186,7 +14186,7 @@ If the container platform cannot be configured to protect against or limit the e
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>9f70a1d5-9bdd-4ab4-be00-e6a2ecee3c78</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>8666d614-f4cd-4e98-bf14-1a7d37a449a8</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -14306,7 +14306,7 @@ If a transmission method is not being used that maintains the confidentiality an
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>cb569bd5-106a-4c40-adad-edea5ff97567</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>6d3c0b98-9502-4054-9569-e92e9d5ca5d3</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -14413,7 +14413,7 @@ If the confidentiality and integrity are not maintained using mechanisms such as
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>4bda5936-a0f4-4bee-a076-040a24c7b973</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>89e04033-251e-4f15-b19c-532858203f20</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -14519,7 +14519,7 @@ If confidentiality and integrity are not maintained using mechanisms such as TLS
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>c4318cff-343f-4bcc-a880-64066b23f641</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>51453333-8c63-4bc9-8a27-9eb87840bde4</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -14629,7 +14629,7 @@ If the container platform does not meet this requirement, this is a finding.</AT
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>da15873b-a78a-4468-a2c4-a39c914ec69e</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>cd677d7d-8483-44db-9939-80806d2ee067</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -14743,7 +14743,7 @@ If safeguards are not in place, this is a finding.</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>3e73a9c6-1a4c-48e8-b36f-e3b807a07221</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>4e25750f-a021-46f5-9247-270869fb481e</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -14859,7 +14859,7 @@ If container platform runtime is not executing latest organization-defined image
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>b16148a7-33b7-48c7-b40c-5c947e2d6a31</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>3168609e-318e-4692-a7ea-d8a815d92174</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -14973,7 +14973,7 @@ If container platform runtime is not executing latest organization-defined image
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>e4d0c174-3082-482b-96f4-228aa284fb89</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>1dc9248b-0b97-4d02-ada1-2a03db6e4205</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -15089,7 +15089,7 @@ The container platform registry should help the user understand where the code i
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>3bd56f53-8ce5-4f3c-b9d7-3e96c1ce2931</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>5c785c97-f491-477a-8ccb-beed8f008fd4</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -15197,7 +15197,7 @@ The container platform registry should help the user understand from where the c
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>723ec788-87b0-4b9f-b11a-27e10f466da4</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>aa334458-53d6-48d3-bd57-70ac13bb8547</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -15307,7 +15307,7 @@ If verification of the correct operation of security functions is not performed,
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>794c511f-68da-4c9a-851b-c983254dd64c</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>6f3a698b-43f9-461c-8834-3405fc907f41</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -15419,7 +15419,7 @@ If it is not, this is a finding.</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>70a21219-05d0-4487-b11f-a35f6e4d8d50</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>38e97295-cc17-4e8e-9a92-5fdb7e4bab35</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -15530,7 +15530,7 @@ If the container platform is not configured to notify organization-defined infor
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>272eeb48-a07c-4066-9caf-d9747bce21c2</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>aa8a894a-6b07-41b2-a5bf-609bbd82bd5a</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -15638,7 +15638,7 @@ If audit records are not generated, this is a finding.</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>b7c28740-b78a-46fb-a53b-a571b62ea44c</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>d5b7ebc3-435f-4b34-b39b-42cd344fe4a7</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -15746,7 +15746,7 @@ If audit records are not generated, this is a finding.</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>0b13e629-fe99-450c-b3c3-f1fee7076aa8</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>8e588996-33ba-4f3c-b1b9-c494a9c40672</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -15854,7 +15854,7 @@ If audit records are not generated, this is a finding.</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>eebb9326-c6d6-47e4-b973-85ffa0a07261</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>e71bbc9e-bc38-4b8c-a71e-78ba6793944d</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -15962,7 +15962,7 @@ If audit records are not generated, this is a finding.</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>eb711305-ba5f-402a-88ca-dda309664340</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>598752a2-e186-47fe-8533-397296067b0d</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -16070,7 +16070,7 @@ If audit records are not generated, this is a finding.</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>e06b989d-b7c4-435b-8998-b8b8e8e74361</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>40df130b-5e3c-4c65-8136-1f18bfea4f16</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -16178,7 +16178,7 @@ If audit records are not generated, this is a finding.</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>44d6d5d2-0800-4652-b615-440ab45d27e6</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>a1600099-1924-4d83-8968-efe9ab7bc2a7</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -16286,7 +16286,7 @@ If audit records are not generated, this is a finding.</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>3206cda5-0609-43d4-a949-e1782592f552</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>fafabf82-20d5-4885-b4af-34bb2876526f</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -16394,7 +16394,7 @@ If audit records are not generated, this is a finding.</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>428217fc-e7b1-44cd-9d1d-dd279f3ed5ec</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>c109a4ae-9ca0-45b8-979d-c824b799f88b</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -16506,7 +16506,7 @@ If audit records are not generated, this is a finding.</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>3873db5b-2d2f-43cf-9c5b-d2c76652197b</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>d24f981a-d5d0-4b0f-a13c-bb1862ee7767</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -16618,7 +16618,7 @@ If audit records are not generated, this is a finding.</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>51ea49c7-6236-46b9-9e73-4550955c8678</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>dd70d117-6999-4589-b625-6c1a2e3628bb</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -16726,7 +16726,7 @@ If audit records are not generated, this is a finding.</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>b28d9bad-a8f3-4448-89ab-94632ae53164</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>62eef237-e62e-440e-aec7-3a459a378eb3</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -16838,7 +16838,7 @@ If logon attempts do not generate log records, this is a finding.</ATTRIBUTE_DAT
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>074713a7-fae9-420f-9110-e37122930274</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>3beee950-1dde-48f1-bbb8-17489a0be1dc</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -16944,7 +16944,7 @@ If log records are not generated for privileged activities, this is a finding.</
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>6c8a44b5-adba-4ea8-95b0-07c54bc5df1b</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>3f59e263-5a08-45a5-8d46-1041d141100e</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -17057,7 +17057,7 @@ If user access start and end times do not generate log records, this is a findin
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>5d717061-0a18-44dd-a51a-3e82f14b81c6</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>8ecdca45-7115-44b6-bd08-2cb4760cf0f4</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -17169,7 +17169,7 @@ If concurrent logons from different workstations and systems do not generate log
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>428eddc8-e689-487f-bca0-c25554ee8ace</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>7588953e-3d33-4f00-9b87-56eb8f8e29a0</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -17277,7 +17277,7 @@ If audit records are not generated by the runtime when objects are successfully/
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>ac936662-1c98-48fb-8224-54ffd8b741d8</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>d1f9b50e-349c-4ea2-80ab-79712777ba5e</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -17392,7 +17392,7 @@ If audit records are not generated, this is a finding.</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>57050f71-6897-4211-9dcc-b509656fc167</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>c4b39eda-a388-4a01-9515-dccefd4ca798</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -17504,7 +17504,7 @@ If the container platform is not configured to generate the audit records, this 
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>ea126d51-b4cc-4b25-9318-e5001753ca75</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>de5aca15-dcfa-40bd-b5d5-4391970e6128</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -17513,12 +17513,12 @@ If the container platform is not configured to generate the audit records, this 
 				<STATUS>NotAFinding</STATUS>
 				<FINDING_DETAILS>bbowen 11-20-2025&#xD;
 This is beyond the scope of podman since it has no user management ability and depends on the host for stuff like that. however the host is properly configured for these checks. Therefore making this as not a finding</FINDING_DETAILS>
-				<COMMENTS>[root@mirhel9 ~]# auditctl -l |grep user&#xD;
--w /etc/group -p wa -k audit_rules_usergroup_modification&#xD;
--w /etc/gshadow -p wa -k audit_rules_usergroup_modification&#xD;
--w /etc/security/opasswd -p wa -k audit_rules_usergroup_modification&#xD;
--w /etc/passwd -p wa -k audit_rules_usergroup_modification&#xD;
--w /etc/shadow -p wa -k audit_rules_usergroup_modification&#xD;
+				<COMMENTS>[root@msn-svr ~]# auditctl -l |grep user
+-w /etc/group -p wa -k audit_rules_usergroup_modification
+-w /etc/gshadow -p wa -k audit_rules_usergroup_modification
+-w /etc/security/opasswd -p wa -k audit_rules_usergroup_modification
+-w /etc/passwd -p wa -k audit_rules_usergroup_modification
+-w /etc/shadow -p wa -k audit_rules_usergroup_modification
 </COMMENTS>
 				<SEVERITY_OVERRIDE></SEVERITY_OVERRIDE>
 				<SEVERITY_JUSTIFICATION></SEVERITY_JUSTIFICATION>
@@ -17616,7 +17616,7 @@ If the container runtime does not generate records for container execution, shut
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>dd365043-1f6a-409b-9027-a0e48763ad6d</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>9fd64692-9a84-4ac7-8d09-e31b7997a16f</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -17625,11 +17625,11 @@ If the container runtime does not generate records for container execution, shut
 				<STATUS>NotAFinding</STATUS>
 				<FINDING_DETAILS>bbowen 11-20-2025&#xD;
 The rules in the auditd confirm these events are logged.</FINDING_DETAILS>
-				<COMMENTS>[root@mirhel9 ~]# grep podman /etc/audit/audit.rules&#xD;
--w /usr/bin/podman -p x -k podman_exec&#xD;
--w /usr/bin/runc   -p x -k podman_runtime&#xD;
--w /usr/bin/crun   -p x -k podman_runtime&#xD;
-[root@mirhel9 ~]#&#xD;
+				<COMMENTS>[root@msn-svr ~]# grep podman /etc/audit/audit.rules
+-w /usr/bin/podman -p x -k podman_exec
+-w /usr/bin/runc   -p x -k podman_runtime
+-w /usr/bin/crun   -p x -k podman_runtime
+
 </COMMENTS>
 				<SEVERITY_OVERRIDE></SEVERITY_OVERRIDE>
 				<SEVERITY_JUSTIFICATION></SEVERITY_JUSTIFICATION>
@@ -17731,7 +17731,7 @@ If non-valid or unapproved FIPS 140-2/140-3 cryptographic modules are being used
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>ae5a9db0-be4d-4444-8239-dafef574280e</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>b9dc2547-7d36-4ae5-bd70-e87617c35480</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -17740,12 +17740,12 @@ If non-valid or unapproved FIPS 140-2/140-3 cryptographic modules are being used
 				<STATUS>NotAFinding</STATUS>
 				<FINDING_DETAILS>bbowen 11-20-2025&#xD;
 podman TLS verification is handled by the host vm config. Podman itself does not present any kind of interface to serve TLS data, and if it reaches out to another host to communicate (for example to pull in a container image), it uses the TLS SSL settings defined on the host. The host is compliant with DOD standards for FIPS and therefore this is not a finding.</FINDING_DETAILS>
-				<COMMENTS>Podman is FIPS compliant&#xD;
-only when the host system is in FIPS mode and other security requirements are met, as Podman itself does not provide FIPS compliance but relies on the host's FIPS-validated cryptographic modules&#xD;
-&#xD;
-[admin@mirhel9 ~]$ fips-mode-setup --check&#xD;
-FIPS mode is enabled.&#xD;
-[admin@mirhel9 ~]$</COMMENTS>
+				<COMMENTS>Podman is FIPS compliant
+only when the host system is in FIPS mode and other security requirements are met, as Podman itself does not provide FIPS compliance but relies on the host's FIPS-validated cryptographic modules
+
+[admin@msn-svr ~]$ fips-mode-setup --check
+FIPS mode is enabled.
+</COMMENTS>
 				<SEVERITY_OVERRIDE></SEVERITY_OVERRIDE>
 				<SEVERITY_JUSTIFICATION></SEVERITY_JUSTIFICATION>
 			</VULN>
@@ -17842,7 +17842,7 @@ If container platform services are not configured in accordance with the securit
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>b02f9729-f81d-44ba-9417-343de966c55e</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>ee1ace26-e009-4759-bdcf-3fabefb2d88f</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -17948,7 +17948,7 @@ If the container platform cannot instantiate industry standard container images,
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>b8b4681f-7e0c-4fe0-aa2b-ad325a891019</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>8efb7fb7-623c-4816-b72a-aa88be89bb8d</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -18056,7 +18056,7 @@ If continuous vulnerability scans are not being performed, this is a finding.</A
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>89ebdafb-c424-426a-ac53-508a5c114774</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>80db201d-6eab-4d41-a038-01d5871c9206</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -18166,7 +18166,7 @@ If communication using TLS versions 1.0 and 1.1, SSL 2.0 and 3.0 is permitted, t
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>c8e2303e-1aac-4b39-9d88-7a5352ddafa1</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>e9dc7634-6bfd-42c4-8169-142d4276e153</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -18291,7 +18291,7 @@ If self-signed certificates are in use, this is a finding.</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>790798b7-009c-4ba8-88a6-3b29eb964279</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>10d4e9d4-be6e-4199-ab57-032d249cd5b6</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -18300,10 +18300,10 @@ If self-signed certificates are in use, this is a finding.</ATTRIBUTE_DATA>
 				<STATUS>NotAFinding</STATUS>
 				<FINDING_DETAILS>bbowen 11-20-2025&#xD;
 podman TLS verification is handled by the host vm config. Podman itself does not present any kind of interface to serve TLS data, and if it reaches out to another host to communicate (for example to pull in a container image), it uses the TLS SSL settings defined on the host. The host is compliant with DOD standards for FIPS and therefore this is not a finding.</FINDING_DETAILS>
-				<COMMENTS>&#xD;
-[admin@mirhel9 ~]$ fips-mode-setup --check&#xD;
-FIPS mode is enabled.&#xD;
-[admin@mirhel9 ~]$</COMMENTS>
+				<COMMENTS>
+[admin@msn-svr ~]$ fips-mode-setup --check
+FIPS mode is enabled.
+</COMMENTS>
 				<SEVERITY_OVERRIDE></SEVERITY_OVERRIDE>
 				<SEVERITY_JUSTIFICATION></SEVERITY_JUSTIFICATION>
 			</VULN>
@@ -18400,7 +18400,7 @@ If a FIPS-validated SHA-2 or higher hash function is not being used for digital 
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>a81da641-44b6-4a3a-a199-231d776c5595</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>a56c3e8d-9bf3-4612-b20b-9d590964b2a8</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -18409,12 +18409,12 @@ If a FIPS-validated SHA-2 or higher hash function is not being used for digital 
 				<STATUS>NotAFinding</STATUS>
 				<FINDING_DETAILS>bbowen 11-20-2025&#xD;
 podman depends on the host for FIPS compliance. the host is compliant</FINDING_DETAILS>
-				<COMMENTS>Podman is FIPS compliant&#xD;
-only when the host system is in FIPS mode and other security requirements are met, as Podman itself does not provide FIPS compliance but relies on the host's FIPS-validated cryptographic modules&#xD;
-&#xD;
-[admin@mirhel9 ~]$ fips-mode-setup --check&#xD;
-FIPS mode is enabled.&#xD;
-[admin@mirhel9 ~]$</COMMENTS>
+				<COMMENTS>Podman is FIPS compliant
+only when the host system is in FIPS mode and other security requirements are met, as Podman itself does not provide FIPS compliance but relies on the host's FIPS-validated cryptographic modules
+
+[admin@msn-svr ~]$ fips-mode-setup --check
+FIPS mode is enabled.
+</COMMENTS>
 				<SEVERITY_OVERRIDE></SEVERITY_OVERRIDE>
 				<SEVERITY_JUSTIFICATION></SEVERITY_JUSTIFICATION>
 			</VULN>
@@ -18515,7 +18515,7 @@ If FIPS-validated cryptographic modules are not being used, this is a finding.</
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>8062ffb4-7ba2-4594-87c1-0d89395f1d9b</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>342dc86e-5aee-4698-85cb-6a46c26101ff</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -18524,12 +18524,12 @@ If FIPS-validated cryptographic modules are not being used, this is a finding.</
 				<STATUS>NotAFinding</STATUS>
 				<FINDING_DETAILS>bbowen 11-20-2025&#xD;
 Fips is enabled on the host, thus limiting podman to only use fips compliant algorythms</FINDING_DETAILS>
-				<COMMENTS>Podman is FIPS compliant&#xD;
-only when the host system is in FIPS mode and other security requirements are met, as Podman itself does not provide FIPS compliance but relies on the host's FIPS-validated cryptographic modules&#xD;
-&#xD;
-[admin@mirhel9 ~]$ fips-mode-setup --check&#xD;
-FIPS mode is enabled.&#xD;
-[admin@mirhel9 ~]$</COMMENTS>
+				<COMMENTS>Podman is FIPS compliant
+only when the host system is in FIPS mode and other security requirements are met, as Podman itself does not provide FIPS compliance but relies on the host's FIPS-validated cryptographic modules
+
+[admin@msn-svr ~]$ fips-mode-setup --check
+FIPS mode is enabled.
+</COMMENTS>
 				<SEVERITY_OVERRIDE></SEVERITY_OVERRIDE>
 				<SEVERITY_JUSTIFICATION></SEVERITY_JUSTIFICATION>
 			</VULN>
@@ -18628,7 +18628,7 @@ If the container platform is using protocols to transmit authentication data une
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>f1c7f8fa-609f-4db4-853a-a57ac612191e</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>063a6a6f-28f2-4dba-9dce-35999b6a53fa</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -18736,7 +18736,7 @@ If the container platform does not enforce organization-defined circumstances an
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>a735bdd5-6f14-49c6-b5f0-c00a4ff73f1d</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>8728f93d-8596-4fbf-911f-6d4eeb9f1b93</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -18842,7 +18842,7 @@ If the container platform is not configured to disable accounts when the account
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>0b031ba5-85af-48e2-9394-bb153fc9ae4c</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>82fecf10-e526-46bc-857b-abd976d5d11f</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -18948,7 +18948,7 @@ If the container platform is not configured to implement the capability to centr
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>7ab7a956-8eee-492e-bfcb-b3ca3ed8189b</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>245792b6-2aa1-4f0a-a68c-191072c86e89</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -19054,7 +19054,7 @@ If the container platform is not configured to alert organization-defined person
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>2de5138b-ce2c-494f-97a6-64092f8f78ec</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>89a1b47f-2a00-40a1-a5f9-d35fe1af4bae</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -19160,7 +19160,7 @@ If the container platform is not configured to implement multifactor authenticat
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>1fa1cc07-e8a3-4ba6-ab4a-75a4820d0ed6</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>4bcceae3-c37d-49a9-808b-72a08ad833c9</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -19266,7 +19266,7 @@ If the container platform is not configured to implement multifactor authenticat
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>d021cf45-fe6e-44a0-9ebd-9ea772546342</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>d1f0c016-0710-4b0b-813d-230b19a12152</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -19372,7 +19372,7 @@ If the container platform is not configured to maintain a list of commonly used,
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>290ba4f6-d841-467f-b938-b4409f4575cc</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>ac48e3bd-3871-4be6-926e-055f38442ab9</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -19478,7 +19478,7 @@ If the container platform is not configured to update the list of passwords on a
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>18181d7d-4968-458b-98c9-dff1d2291807</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>fd6b5149-4bd6-47f3-ac2c-8afb46e307f1</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -19584,7 +19584,7 @@ If the container platform is not configured to update the list of passwords when
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>f0ff95fc-2e11-486b-96ed-54bde7e81489</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>92aa374a-de99-485e-86fd-236f5fd14156</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -19690,7 +19690,7 @@ If the container platform is not configured to verify when users create or updat
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>806ff3fd-2ea3-4fd5-938e-d3912143b1b3</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>1a9efc25-d8ad-4756-b5b3-38b93c6a6336</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -19796,7 +19796,7 @@ If the container platform is not configured to require immediate selection of a 
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>e7663118-605e-49d7-9d6b-b2f575b00b54</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>52505731-a523-4d0c-88c6-1ed982a6302f</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -19903,7 +19903,7 @@ If the container platform is not configured to allow user selection of long pass
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>c84a7de4-ffef-4a06-b19b-9d6f45fa0a89</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>89910ff9-20f7-4a0a-8ee5-943b19f564cd</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -20009,7 +20009,7 @@ If the container platform is not configured to employ automated tools to assist 
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>74a4dda0-75cd-4a6d-8f3d-f563fcad49a8</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>2146c092-f4d3-43c8-a595-efcc7f9fb096</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -20116,7 +20116,7 @@ If the container platform is not configured to protect nonlocal maintenance sess
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>ea69e613-be81-4034-b75d-0e8ecccee317</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>7c77bf28-cbfd-421a-8238-9484bb09735b</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -20222,7 +20222,7 @@ If the container platform is not configured to include only approved trust ancho
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>10be777f-5263-4a22-b140-f1023cb363cc</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>25aa2f24-0041-4e51-8f19-289ec656d69d</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -20328,7 +20328,7 @@ If the container platform is not configured to provide protected storage for cry
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>f8243082-6f4d-4801-ad6c-87ed38e47ae6</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>596e9f43-f356-459b-9453-56df1cd5c107</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -20434,7 +20434,7 @@ If the container platform is not configured to synchronize system clocks within 
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>743d8082-87c8-4cea-afb4-f99950c73386</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>0d37ef99-6875-4bde-874b-a6ddc29f7d0f</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -20540,7 +20540,7 @@ If the container platform does not enforce resource limits, this is a finding.</
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>0b63136c-2342-455a-b4cf-09be627b674e</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>78cf5058-b1aa-461f-8c93-a79de89efc37</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -20549,17 +20549,16 @@ If the container platform does not enforce resource limits, this is a finding.</
 				<STATUS>NotAFinding</STATUS>
 				<FINDING_DETAILS>bbowen 11-20-2025&#xD;
 limits are set</FINDING_DETAILS>
-				<COMMENTS> cat /etc/containers/containers.conf&#xD;
-[containers]&#xD;
-default_ulimits = [&#xD;
-  "nofile=1024:2048",&#xD;
-  "nproc=1024:2048"&#xD;
-]&#xD;
-cpus = 2.0&#xD;
-memory = "4096m"&#xD;
-pids_limit = 100&#xD;
-&#xD;
-[admin@mirhel9 ~]$&#xD;
+				<COMMENTS> cat /etc/containers/containers.conf
+[containers]
+default_ulimits = [
+  "nofile=1024:2048",
+  "nproc=1024:2048"
+]
+cpus = 2.0
+memory = "4096m"
+pids_limit = 100
+
 </COMMENTS>
 				<SEVERITY_OVERRIDE></SEVERITY_OVERRIDE>
 				<SEVERITY_JUSTIFICATION></SEVERITY_JUSTIFICATION>
@@ -20657,7 +20656,7 @@ If the container platform does not enforce such access restrictions, this is a f
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>a1c9e14f-b938-435c-be6e-63f11bab6c0c</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>45ec6dba-7259-4616-85ec-6817de7997d9</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
@@ -20768,7 +20767,7 @@ If the container platform is not a version supported by the vendor, this is a fi
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>STIG_UUID</VULN_ATTRIBUTE>
-					<ATTRIBUTE_DATA>5b437acf-806b-42ba-bd95-80181fbe4502</ATTRIBUTE_DATA>
+					<ATTRIBUTE_DATA>3225885d-29f1-463a-9299-c38f9d329aa7</ATTRIBUTE_DATA>
 				</STIG_DATA>
 				<STIG_DATA>
 					<VULN_ATTRIBUTE>CCI_REF</VULN_ATTRIBUTE>
