@@ -49,15 +49,12 @@ spec:
           mountPath: /mission-share/tide
 
         #libs
-        - name: LD_LIBRARY_PATH
-          mountPath: /usr/lib64/libcompression.so.1
-          subPath: libcompression.so.1
-        - name: LD_LIBRARY_PATH
-          mountPath: /usr/lib64/libfftw3f.so.3
-          subPath: libfftw3f.so.3
-        - name: LD_LIBRARY_PATH
-          mountPath: /usr/lib64/libgomp.so.1
-          subPath: libgomp.so.1
+        - name: libcompression.so.1
+          mountPath: /lib/libcompression.so.1
+        - name: libfftw3f.so.3
+          mountPath: /lib/libfftw3f.so.3
+        - name: libgomp.so.1
+          mountPath: /lib/libgomp.so.1
 
         #bins
         - name: nifi-usr-bin-sarzipnitf
@@ -107,7 +104,15 @@ spec:
       hostPath:
         path: /mission-share/SAR-NFS-REMOTE-SITE
         type: DirectoryOrCreate
-    - name: LD_LIBRARY_PATH
+    - name: libcompression.so.1
       hostPath:
-        path: /usr/lib64
-        type: Directory
+        path: /usr/lib64/libcompression.so.1
+        type: File
+    - name: libfftw3f.so.3
+      hostPath:
+        path: /usr/lib64/libfftw3f.so.3
+        type: File
+    - name: libgomp.so.1
+      hostPath:
+        path: /usr/lib64/libgomp.so.1
+        type: File
