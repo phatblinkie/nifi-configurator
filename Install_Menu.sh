@@ -1,6 +1,6 @@
 #!/bin/bash
 
-script_version="20260115.0"
+script_version="20260224.0"
 # Do not allow to run as root
 if (( $EUID == 0 )); then
  echo "ERROR: This script must not be run as root, run as normal user that will manage the containers. 'miadmin?'" >&2
@@ -2427,7 +2427,7 @@ while true; do
         3) copy_source_directories ;;
         4) generate_ssl_keys ;;
         5) install_nginx ;;
-	5a) install_nginx_no_pki ;;
+	    5a) install_nginx_no_pki ;;
         6) configure_firewall ;;
         7) install_sarzip_and_zfts_rpms ;;
         7a) install_zfts_html_files ;;
