@@ -1594,7 +1594,7 @@ copy_source_directories() {
 
     echo "INFO: chmod 0777 /mission-share/zfts/{send, receive}, $rootpath/zfts $rootpath/zfts/send  $rootpath/zfts/receive  $rootpath/zfts/receive/83 $rootpath/zfts/receive/89 $rootpath/zfts/receive/105 $rootpath/zfts/receive/107 $rootpath/sar $rootpath/sar/83 $rootpath/sar/89 $rootpath/sar/105 $rootpath/sar/107"
     if podman unshare chmod 0777 $rootpath/zfts $rootpath/zfts/send  $rootpath/zfts/receive  $rootpath/zfts/receive/83 $rootpath/zfts/receive/89 $rootpath/zfts/receive/105 $rootpath/zfts/receive/107 $rootpath/sar $rootpath/sar/83 $rootpath/sar/89 $rootpath/sar/105 $rootpath/sar/107 ; then
-        echo "SUCCESS: chmod 0777 /mission-share/zfts /mission-share/zfts/send /mission-share/zfts/receive"
+        echo "SUCCESS: chmod 0777 /mission-share/zfts/{send, receive}, $rootpath/zfts $rootpath/zfts/send  $rootpath/zfts/receive  $rootpath/zfts/receive/83 $rootpath/zfts/receive/89 $rootpath/zfts/receive/105 $rootpath/zfts/receive/107 $rootpath/sar $rootpath/sar/83 $rootpath/sar/89 $rootpath/sar/105 $rootpath/sar/107"
     else
         echo "ERROR: Failed to chmod 0777 $rootpath/zfts $rootpath/zfts/send  $rootpath/zfts/receive  $rootpath/zfts/receive/83 $rootpath/zfts/receive/89 $rootpath/zfts/receive/105 $rootpath/zfts/receive/107 $rootpath/sar $rootpath/sar/83 $rootpath/sar/89 $rootpath/sar/105 $rootpath/sar/107" >&2
         return 1
