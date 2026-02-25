@@ -1567,7 +1567,7 @@ copy_source_directories() {
           "$path/keys/"{nginx,nifi,zfts} \
           "$rootpath/tide/"{out,in,ccads-in,ccads-out,arc-out,fuse-out,sceptre-in,sceptre-out,esa-out,eped-out,fail,tmp,save,idm-in/save} \
           "$rootpath/audit_logs" \
-	  "$rootpath/sar" \
+	  "$rootpath/sar"{83,89,105,107} \
 	  "$rootpath/SAR-NFS-REMOTE-SITE"; then
         echo "SUCCESS: Directories created"
    else
@@ -1593,10 +1593,10 @@ copy_source_directories() {
     fi
 
     echo "INFO: chmod 0777 /mission-share/zfts/{send, receive}"
-    if podman unshare chmod 0777 $rootpath/zfts $rootpath/zfts/send  $rootpath/zfts/receive ; then
+    if podman unshare chmod 0777 $rootpath/zfts $rootpath/zfts/send  $rootpath/zfts/receive  $rootpath/zfts/receive/83 $rootpath/zfts/receive/89 $rootpath/zfts/receive/105 $rootpath/zfts/receive/107 ; then
         echo "SUCCESS: chmod 0777 /mission-share/zfts /mission-share/zfts/send /mission-share/zfts/receive"
     else
-        echo "ERROR: Failed to chmod 0777 /mission-share/zfts /mission-share/zfts/send /mission-share/zfts/receive" >&2
+        echo "ERROR: Failed to chmod 0777 /mission-share/zfts /mission-share/zfts/send /mission-share/zfts/receive $rootpath/zfts/receive/83 $rootpath/zfts/receive/89 $rootpath/zfts/receive/105 $rootpath/zfts/receive/107" >&2
         return 1
     fi
 
