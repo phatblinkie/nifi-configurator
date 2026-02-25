@@ -1567,7 +1567,7 @@ copy_source_directories() {
           "$path/keys/"{nginx,nifi,zfts} \
           "$rootpath/tide/"{out,in,ccads-in,ccads-out,arc-out,fuse-out,sceptre-in,sceptre-out,esa-out,eped-out,fail,tmp,save,idm-in/save} \
           "$rootpath/audit_logs" \
-	  "$rootpath/sar"{83,89,105,107} \
+	  "$rootpath/sar/"{83,89,105,107} \
 	  "$rootpath/SAR-NFS-REMOTE-SITE"; then
         echo "SUCCESS: Directories created"
    else
