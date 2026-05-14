@@ -23,6 +23,9 @@ spec:
           value: "SINGLE_USER_CREDENTIALS_PASSWORD_VALUE"
         - name: NIFI_WEB_PROXY_HOST
           value: "NIFI_FQDN_NAME"
+        - name: JDK_JAVA_OPTIONS
+          value: "-Dcom.redhat.fips=false"
+
       ports:
         - containerPort: 8443
           hostPort: 8443
@@ -36,6 +39,8 @@ spec:
           mountPath: /opt/nifi/nifi-current/database_repository
         - name: nifi-content-repo
           mountPath: /opt/nifi/nifi-current/content_repository
+        - name: nifi-conf
+          mountPath: /opt/nifi/nifi-current/conf
 
         #custom paths added to container. libs and dirs it needs
         #sar directory and zfts directory
@@ -80,6 +85,10 @@ spec:
     - name: nifi-content-repo
       hostPath:
         path: /mission-share/podman/containers/nifi/nifi-current/content_repository
+        type: DirectoryOrCreate
+    - name: nifi-conf
+      hostPath:
+        path: /mission-share/podman/containers/nifi/nifi-current/conf
         type: DirectoryOrCreate
 
     #custom host directory path definitions
