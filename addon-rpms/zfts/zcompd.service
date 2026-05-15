@@ -6,6 +6,7 @@ Wants=network-online.target
 
 [Service]
 Type=simple
+UMask=0022
 #User=admin
 #Group=admin
 ExecStart=/opt/prgsnap/bin/zcompd -c /home/admin/zfts.configs/zfts_zcomp_gnd.ini
