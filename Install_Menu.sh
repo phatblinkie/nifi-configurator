@@ -1663,8 +1663,138 @@ get_ip_addresses() {
     | sort -u
 }
 
-
 build_and_start_pod() {
+    echo "INFO: Building and starting NIFI pod"
+
+    podmanshare="/mission-share/podman"
+    echo "INFO: Setting SELinux context for $podmanshare"
+    if run_with_sudo chcon -t container_file_t -R $podmanshare; then
+        echo "SUCCESS: SELinux context set for $podmanshare"
+    else
+        echo "ERROR: Failed to set SELinux context for $podmanshare"
+        return 1
+    fi
+
+    if run_with_sudo restorecon -R $podmanshare; then
+        echo "SUCCESS: SELinux restored context for $podmanshare"
+    else
+        echo "ERROR: Failed to restore SELinux context for $podmanshare"
+        return 1
+    fi
+
+    echo "INFO: Loading versions from versions.txt"
+    if . versions.txt; then
+        echo "SUCCESS: Versions loaded"
+    else
+        echo "ERROR: Failed to load versions.txt" >&2
+        return 1
+    fi
+
+    # ── Stop existing quadlet services if running ─────────────────────────────
+    echo "INFO: Stopping NIFI services if running"
+    systemctl --user stop nifi.service 2>/dev/null \
+        && echo "SUCCESS: nifi.service stopped" \
+        || echo "INFO: nifi.service was not running"
+    systemctl --user stop nifi-pod.service 2>/dev/null
+
+    # ── Create required directories ───────────────────────────────────────────
+    echo "INFO: Creating required directories"
+    if mkdir -p ~/.config/containers/systemd; then
+        echo "SUCCESS: Directories created"
+    else
+        echo "ERROR: Failed to create required directories" >&2
+        return 1
+    fi
+
+    # ── Generate nifi.container from template ─────────────────────────────────
+    echo "INFO: Generating nifi.container from template"
+    cd nifi-pod || { echo "ERROR: Failed to change to nifi-pod directory" >&2; return 1; }
+
+    if cat nifi.container.template | \
+       sed "s|NIFI_FQDN_NAME|$NIFI_DOMAIN_FQDN|g" | \
+       sed "s|SINGLE_USER_CREDENTIALS_USERNAME_VALUE|$SINGLE_USER_CREDENTIALS_USERNAME|g" | \
+       sed "s|SINGLE_USER_CREDENTIALS_PASSWORD_VALUE|$SINGLE_USER_CREDENTIALS_PASSWORD|g" | \
+       sed "s|NIFI_IMAGENAME|$NIFI_IMAGENAME|g" | \
+       sed "s|NIFI_VERSION|$NIFI_VERSION|g" > nifi.container; then
+        echo "SUCCESS: Generated nifi.container"
+        echo "---> image: $NIFI_IMAGENAME:$NIFI_VERSION"
+        echo "---> credentials: user=$SINGLE_USER_CREDENTIALS_USERNAME"
+        echo "---> proxy host: $NIFI_DOMAIN_FQDN"
+    else
+        echo "ERROR: Failed to generate nifi.container" >&2
+        return 1
+    fi
+
+    # ── Install quadlet files to systemd directory ────────────────────────────
+    echo "INFO: Installing Quadlet files to ~/.config/containers/systemd/"
+    if cp -fv nifi.container nifi.pod ~/.config/containers/systemd/; then
+        echo "SUCCESS: Quadlet files installed"
+    else
+        echo "ERROR: Failed to install Quadlet files" >&2
+        return 1
+    fi
+
+    # ── Ensure nifi-conf-merge.sh is executable ───────────────────────────────
+    echo "INFO: Ensuring nifi-conf-merge.sh is executable"
+    if chmod +x /opt/upload/nifi-configurator/nifi-pod/nifi-conf-merge.sh; then
+        echo "SUCCESS: nifi-conf-merge.sh is executable"
+    else
+        echo "ERROR: Failed to set executable bit on nifi-conf-merge.sh" >&2
+        return 1
+    fi
+
+#    # ── Install nifi-conf-merge.sh to ExecStartPre location ──────────────────
+#    echo "INFO: Installing nifi-conf-merge.sh to /opt/upload/nifi-configurator/"
+#    if cp -fv nifi-conf-merge.sh /opt/upload/nifi-configurator/ && \
+#       chmod +x /opt/upload/nifi-configurator/nifi-conf-merge.sh; then
+#        echo "SUCCESS: nifi-conf-merge.sh installed and made executable"
+#    else
+#        echo "ERROR: Failed to install nifi-conf-merge.sh" >&2
+#        return 1
+#    fi
+
+    cd "$OLDPWD"
+
+    # ── Reload systemd to pick up new quadlet files ───────────────────────────
+    echo "INFO: Reloading systemd user daemon"
+    if systemctl --user daemon-reload; then
+        echo "SUCCESS: Systemd user daemon reloaded"
+    else
+        echo "ERROR: Failed to reload systemd user daemon" >&2
+        return 1
+    fi
+
+    # ── Enable linger so services survive logout and start at boot ────────────
+    echo "INFO: Enabling linger for user $USER"
+    if loginctl enable-linger; then
+        echo "SUCCESS: Linger enabled for user $USER"
+    else
+        echo "ERROR: Failed to enable linger for user $USER" >&2
+        return 1
+    fi
+
+    # ── Enable and start the container service ────────────────────────────────
+    echo "INFO: Enabling and starting nifi.service"
+    if systemctl --user enable --now nifi.service; then
+        echo "SUCCESS: nifi.service enabled and started"
+    else
+        echo "ERROR: Failed to enable or start nifi.service" >&2
+        return 1
+    fi
+
+    sleep 3
+    echo "INFO: Listing all containers"
+    podman ps -a -p
+
+    echo "SUCCESS: NIFI pod deployment completed"
+    echo "INFO:   NIFI services available:"
+    echo "INFO: - Nifi on port 8443"
+    echo "INFO: - Parent NGINX proxy on port 443"
+    echo "INFO: - initial login username $SINGLE_USER_CREDENTIALS_USERNAME"
+    echo "INFO: - initial login password $SINGLE_USER_CREDENTIALS_PASSWORD"
+}
+
+build_and_start_pod_old() {
     echo "INFO: Building and starting NIFI pod"
 
     podmanshare="/mission-share/podman"
@@ -2052,6 +2182,69 @@ delete_all_mission-share_data() {
 }
 
 cleanup_pod_services() {
+    local podname="$1"
+    local quadlet_dir="$HOME/.config/containers/systemd"
+    local legacy_dir="$HOME/.config/systemd/user"
+
+    if [[ -z "$podname" ]]; then
+        echo "ERROR: No pod name provided to cleanup_pod_services" >&2
+        return 1
+    fi
+
+    echo "INFO: Beginning cleanup of service files for pod '$podname'"
+
+    # ── Stop and disable quadlet services ─────────────────────────────────────
+    for svc in "${podname}.service" "${podname}-pod.service"; do
+        if systemctl --user is-active --quiet "$svc" 2>/dev/null; then
+            echo "INFO: Stopping $svc"
+            systemctl --user stop "$svc" 2>/dev/null \
+                && echo "SUCCESS: $svc stopped" \
+                || echo "WARNING: Could not stop $svc"
+        fi
+        if systemctl --user is-enabled --quiet "$svc" 2>/dev/null; then
+            echo "INFO: Disabling $svc"
+            systemctl --user disable "$svc" 2>/dev/null \
+                && echo "SUCCESS: $svc disabled" \
+                || echo "WARNING: Could not disable $svc"
+        fi
+    done
+
+    # ── Remove quadlet unit files ──────────────────────────────────────────────
+    for f in "$quadlet_dir/${podname}.container" "$quadlet_dir/${podname}.pod"; do
+        if [[ -f "$f" ]]; then
+            rm -f "$f" \
+                && echo "SUCCESS: Removed $f" \
+                || echo "ERROR: Failed to remove $f"
+        else
+            echo "INFO: $f not found, skipping"
+        fi
+    done
+
+    # ── Also remove any legacy generated systemd service files ────────────────
+    for f in "$legacy_dir/pod-${podname}.service" \
+              "$legacy_dir/container-${podname}-${podname}.service"; do
+        if [[ -f "$f" ]]; then
+            rm -f "$f" \
+                && echo "SUCCESS: Removed legacy file $f" \
+                || echo "WARNING: Could not remove legacy file $f"
+        fi
+    done
+
+    # ── Reload daemon so systemd forgets the removed units ────────────────────
+    echo "INFO: Reloading systemd user daemon"
+    if systemctl --user daemon-reload; then
+        echo "SUCCESS: Systemd user daemon reloaded"
+    else
+        echo "ERROR: Failed to reload systemd user daemon" >&2
+        return 1
+    fi
+
+    echo "SUCCESS: Cleanup of service files for pod '$podname' completed"
+    return 0
+}
+
+
+cleanup_pod_services_old() {
     local podname="$1"
     local systemd_user_dir="$HOME/.config/systemd/user"
     local pod_service="pod-$podname.service"
