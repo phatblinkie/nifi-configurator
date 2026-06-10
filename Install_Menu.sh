@@ -2002,8 +2002,90 @@ stop_pod_named() {
     echo "SUCCESS: Pod '$podname' stopped successfully"
     return 0
 }
-
 stop_and_delete_pod() {
+    local podname="$1"
+
+    # Sanity check: Ensure podname is not empty
+    if [[ -z "$podname" ]]; then
+        echo "ERROR: No pod name provided to stop_and_delete_pod" >&2
+        return 1
+    fi
+
+    echo "INFO: Beginning stop and delete process for pod '$podname'"
+
+    # ── Detect service name — Quadlet (nifi.service) or legacy (pod-nifi.service) ──
+    local quadlet_svc="${podname}.service"
+    local legacy_svc="pod-${podname}.service"
+    local found_svc=""
+
+    if systemctl --user list-units --type=service --all 2>/dev/null | grep -q "${quadlet_svc}"; then
+        found_svc="$quadlet_svc"
+    elif systemctl --user list-units --type=service --all 2>/dev/null | grep -q "${legacy_svc}"; then
+        found_svc="$legacy_svc"
+    fi
+
+    if [[ -n "$found_svc" ]]; then
+        echo "INFO: Found service '$found_svc'"
+        if systemctl --user is-active --quiet "$found_svc" 2>/dev/null; then
+            echo "INFO: '$found_svc' is active — stopping"
+            if ! systemctl --user stop "$found_svc"; then
+                echo "ERROR: Failed to stop '$found_svc'" >&2
+                return 1
+            fi
+            echo "SUCCESS: '$found_svc' stopped successfully"
+        else
+            echo "INFO: '$found_svc' is not active"
+        fi
+        systemctl --user disable "$found_svc" 2>/dev/null \
+            && echo "SUCCESS: '$found_svc' disabled successfully" \
+            || echo "INFO: '$found_svc' was not enabled (skipping disable)"
+    else
+        echo "INFO: No NIFI systemd service found — proceeding to podman operations"
+    fi
+
+    # Stop the pod
+    if ! stop_pod_named "$podname"; then
+        echo "ERROR: Failed to stop pod '$podname'" >&2
+        return 1
+    fi
+
+    # Delete the pod
+    echo "INFO: Deleting pod '$podname' with 'podman pod rm --force $podname'"
+    if ! podman pod rm --force "$podname" &>/dev/null; then
+        echo "ERROR: Failed to delete pod '$podname'" >&2
+        return 1
+    fi
+
+    echo "SUCCESS: Pod '$podname' deleted successfully"
+
+    echo
+    echo
+    read -p "INFO: Confirm you wish to delete the data from pod: $podname (yes/no) " confirm
+    if [[ "$confirm" =~ [yY]|[yY][eE][sS] ]]; then
+        echo "INFO: Removing Container files for pod named: $podname"
+        if [ "$podname" == "nifi" ]; then
+            deletepath="/mission-share/podman/containers/$podname-pod.yml
+            /mission-share/podman/containers/$podname
+	    "
+        fi
+        #run the delete commands with deletepath variable data
+        echo "Standby, this could take a minute"
+        for i in `echo -e $deletepath`; do
+            if run_with_sudo rm -rf "$i"; then
+                echo "SUCCESS: Removed files on path $deletepath"
+            else
+                echo "ERROR: Failed to Remove files on path $deletepath" >&2
+                return 1
+            fi
+        done
+
+    else
+        echo -e "\nSkipping file deletion sequence\n"
+    fi
+    return 0
+}
+
+stop_and_delete_pod_old2() {
     local podname="$1"
 
     # Sanity check: Ensure podname is not empty
@@ -2086,6 +2168,89 @@ stop_and_delete_pod() {
 }
 
 stop_and_delete_pod_auto() {
+    local podname="$1"
+
+    # Sanity check: Ensure podname is not empty
+    if [[ -z "$podname" ]]; then
+        echo "ERROR: No pod name provided to stop_and_delete_pod" >&2
+        return 1
+    fi
+
+    echo "INFO: Beginning stop and delete process for pod '$podname'"
+
+    # ── Detect service name — Quadlet (nifi.service) or legacy (pod-nifi.service) ──
+    local quadlet_svc="${podname}.service"
+    local legacy_svc="pod-${podname}.service"
+    local found_svc=""
+
+    if systemctl --user list-units --type=service --all 2>/dev/null | grep -q "${quadlet_svc}"; then
+        found_svc="$quadlet_svc"
+    elif systemctl --user list-units --type=service --all 2>/dev/null | grep -q "${legacy_svc}"; then
+        found_svc="$legacy_svc"
+    fi
+
+    if [[ -n "$found_svc" ]]; then
+        echo "INFO: Found service '$found_svc'"
+        if systemctl --user is-active --quiet "$found_svc" 2>/dev/null; then
+            echo "INFO: '$found_svc' is active — stopping"
+            if ! systemctl --user stop "$found_svc"; then
+                echo "ERROR: Failed to stop '$found_svc'" >&2
+                return 1
+            fi
+            echo "SUCCESS: '$found_svc' stopped successfully"
+        else
+            echo "INFO: '$found_svc' is not active"
+        fi
+        systemctl --user disable "$found_svc" 2>/dev/null \
+            && echo "SUCCESS: '$found_svc' disabled successfully" \
+            || echo "INFO: '$found_svc' was not enabled (skipping disable)"
+    else
+        echo "INFO: No NIFI systemd service found — proceeding to podman operations"
+    fi
+
+    # Stop the pod
+    if ! stop_pod_named "$podname"; then
+        echo "ERROR: Failed to stop pod '$podname'" >&2
+        return 1
+    fi
+
+    # Delete the pod
+    echo "INFO: Deleting pod '$podname' with 'podman pod rm --force $podname'"
+    if ! podman pod rm --force "$podname" &>/dev/null; then
+        echo "ERROR: Failed to delete pod '$podname'" >&2
+        return 1
+    fi
+
+    echo "SUCCESS: Pod '$podname' deleted successfully"
+
+    echo
+    echo
+    #read -p "INFO: Confirm you wish to delete the data from pod: $podname (yes/no) " confirm
+    confirm="yes"
+    if [[ "$confirm" =~ [yY]|[yY][eE][sS] ]]; then
+        echo "INFO: Removing Container files for pod named: $podname"
+        if [ "$podname" == "nifi" ]; then
+            deletepath="/mission-share/podman/containers/$podname-pod.yml
+            /mission-share/podman/containers/$podname"
+        fi
+        #run the delete commands with deletepath variable data
+        echo "Standby, this could take a minute"
+        for i in `echo -e $deletepath`; do
+            if run_with_sudo rm -rf "$i"; then
+                echo "SUCCESS: Removed files on path $deletepath"
+            else
+                echo "ERROR: Failed to Remove files on path $deletepath" >&2
+                return 1
+            fi
+        done
+
+    else
+        echo -e "\nSkipping file deletion sequence\n"
+    fi
+    return 0
+}
+
+stop_and_delete_pod_auto_old2() {
     local podname="$1"
 
     # Sanity check: Ensure podname is not empty
