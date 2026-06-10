@@ -2016,7 +2016,8 @@ stop_and_delete_pod() {
 
     # Check if the pod-$podname service exists
     echo "INFO: Checking if 'pod-$podname' service exists"
-    if ! systemctl --user list-units --type=service --all | grep -q "pod-$podname"; then
+    #if ! systemctl --user list-units --type=service --all | grep -q "pod-$podname"; then
+    if ! systemctl --user list-units --type=service --all | grep -qE "pod-$podname|^$podname\.service"; then
         echo "INFO: 'pod-$podname' service does not exist, proceeding to podman operations"
     else
         # Check if the pod-$podname service is active
@@ -2097,8 +2098,9 @@ stop_and_delete_pod_auto() {
 
     # Check if the pod-$podname service exists
     echo "INFO: Checking if 'pod-$podname' service exists"
-    if ! systemctl --user list-units --type=service --all | grep -q "pod-$podname"; then
-        echo "INFO: 'pod-$podname' service does not exist, proceeding to podman operations"
+    #if ! systemctl --user list-units --type=service --all | grep -q "pod-$podname"; then
+    if ! systemctl --user list-units --type=service --all | grep -qE "pod-$podname|^$podname\.service"; then
+	echo "INFO: 'pod-$podname' service does not exist, proceeding to podman operations"
     else
         # Check if the pod-$podname service is active
         echo "INFO: Checking if 'pod-$podname' service is active"
