@@ -1,14 +1,15 @@
 # /etc/systemd/system/zcompd.service
 [Unit]
-Description=Zcompd Compression Daemon
+Description=Zfts transfer system dops-p2
 After=network.target
 Wants=network-online.target
 
 [Service]
 Type=simple
+UMask=0022
 #User=admin
 #Group=admin
-ExecStart=/opt/prgsnap/bin/zcompd -c /home/admin/zfts.configs/zfts_zcomp_gnd.ini
+ExecStart=/opt/prgsnap/bin/zcompd -c /etc/zfts.configs/zfts_zcomp_gnd_dops_p2.ini
 ExecStop=/bin/kill -TERM $MAINPID
 PIDFile=/run/zcompd.pid
 WorkingDirectory=/opt/prgsnap
@@ -18,10 +19,7 @@ RestartSec=5
 NoNewPrivileges=true
 PrivateTmp=true
 
-# Logging
-StandardOutput=journal
-StandardError=journal
-SyslogIdentifier=zcompd
+SyslogIdentifier=zcompd-dops-p2
 
 [Install]
 WantedBy=default.target

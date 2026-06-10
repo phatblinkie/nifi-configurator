@@ -1,0 +1,53 @@
+[Unit]
+Description=Apache NiFi
+After=nifi-pod.service network-online.target
+Requires=nifi-pod.service
+
+[Container]
+Image=localhost/nifi-custom:2.7.1-fips-bc
+ContainerName=nifi
+Pod=nifi.pod
+UserNS=keep-id
+
+# ── Environment ────────────────────────────────────────────────────────────────
+Environment=NIFI_WEB_HTTPS_PORT=8443
+Environment=SINGLE_USER_CREDENTIALS_USERNAME=admin
+Environment=SINGLE_USER_CREDENTIALS_PASSWORD=!Changeme12345
+Environment=NIFI_WEB_PROXY_HOST=nifi.phatsplace.com
+
+# ── Conf (private to this container - Z) ──────────────────────────────────────
+Volume=/mission-share/podman/containers/nifi/nifi-current/conf:/opt/nifi/nifi-current/conf:Z
+
+# ── NiFi data repositories (private - Z) ──────────────────────────────────────
+Volume=/mission-share/podman/containers/nifi/nifi-current/flowfile_repository:/opt/nifi/nifi-current/flowfile_repository:Z
+Volume=/mission-share/podman/containers/nifi/nifi-current/database_repository:/opt/nifi/nifi-current/database_repository:Z
+Volume=/mission-share/podman/containers/nifi/nifi-current/content_repository:/opt/nifi/nifi-current/content_repository:Z
+
+# ── Mission dirs (shared label - z) ───────────────────────────────────────────
+Volume=/mission-share/sar:/mission-share/sar:z
+Volume=/mission-share/zfts:/mission-share/zfts:z
+Volume=/mission-share/tools:/mission-share/tools:z
+Volume=/mission-share/tide:/mission-share/tide:z
+
+# ── System libs (read-only, no relabel — system context already correct) ───────
+# NOTE: If you see SELinux AVC denials for these, add :z but test on non-prod first
+Volume=/usr/lib64/libcompression.so.1:/usr/lib64/libcompression.so.1:ro
+Volume=/usr/lib64/libfftw3f.so.3:/usr/lib64/libfftw3f.so.3:ro
+Volume=/usr/lib64/libgomp.so.1:/usr/lib64/libgomp.so.1:ro
+
+# ── Custom binary (read-only, shared label) ────────────────────────────────────
+Volume=/usr/bin/sarzipnitf:/usr/bin/sarzipnitf:ro,z
+
+# ── NFS share (shared label - z) ──────────────────────────────────────────────
+Volume=/mission-share/SAR-NFS-REMOTE-SITE:/SAR-NFS-REMOTE-SITE:z
+
+[Service]
+# Restart on crash with 30 second cooldown
+Restart=on-failure
+RestartSec=30
+
+# Bootstrap conf or merge new defaults before container starts
+ExecStartPre=/opt/upload/nifi-configurator/nifi-conf-merge.sh localhost/nifi-custom:2.7.1-fips-bc
+
+[Install]
+WantedBy=default.target

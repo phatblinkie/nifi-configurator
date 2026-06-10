@@ -1,0 +1,23 @@
+# /etc/systemd/system/zfts-collector.service
+[Unit]
+Description=ZFTS Multi-Instance Transfer Collector
+After=network.target
+
+[Service]
+Type=simple
+ExecStartPre=/usr/bin/touch /usr/share/nginx/html/transfers-105.json
+ExecStartPre=/usr/bin/touch /usr/share/nginx/html/transfers-107.json
+ExecStartPre=/usr/bin/touch /usr/share/nginx/html/transfers-dops-p2.json
+ExecStartPre=/usr/bin/chmod 0644 /usr/share/nginx/html/transfers-105.json
+ExecStartPre=/usr/bin/chmod 0644 /usr/share/nginx/html/transfers-107.json
+ExecStartPre=/usr/bin/chmod 0644 /usr/share/nginx/html/transfers-dops-p2.json
+ExecStart=/usr/bin/python3 /usr/local/bin/zfts_collector.py
+Restart=always
+RestartSec=5
+User=root
+
+NoNewPrivileges=true
+PrivateTmp=false
+
+[Install]
+WantedBy=multi-user.target

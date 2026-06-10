@@ -3,33 +3,12 @@ kind: Pod
 metadata:
   name: nifi
   annotations:
+    # Ensures container runs with the same UID/GID as the pod creator (admin)
+    # needs to be a user with UID = 1000 else perms get wonky
     io.podman.annotations.userns: keep-id
 
 spec:
   restartPolicy: Never
-
-  # ── Init container runs FIRST, populates conf if empty ──────────────────────
-  initContainers:
-    - name: nifi-conf-init
-      image: localhost/nifi-custom:2.7.1-fips-bc
-      command: ["/bin/sh", "-c"]
-      args:
-        - |
-          echo "[init] Starting additive conf merge..."
-          for src_file in /opt/nifi/nifi-current/conf/*; do
-            filename=$(basename "$src_file")
-            dest_file="/conf-staging/$filename"
-            if [ ! -e "$dest_file" ]; then
-              echo "[init] NEW → copying missing file: $filename"
-              cp -p "$src_file" "$dest_file"
-            else
-              echo "[init] EXISTS → keeping existing: $filename"
-            fi
-          done
-          echo "[init] Merge complete."
-      volumeMounts:
-        - name: nifi-conf
-          mountPath: /conf-staging
 
   containers:
     - name: nifi
@@ -46,25 +25,24 @@ spec:
           value: "NIFI_FQDN_NAME"
         - name: JDK_JAVA_OPTIONS
           value: "-Dcom.redhat.fips=false"
-
       ports:
         - containerPort: 8443
           hostPort: 8443
 
+      #container volume maps
       volumeMounts:
-        # ── conf (persisted, init-populated) ──────────────────────────────────
-        - name: nifi-conf
-          mountPath: /opt/nifi/nifi-current/conf
-
-        # ── nifi content repos ─────────────────────────────────────────────────
+        #nifi content repos
         - name: nifi-flowfile-repo
           mountPath: /opt/nifi/nifi-current/flowfile_repository
         - name: nifi-database-repo
           mountPath: /opt/nifi/nifi-current/database_repository
         - name: nifi-content-repo
           mountPath: /opt/nifi/nifi-current/content_repository
+#        - name: nifi-conf
+#          mountPath: /opt/nifi/nifi-current/conf
 
-        # ── mission dirs ───────────────────────────────────────────────────────
+        #custom paths added to container. libs and dirs it needs
+        #sar directory and zfts directory
         - name: nifi-sar
           mountPath: /mission-share/sar
         - name: nifi-zfts
@@ -74,7 +52,7 @@ spec:
         - name: nifi-tide
           mountPath: /mission-share/tide
 
-        # ── libs ───────────────────────────────────────────────────────────────
+        #libs
         - name: LD_LIBRARY_PATH
           mountPath: /usr/lib64/libcompression.so.1
           subPath: libcompression.so.1
@@ -85,22 +63,16 @@ spec:
           mountPath: /usr/lib64/libgomp.so.1
           subPath: libgomp.so.1
 
-        # ── bins ───────────────────────────────────────────────────────────────
+        #bins
         - name: nifi-usr-bin-sarzipnitf
           mountPath: /usr/bin/sarzipnitf
 
-        # ── nfs share ──────────────────────────────────────────────────────────
+        #nfs share dir
         - name: nifi-nfs-share
           mountPath: /SAR-NFS-REMOTE-SITE
 
+  #host volume maps
   volumes:
-    # ── conf volume (new) ──────────────────────────────────────────────────────
-    - name: nifi-conf
-      hostPath:
-        path: /mission-share/podman/containers/nifi/nifi-current/conf
-        type: DirectoryOrCreate
-
-    # ── existing volumes (unchanged) ──────────────────────────────────────────
     - name: nifi-flowfile-repo
       hostPath:
         path: /mission-share/podman/containers/nifi/nifi-current/flowfile_repository
@@ -113,6 +85,12 @@ spec:
       hostPath:
         path: /mission-share/podman/containers/nifi/nifi-current/content_repository
         type: DirectoryOrCreate
+#    - name: nifi-conf
+#      hostPath:
+#        path: /mission-share/podman/containers/nifi/nifi-current/conf
+#        type: DirectoryOrCreate
+
+    #custom host directory path definitions
     - name: nifi-tools
       hostPath:
         path: /mission-share/tools
