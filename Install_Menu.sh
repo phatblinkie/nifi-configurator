@@ -1,6 +1,6 @@
 #!/bin/bash
 
-script_version="20260608.0"
+script_version="202606.0"
 for_release="1.2.11 ogs"
 
 # Do not allow to run as root
@@ -1775,10 +1775,13 @@ build_and_start_pod() {
 
     # ── Enable and start the container service ────────────────────────────────
     echo "INFO: Enabling and starting nifi.service"
-    if systemctl --user enable --now nifi.service; then
-        echo "SUCCESS: nifi.service enabled and started"
+
+    # ── Start the container service (auto-enabled by Quadlet generator) ──────────
+    echo "INFO: Starting nifi.service (Quadlet — auto-enabled by generator)"
+    if systemctl --user start nifi.service; then
+        echo "SUCCESS: nifi.service started"
     else
-        echo "ERROR: Failed to enable or start nifi.service" >&2
+        echo "ERROR: Failed to start nifi.service" >&2
         return 1
     fi
 
@@ -2064,8 +2067,7 @@ stop_and_delete_pod() {
     if [[ "$confirm" =~ [yY]|[yY][eE][sS] ]]; then
         echo "INFO: Removing Container files for pod named: $podname"
         if [ "$podname" == "nifi" ]; then
-            deletepath="/mission-share/podman/containers/$podname-pod.yml
-            /mission-share/podman/containers/$podname
+            deletepath="/mission-share/podman/containers/$podname
 	    "
         fi
         #run the delete commands with deletepath variable data
