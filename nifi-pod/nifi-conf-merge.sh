@@ -9,7 +9,7 @@
 #
 # Usage  : nifi-conf-merge.sh <image_tag>
 # Example: nifi-conf-merge.sh localhost/nifi-custom:2.7.1-fips-bc
-# Called automatically via systemd ExecStartPre in nifi.container quadlet
+# Called directly from build_and_start_pod() before pod starts
 # ─────────────────────────────────────────────────────────────────────────────
 
 IMAGE="${1:-localhost/nifi-custom:2.7.1-fips-bc}"
@@ -33,15 +33,27 @@ if [ ! -d "$CONF_HOST" ]; then
 fi
 
 # ── Extract image defaults into a temp directory ───────────────────────────────
-TMPDIR=$(mktemp -d)
-trap "rm -rf $TMPDIR" EXIT
+# - WORK_DIR lives under /mission-share — avoids STIG-hardened /tmp
+#   (/tmp is mounted noexec/nosuid/nodev on this system)
+# - Mounted at the SAME path inside the container — /tmp not used at all
+# - chmod 777 lets the container sub-UID write into it under rootless Podman
+#   UID mapping (host UID 1000 -> container UID 0; NiFi runs as container
+#   UID 1000 which maps to a sub-UID — 777 ensures write access regardless)
+# - chmod only the CONTENTS (${WORK_DIR}/*) not the dir itself:
+#   NiFi owns the files it created and can chmod them; it cannot chmod
+#   the mount-point directory which is owned by container UID 0
+# - Host-side cp has no -p: preserving sub-UID ownership would cause EPERM
+WORK_DIR="$(dirname "$CONF_HOST")/.conf-merge-$$"
+mkdir -p "$WORK_DIR"
+chmod 777 "$WORK_DIR"
+trap "rm -rf $WORK_DIR" EXIT
 
 echo "[init] Extracting defaults from image..."
 podman run --rm \
-  -v "${TMPDIR}:/tmp/conf-src:z" \
+  -v "${WORK_DIR}:${WORK_DIR}:z" \
   --entrypoint /bin/bash \
   "$IMAGE" \
-  -c "cp -rp ${NIFI_CONF_INSIDE}/. /tmp/conf-src/ && echo '[init] Image extraction complete.'"
+  -c "cp -r ${NIFI_CONF_INSIDE}/. ${WORK_DIR}/ && chmod -R a+r ${WORK_DIR}/* && echo '[init] Image extraction complete.'"
 
 if [ $? -ne 0 ]; then
   echo "[ERROR] Failed to extract conf from image: $IMAGE"
@@ -54,7 +66,7 @@ HOST_FILE_COUNT=$(find "$CONF_HOST" -type f 2>/dev/null | wc -l)
 if [ "$HOST_FILE_COUNT" -eq 0 ]; then
   echo ""
   echo "[init] Conf directory is empty — performing full bootstrap copy..."
-  cp -rp "$TMPDIR"/. "$CONF_HOST"/
+  cp -r "$WORK_DIR"/. "$CONF_HOST"/
   if [ $? -ne 0 ]; then
     echo "[ERROR] Bootstrap copy failed."
     exit 1
@@ -75,12 +87,12 @@ echo ""
 ADDED=0
 SKIPPED=0
 
-for src_file in "$TMPDIR"/*; do
+for src_file in "$WORK_DIR"/*; do
   filename=$(basename "$src_file")
   dest_file="$CONF_HOST/$filename"
 
   if [ ! -e "$dest_file" ]; then
-    cp -p "$src_file" "$dest_file"
+    cp "$src_file" "$dest_file"
     echo "  ✔ ADDED   → $filename"
     ((ADDED++))
   else
@@ -94,7 +106,7 @@ echo "[init] Merge complete — Added: $ADDED  |  Kept existing: $SKIPPED"
 
 # ── Diff summary (upgrade awareness) ──────────────────────────────────────────
 DIFFS=0
-for src_file in "$TMPDIR"/*; do
+for src_file in "$WORK_DIR"/*; do
   filename=$(basename "$src_file")
   dest_file="$CONF_HOST/$filename"
   if [ -e "$dest_file" ] && ! diff -q "$dest_file" "$src_file" > /dev/null 2>&1; then

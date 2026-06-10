@@ -8,28 +8,6 @@ metadata:
 spec:
   restartPolicy: Never
 
-  # ── Init container runs FIRST, populates conf if empty ──────────────────────
-  initContainers:
-    - name: nifi-conf-init
-      image: localhost/nifi-custom:2.7.1-fips-bc
-      command: ["/bin/sh", "-c"]
-      args:
-        - |
-          echo "[init] Starting additive conf merge..."
-          for src_file in /opt/nifi/nifi-current/conf/*; do
-            filename=$(basename "$src_file")
-            dest_file="/conf-staging/$filename"
-            if [ ! -e "$dest_file" ]; then
-              echo "[init] NEW → copying missing file: $filename"
-              cp -p "$src_file" "$dest_file"
-            else
-              echo "[init] EXISTS → keeping existing: $filename"
-            fi
-          done
-          echo "[init] Merge complete."
-      volumeMounts:
-        - name: nifi-conf
-          mountPath: /conf-staging
 
   containers:
     - name: nifi
