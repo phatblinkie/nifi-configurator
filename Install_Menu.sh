@@ -1690,72 +1690,113 @@ build_and_start_pod() {
         return 1
     fi
 
-    # ── Stop existing quadlet services if running ─────────────────────────────
-    echo "INFO: Stopping NIFI services if running"
-    systemctl --user stop nifi.service 2>/dev/null \
-        && echo "SUCCESS: nifi.service stopped" \
-        || echo "INFO: nifi.service was not running"
+    # ── Clean up any leftover quadlet files from previous attempts ────────────
+    echo "INFO: Cleaning up any existing service/quadlet files"
+    systemctl --user stop nifi.service 2>/dev/null
     systemctl --user stop nifi-pod.service 2>/dev/null
+    systemctl --user stop pod-nifi.service 2>/dev/null
+    rm -f ~/.config/containers/systemd/nifi.container 2>/dev/null
+    rm -f ~/.config/containers/systemd/nifi.pod 2>/dev/null
+    echo "SUCCESS: Cleanup done"
 
-    # ── Create required directories ───────────────────────────────────────────
-    echo "INFO: Creating required directories"
-    if mkdir -p ~/.config/containers/systemd; then
-        echo "SUCCESS: Directories created"
+    # ── Stop existing pod if running ──────────────────────────────────────────
+    echo "INFO: Stopping NIFI pod if running"
+    if podman pod stop -t 60 nifi 2>/dev/null; then
+        echo "SUCCESS: NIFI pod stopped or was not running"
     else
-        echo "ERROR: Failed to create required directories" >&2
+        echo "INFO: NIFI pod was not running or stop command ignored"
+    fi
+
+    # ── Create NiFi data directories ─────────────────────────────────────────
+    # Bind mounts require host paths to exist — previously the container
+    # created these itself on first run (no host mount). Now they are
+    # pre-created so volumes can attach cleanly.
+    echo "INFO: Creating NiFi data directories"
+    if mkdir -p \
+        /mission-share/podman/containers/nifi/nifi-current/conf \
+        /mission-share/podman/containers/nifi/nifi-current/flowfile_repository \
+        /mission-share/podman/containers/nifi/nifi-current/database_repository \
+        /mission-share/podman/containers/nifi/nifi-current/content_repository; then
+        echo "SUCCESS: NiFi data directories created"
+    else
+        echo "ERROR: Failed to create NiFi data directories" >&2
         return 1
     fi
 
-    # ── Generate nifi.container from template ─────────────────────────────────
-    echo "INFO: Generating nifi.container from template"
+    if chmod 777 \
+        /mission-share/podman/containers/nifi/nifi-current/conf \
+        /mission-share/podman/containers/nifi/nifi-current/flowfile_repository \
+        /mission-share/podman/containers/nifi/nifi-current/database_repository \
+        /mission-share/podman/containers/nifi/nifi-current/content_repository; then
+        echo "SUCCESS: NiFi data directory permissions set"
+    else
+        echo "ERROR: Failed to set permissions on NiFi data directories" >&2
+        return 1
+    fi
+
+    # ── Bootstrap / merge NiFi conf BEFORE pod starts ────────────────────────
+    # Replaces the old initContainer approach. Runs on host before the pod
+    # launches so conf is populated when NiFi reads it on first start.
+    echo "INFO: Bootstrapping NiFi conf directory"
+    chmod +x /opt/upload/nifi-configurator/nifi-pod/nifi-conf-merge.sh
+    if /opt/upload/nifi-configurator/nifi-pod/nifi-conf-merge.sh "$NIFI_IMAGENAME:$NIFI_VERSION"; then
+        echo "SUCCESS: NiFi conf ready"
+    else
+        echo "ERROR: Conf bootstrap/merge failed" >&2
+        return 1
+    fi
+
+    # ── Generate pod YAML from template ───────────────────────────────────────
+    echo "INFO: Generating new pod YAML from template"
     cd nifi-pod || { echo "ERROR: Failed to change to nifi-pod directory" >&2; return 1; }
 
-    if cat nifi.container.template | \
+    if cat nifi-pod.yml.template | \
        sed "s|NIFI_FQDN_NAME|$NIFI_DOMAIN_FQDN|g" | \
        sed "s|SINGLE_USER_CREDENTIALS_USERNAME_VALUE|$SINGLE_USER_CREDENTIALS_USERNAME|g" | \
        sed "s|SINGLE_USER_CREDENTIALS_PASSWORD_VALUE|$SINGLE_USER_CREDENTIALS_PASSWORD|g" | \
        sed "s|NIFI_IMAGENAME|$NIFI_IMAGENAME|g" | \
-       sed "s|NIFI_VERSION|$NIFI_VERSION|g" > nifi.container; then
-        echo "SUCCESS: Generated nifi.container"
+       sed "s|NIFI_VERSION|$NIFI_VERSION|g" > nifi-pod.yml; then
+        echo "SUCCESS: Generated NIFI pod YAML"
         echo "---> image: $NIFI_IMAGENAME:$NIFI_VERSION"
         echo "---> credentials: user=$SINGLE_USER_CREDENTIALS_USERNAME"
         echo "---> proxy host: $NIFI_DOMAIN_FQDN"
     else
-        echo "ERROR: Failed to generate nifi.container" >&2
+        echo "ERROR: Failed to generate NIFI pod YAML" >&2
         return 1
     fi
 
-    # ── Install quadlet files to systemd directory ────────────────────────────
-    echo "INFO: Installing Quadlet files to ~/.config/containers/systemd/"
-    if cp -fv nifi.container nifi.pod ~/.config/containers/systemd/; then
-        echo "SUCCESS: Quadlet files installed"
+    # ── Copy pod YAML to mission-share ────────────────────────────────────────
+    echo "INFO: Copying pod YAML to /mission-share/podman/containers/"
+    if podman unshare cp -vf nifi-pod.yml /mission-share/podman/containers/nifi-pod.yml; then
+        echo "SUCCESS: pod YAML copied to /mission-share/podman/containers/nifi-pod.yml"
     else
-        echo "ERROR: Failed to install Quadlet files" >&2
+        echo "ERROR: Failed to copy pod YAML" >&2
         return 1
     fi
 
-    # ── Ensure nifi-conf-merge.sh is executable ───────────────────────────────
-    echo "INFO: Ensuring nifi-conf-merge.sh is executable"
-    if chmod +x /opt/upload/nifi-configurator/nifi-pod/nifi-conf-merge.sh; then
-        echo "SUCCESS: nifi-conf-merge.sh is executable"
+    # ── Create pod from YAML (not started yet) ────────────────────────────────
+    echo "INFO: Creating NIFI pod from YAML (start=false)"
+    if podman kube play --replace --start=false --userns=keep-id /mission-share/podman/containers/nifi-pod.yml; then
+        echo "SUCCESS: NIFI pod created"
     else
-        echo "ERROR: Failed to set executable bit on nifi-conf-merge.sh" >&2
+        echo "ERROR: Failed to create NIFI pod from YAML" >&2
         return 1
     fi
 
-#    # ── Install nifi-conf-merge.sh to ExecStartPre location ──────────────────
-#    echo "INFO: Installing nifi-conf-merge.sh to /opt/upload/nifi-configurator/"
-#    if cp -fv nifi-conf-merge.sh /opt/upload/nifi-configurator/ && \
-#       chmod +x /opt/upload/nifi-configurator/nifi-conf-merge.sh; then
-#        echo "SUCCESS: nifi-conf-merge.sh installed and made executable"
-#    else
-#        echo "ERROR: Failed to install nifi-conf-merge.sh" >&2
-#        return 1
-#    fi
+    # ── Generate and install systemd service files ────────────────────────────
+    echo "INFO: Generating systemd service files"
+    mkdir -p ~/.config/systemd/user
+    if podman generate systemd --name --files nifi && \
+       cp -v pod-nifi.service container-nifi-nifi.service ~/.config/systemd/user/; then
+        echo "SUCCESS: Systemd service files generated and installed"
+    else
+        echo "ERROR: Failed to generate or install systemd service files" >&2
+        return 1
+    fi
 
     cd "$OLDPWD"
 
-    # ── Reload systemd to pick up new quadlet files ───────────────────────────
+    # ── Reload systemd user daemon ────────────────────────────────────────────
     echo "INFO: Reloading systemd user daemon"
     if systemctl --user daemon-reload; then
         echo "SUCCESS: Systemd user daemon reloaded"
@@ -1773,15 +1814,12 @@ build_and_start_pod() {
         return 1
     fi
 
-    # ── Enable and start the container service ────────────────────────────────
-    echo "INFO: Enabling and starting nifi.service"
-
-    # ── Start the container service (auto-enabled by Quadlet generator) ──────────
-    echo "INFO: Starting nifi.service (Quadlet — auto-enabled by generator)"
-    if systemctl --user start nifi.service; then
-        echo "SUCCESS: nifi.service started"
+    # ── Enable and start the pod service ─────────────────────────────────────
+    echo "INFO: Enabling and starting pod-nifi.service"
+    if systemctl --user enable --now pod-nifi.service; then
+        echo "SUCCESS: pod-nifi.service enabled and started"
     else
-        echo "ERROR: Failed to start nifi.service" >&2
+        echo "ERROR: Failed to enable or start pod-nifi.service" >&2
         return 1
     fi
 
@@ -1791,10 +1829,10 @@ build_and_start_pod() {
 
     echo "SUCCESS: NIFI pod deployment completed"
     echo "INFO:   NIFI services available:"
-    echo "INFO: - Nifi on port 8443"
+    echo "INFO: - NiFi on port 8443"
     echo "INFO: - Parent NGINX proxy on port 443"
-    echo "INFO: - initial login username $SINGLE_USER_CREDENTIALS_USERNAME"
-    echo "INFO: - initial login password $SINGLE_USER_CREDENTIALS_PASSWORD"
+    echo "INFO: - initial login username: $SINGLE_USER_CREDENTIALS_USERNAME"
+    echo "INFO: - initial login password: $SINGLE_USER_CREDENTIALS_PASSWORD"
 }
 
 build_and_start_pod_old() {
