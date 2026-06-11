@@ -70,7 +70,8 @@ http {
     #  Reverse Proxy for NiFi  (internal only)
     # -------------------------------------------------------------------------
     server {
-        listen 443 ssl http2;
+        listen 443 ssl;
+        http2 on;
         server_name NIFI_DOMAIN_FQDN;
 
         # ---------------------------------------------------------------------
@@ -141,7 +142,8 @@ http {
     # -------------------------------------------------------------------------
 
      server {
-        listen 443 ssl http2;
+        listen 443 ssl;
+        http2 on;
         server_name ZFTS_DOMAIN_FQDN IP_ADDRESS;  # Update IP if needed
 
         # ---------------------------------------------------------------------
