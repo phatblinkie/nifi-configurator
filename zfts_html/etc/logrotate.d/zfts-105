@@ -1,0 +1,8 @@
+/var/log/zfts-105.log {
+    size 50M
+    rotate 1
+    copytruncate
+    compress
+    missingok
+    notifempty
+}

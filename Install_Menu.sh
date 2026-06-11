@@ -1,6 +1,8 @@
 #!/bin/bash
 
-script_version="20260224.0"
+script_version="202606.0"
+for_release="1.2.11 ogs"
+
 # Do not allow to run as root
 if (( $EUID == 0 )); then
  echo "ERROR: This script must not be run as root, run as normal user that will manage the containers. 'miadmin?'" >&2
@@ -58,7 +60,7 @@ get_sudo_password() {
  sudo -k
 
  echo "===================================================="
- echo " Monitoring Stack Deployment Tool - Ver. $script_version"
+ echo " nifi-zfts deployment Tool - Ver. $script_version"
  echo "===================================================="
  echo "INFO: This script requires root privileges for some operations."
 
@@ -756,7 +758,7 @@ echo -e "$SUDO_PASSWORD" |  sudo -S sh -c "sed -i 's|^kernel\.core_pattern=.*|ke
  echo -e "\nINFO: applying facl to /usr/bin/podman"
  run_with_sudo setfacl -m g:$(id -gn):rx /usr/bin/podman
  echo -e "\nINFO: adding root, admin, miadmin to group container-admins"
- run_with_sudo usermod -aG container-admins miadmin
+
  run_with_sudo usermod -aG container-admins admin
  run_with_sudo usermod -aG container-admins root
 
@@ -765,6 +767,11 @@ echo -e "$SUDO_PASSWORD" |  sudo -S sh -c "sed -i 's|^kernel\.core_pattern=.*|ke
  echo -e "\nINFO: V-270875 (container runtime stigs): place limits on containers"
  run_with_sudo cp -fv configs/containers.conf /etc/containers/
 
+ #enable firewall to reply to icmp echos
+ echo -e "\nINFO: enable host to reply to icmp echo requests"
+ run_with_sudo firewall-cmd --permanent --add-icmp-block-inversion
+ run_with_sudo firewall-cmd --permanent --add-icmp-block=echo-request
+ run_with_sudo firewall-cmd --reload
 
  #v-233192 (deny all, allow by exception registries)
  echo -e "\nINFO: V-233192 (container runtime stigs): limit registries"
@@ -989,68 +996,77 @@ then
 	echo "INFO: sarzip and zfts are already installed, skipping installation."
 else
 	echo "INFO: Installing sarzip and zfts rpms"
-	if run_with_sudo dnf install --disablerepo="*" --nogpgcheck -y addon-rpms/*.rpm addon-rpms/zfts/*.rpm; then
+	if run_with_sudo dnf install --disablerepo="*" --nogpgcheck -y addon-rpms/*.rpm ; then
 		echo "SUCCESS: rpms installed"
 	else
 		echo "ERROR: Failed to install rpms, cannot continue"
 	fi
-#install zcomd and zfts service files
-        #make user systed directories just in case
-	mkdir -p ~/.config/systemd/user >/dev/null 2>&1
-	echo "INFO: Installing zfts and zcompd user service files"
-	if cp -vf addon-rpms/zfts/zcompd.service addon-rpms/zfts/zfts.service ~/.config/systemd/user/; then
-		echo "SUCCESS: service files copied into ~/.config/systemd/user/"
-	else
-		echo "ERROR: Failed to copy service files to ~/.config/systemd/user"
-		return 1
-	fi
-#install the config files
-	echo "INFO: Installing zfts and zcomd ini files to ~/zfts.configs/"
-	if rsync -avh configs/zfts.configs ~/ ; then
-		echo "SUCCESS: zfts and zcompd ini files placed in ~/zfts.configs/"
-	else
-		echo "ERROR: failed to move zfts and zcompd ini files into ~/zfts.configs/"
-		return 1
-	fi
-#reload systemctl with --user and enable and start the services
-	echo "INFO: reloading systemd for current user to load new service entries"
-	if systemctl --user daemon-reload ; then
-		echo "SUCCESS: daemon reloaded"
-	else
-		echo "ERROR: unable to reload systemd with command systemctl --user daemon-reload"
-		return 1
-	fi
-	#enable them
-        echo "INFO: Setting zfts and zcompd services to start at boot up"
-        if systemctl --user enable zfts ; then
-                echo "SUCCESS: zfts is now enabled"
-        else
-                echo "ERROR: unable to enable zfts with command systemctl --user enable zfts"
-                return 1
-        fi
-        if systemctl --user start zfts ; then
-                echo "SUCCESS: zfts is now started"
-        else
-                echo "ERROR: unable to start zfts with command systemctl --user start zfts"
-                return 1
-        fi
-
-
-	if systemctl --user enable zcompd ; then
-                echo "SUCCESS: zcompd is now enabled"
-        else
-                echo "ERROR: unable to enable zcompd with command systemctl --user enable zcompd"
-                return 1
-        fi
-        if systemctl --user start zcompd ; then
-                echo "SUCCESS: zcompd is now started"
-        else
-                echo "ERROR: unable to start zcompd with command systemctl --user start zcompd"
-                return 1
-        fi
-
 fi
 
+#install zcompd and zfts service files
+	echo "INFO: Installing zfts and zcompd service files"
+	if run_with_sudo cp -vf zfts_html/etc/systemd/*.service /etc/systemd/system/ ; then
+		echo "SUCCESS: service files copied into /etc/systemd/system/"
+	else
+		echo "ERROR: Failed to copy service files to /etc/systemd/system/"
+		return 1
+	fi
+#install fix perms on service files
+	echo "INFO: Installing zfts and zcompd service files"
+	if run_with_sudo chmod -v 0644 /etc/systemd/system/z* ; then
+		echo "SUCCESS: service files permissions set"
+	else
+		echo "ERROR: Failed to set service files permissions"
+		return 1
+	fi
+#install zcompd and zfts configuration files
+	echo "INFO: Installing zfts and zcompd configuration files"
+	if run_with_sudo rsync -avh zfts_html/etc/zfts.configs /etc/; then
+		echo "SUCCESS: zfts and zcompd user service files copied into /etc/zfts.configs/"
+	else
+		echo "ERROR: Failed to copy zfts and zcompd user service files into /etc/zfts.configs"
+		return 1
+	fi
+#install the logrotate files
+	echo "INFO: Installing zfts and zcompd logrotate configuration files"
+	if run_with_sudo rsync -avh zfts_html/etc/logrotate.d/* /etc/logrotate.d/ ; then
+		echo "SUCCESS: installed zfts and zcompd logrotate configuration files"
+	else
+		echo "ERROR: failed to move install zfts and zcompd logrotate configuration files"
+		return 1
+	fi
+#install the extra bin files
+	echo "INFO: Installing zfts and zcompd log collector in /usr/local/bin/zfts_collector.py"
+	if run_with_sudo rsync -avh /opt/upload/nifi-configurator/zfts_html/bin/zfts_collector.py /usr/local/bin/ ; then
+		echo "SUCCESS: installed /usr/local/bin/zfts_collector.py"
+	else
+		echo "ERROR: failed to move install /usr/local/bin/zfts_collector.py"
+		return 1
+	fi
+  
+#reload systemctl with --user and enable and start the services
+	echo "INFO: reloading systemd to load new service entries"
+	if run_with_sudo systemctl daemon-reload ; then
+		echo "SUCCESS: daemon reloaded"
+	else
+		echo "ERROR: unable to reload systemd with command systemctl daemon-reload"
+		return 1
+	fi
+  
+	#enable them
+  echo "INFO: Setting zfts and zcompd services to start at boot up"
+  if run_with_sudo systemctl enable zfts-105 zcompd-105 zfts-107 zcompd-107 zfts-dops-p2 zcompd-dops-p2 zfts-collector; then
+          echo "SUCCESS: zfts services are now enabled"
+  else
+          echo "ERROR: unable to enable zfts with command systemctl enable zfts-105 zcompd-105 zfts-107 zcompd-107 zfts-dops-p2 zcompd-dops-p2 zfts-collector"
+          return 1
+  fi
+  if run_with_sudo systemctl start zfts-105 zcompd-105 zfts-107 zcompd-107 zfts-dops-p2 zcompd-dops-p2 zfts-collector ; then
+          echo "SUCCESS: zfts services are now started"
+  else
+          echo "ERROR: unable to start zfts with command systemctl start zfts-105 zcompd-105 zfts-107 zcompd-107 zfts-dops-p2 zcompd-dops-p2 zfts-collector"
+          return 1
+  fi
 }
 
 install_nginx() {
@@ -1074,7 +1090,7 @@ install_nginx() {
  #replace the DOMAIN in the nginx.conf template
  echo "substituting domain value in nginx template file"
     if cat configs/nginx.conf.template | \
-       sed "s|nifi.DOMAIN|$NIFI_DOMAIN_FQDN|g" | sed "s|zfts.DOMAIN|$ZFTS_DOMAIN_FQDN|g" | sed "s|IP_ADDRESS|$IP_ADDRESS|g"> configs/nginx.conf; then
+       sed "s|NIFI_DOMAIN_FQDN|$NIFI_DOMAIN_FQDN|g" | sed "s|ZFTS_DOMAIN_FQDN|$ZFTS_DOMAIN_FQDN|g" | sed "s|IP_ADDRESS|$IP_ADDRESS|g"> configs/nginx.conf; then
        echo "SUCCESS: Generated nginx.conf"
     else
        echo "ERROR: Failed to create nginx.conf file" >&2
@@ -1133,7 +1149,7 @@ install_nginx_no_pki() {
  #replace the DOMAIN in the nginx.conf template
  echo "substituting domain value in nginx template file"
     if cat configs/nginx.conf.nopki.template | \
-       sed "s|nifi.DOMAIN|$NIFI_DOMAIN_FQDN|g" | sed "s|zfts.DOMAIN|$ZFTS_DOMAIN_FQDN|g" | sed "s|IP_ADDRESS|$IP_ADDRESS|g"> configs/nginx.conf; then
+       sed "s|NIFI_DOMAIN_FQDN|$NIFI_DOMAIN_FQDN|g" | sed "s|ZFTS_DOMAIN_FQDN|$ZFTS_DOMAIN_FQDN|g" | sed "s|IP_ADDRESS|$IP_ADDRESS|g"> configs/nginx.conf; then
        echo "SUCCESS: Generated nginx.conf"
     else
        echo "ERROR: Failed to create nginx.conf file" >&2
@@ -1249,7 +1265,9 @@ configure_firewall() {
 
  declare -A PORTS=(
  ["HTTPs"]="443/tcp"
- ["zfts-listener"]="50001/udp"
+ ["zfts-105-listener"]="50001/udp"
+ ["zfts-107-listener"]="50002/udp"
+ ["zfts-dops-p2-listener"]="50003/udp"
  )
 
 #8443 is internal proxy, no need to expose
@@ -1305,8 +1323,9 @@ empty_firewall_rules() {
 
  declare -A PORTS=(
  ["HTTPs"]="443/tcp"
- ["Nifi-ssl"]="8443/tcp"
- ["zfts-listener"]="50001/udp"
+ ["zfts-105-listener"]="50001/udp"
+ ["zfts-107-listener"]="50002/udp"
+ ["zfts-dops-p2-listener"]="50003/udp"
  )
 
  for service in "${!PORTS[@]}"; do
@@ -1567,7 +1586,7 @@ copy_source_directories() {
           "$path/keys/"{nginx,nifi,zfts} \
           "$rootpath/tide/"{out,in,ccads-in,ccads-out,arc-out,fuse-out,sceptre-in,sceptre-out,esa-out,eped-out,fail,tmp,save,idm-in/save} \
           "$rootpath/audit_logs" \
-	  "$rootpath/sar/"{83,89,105,107} \
+	  "$rootpath/sar/"{83,89,105,107,dops-p2} \
 	  "$rootpath/SAR-NFS-REMOTE-SITE"; then
         echo "SUCCESS: Directories created"
    else
@@ -1592,11 +1611,12 @@ copy_source_directories() {
         return 1
     fi
 
-    echo "INFO: chmod 0777 /mission-share/zfts/{send, receive}, $rootpath/zfts $rootpath/zfts/send  $rootpath/zfts/receive  $rootpath/zfts/receive/83 $rootpath/zfts/receive/89 $rootpath/zfts/receive/105 $rootpath/zfts/receive/107 $rootpath/sar $rootpath/sar/83 $rootpath/sar/89 $rootpath/sar/105 $rootpath/sar/107"
-    if podman unshare chmod 0777 $rootpath/zfts $rootpath/zfts/send  $rootpath/zfts/receive  $rootpath/zfts/receive/83 $rootpath/zfts/receive/89 $rootpath/zfts/receive/105 $rootpath/zfts/receive/107 $rootpath/sar $rootpath/sar/83 $rootpath/sar/89 $rootpath/sar/105 $rootpath/sar/107 ; then
-        echo "SUCCESS: chmod 0777 /mission-share/zfts/{send, receive}, $rootpath/zfts $rootpath/zfts/send  $rootpath/zfts/receive  $rootpath/zfts/receive/83 $rootpath/zfts/receive/89 $rootpath/zfts/receive/105 $rootpath/zfts/receive/107 $rootpath/sar $rootpath/sar/83 $rootpath/sar/89 $rootpath/sar/105 $rootpath/sar/107"
+    echo "INFO: chmod 0777 /mission-share/zfts/{send, receive}, $rootpath/zfts $rootpath/zfts/send  $rootpath/zfts/receive  $rootpath/zfts/receive/83 $rootpath/zfts/receive/89 $rootpath/zfts/receive/105 $rootpath/zfts/receive/107 $rootpath/zfts/receive/dops-p2 $rootpath/sar $rootpath/sar/83 $rootpath/sar/89 $rootpath/sar/105 $rootpath/sar/107 $rootpath/sar/dops-p2"
+    
+    if podman unshare chmod 0777 $rootpath/zfts $rootpath/zfts/send  $rootpath/zfts/receive  $rootpath/zfts/receive/83 $rootpath/zfts/receive/89 $rootpath/zfts/receive/105 $rootpath/zfts/receive/107 $rootpath/zfts/receive/dops-p2 $rootpath/sar $rootpath/sar/83 $rootpath/sar/89 $rootpath/sar/105 $rootpath/sar/107 $rootpath/sar/dops-p2; then
+        echo "SUCCESS: chmod 0777 /mission-share/zfts/{send, receive}, $rootpath/zfts $rootpath/zfts/send  $rootpath/zfts/receive  $rootpath/zfts/receive/83 $rootpath/zfts/receive/89 $rootpath/zfts/receive/105 $rootpath/zfts/receive/107 $rootpath/sar $rootpath/sar/83 $rootpath/sar/89 $rootpath/sar/105 $rootpath/sar/107 $rootpath/sar/dops-p2"
     else
-        echo "ERROR: Failed to chmod 0777 $rootpath/zfts $rootpath/zfts/send  $rootpath/zfts/receive  $rootpath/zfts/receive/83 $rootpath/zfts/receive/89 $rootpath/zfts/receive/105 $rootpath/zfts/receive/107 $rootpath/sar $rootpath/sar/83 $rootpath/sar/89 $rootpath/sar/105 $rootpath/sar/107" >&2
+        echo "ERROR: Failed to chmod 0777 /mission-share/zfts/{send, receive}, $rootpath/zfts $rootpath/zfts/send  $rootpath/zfts/receive  $rootpath/zfts/receive/83 $rootpath/zfts/receive/89 $rootpath/zfts/receive/105 $rootpath/zfts/receive/107 $rootpath/sar $rootpath/sar/83 $rootpath/sar/89 $rootpath/sar/105 $rootpath/sar/107 $rootpath/sar/dops-p2" >&2
         return 1
     fi
 
@@ -1643,8 +1663,179 @@ get_ip_addresses() {
     | sort -u
 }
 
-
 build_and_start_pod() {
+    echo "INFO: Building and starting NIFI pod"
+
+    podmanshare="/mission-share/podman"
+    echo "INFO: Setting SELinux context for $podmanshare"
+    if run_with_sudo chcon -t container_file_t -R $podmanshare; then
+        echo "SUCCESS: SELinux context set for $podmanshare"
+    else
+        echo "ERROR: Failed to set SELinux context for $podmanshare"
+        return 1
+    fi
+
+    if run_with_sudo restorecon -R $podmanshare; then
+        echo "SUCCESS: SELinux restored context for $podmanshare"
+    else
+        echo "ERROR: Failed to restore SELinux context for $podmanshare"
+        return 1
+    fi
+
+    echo "INFO: Loading versions from versions.txt"
+    if . versions.txt; then
+        echo "SUCCESS: Versions loaded"
+    else
+        echo "ERROR: Failed to load versions.txt" >&2
+        return 1
+    fi
+
+    # ── Clean up any leftover quadlet files from previous attempts ────────────
+    echo "INFO: Cleaning up any existing service/quadlet files"
+    systemctl --user stop nifi.service 2>/dev/null
+    systemctl --user stop nifi-pod.service 2>/dev/null
+    systemctl --user stop pod-nifi.service 2>/dev/null
+    rm -f ~/.config/containers/systemd/nifi.container 2>/dev/null
+    rm -f ~/.config/containers/systemd/nifi.pod 2>/dev/null
+    echo "SUCCESS: Cleanup done"
+
+    # ── Stop existing pod if running ──────────────────────────────────────────
+    echo "INFO: Stopping NIFI pod if running"
+    if podman pod stop -t 60 nifi 2>/dev/null; then
+        echo "SUCCESS: NIFI pod stopped or was not running"
+    else
+        echo "INFO: NIFI pod was not running or stop command ignored"
+    fi
+
+    # ── Create NiFi data directories ─────────────────────────────────────────
+    # Bind mounts require host paths to exist — previously the container
+    # created these itself on first run (no host mount). Now they are
+    # pre-created so volumes can attach cleanly.
+    echo "INFO: Creating NiFi data directories"
+    if mkdir -p \
+        /mission-share/podman/containers/nifi/nifi-current/conf \
+        /mission-share/podman/containers/nifi/nifi-current/flowfile_repository \
+        /mission-share/podman/containers/nifi/nifi-current/database_repository \
+        /mission-share/podman/containers/nifi/nifi-current/content_repository; then
+        echo "SUCCESS: NiFi data directories created"
+    else
+        echo "ERROR: Failed to create NiFi data directories" >&2
+        return 1
+    fi
+
+    if chmod 777 \
+        /mission-share/podman/containers/nifi/nifi-current/conf \
+        /mission-share/podman/containers/nifi/nifi-current/flowfile_repository \
+        /mission-share/podman/containers/nifi/nifi-current/database_repository \
+        /mission-share/podman/containers/nifi/nifi-current/content_repository; then
+        echo "SUCCESS: NiFi data directory permissions set"
+    else
+        echo "ERROR: Failed to set permissions on NiFi data directories" >&2
+        return 1
+    fi
+
+    # ── Bootstrap / merge NiFi conf BEFORE pod starts ────────────────────────
+    # Replaces the old initContainer approach. Runs on host before the pod
+    # launches so conf is populated when NiFi reads it on first start.
+    echo "INFO: Bootstrapping NiFi conf directory"
+    chmod +x /opt/upload/nifi-configurator/nifi-pod/nifi-conf-merge.sh
+    if /opt/upload/nifi-configurator/nifi-pod/nifi-conf-merge.sh "$NIFI_IMAGENAME:$NIFI_VERSION"; then
+        echo "SUCCESS: NiFi conf ready"
+    else
+        echo "ERROR: Conf bootstrap/merge failed" >&2
+        return 1
+    fi
+
+    # ── Generate pod YAML from template ───────────────────────────────────────
+    echo "INFO: Generating new pod YAML from template"
+    cd nifi-pod || { echo "ERROR: Failed to change to nifi-pod directory" >&2; return 1; }
+
+    if cat nifi-pod.yml.template | \
+       sed "s|NIFI_FQDN_NAME|$NIFI_DOMAIN_FQDN|g" | \
+       sed "s|SINGLE_USER_CREDENTIALS_USERNAME_VALUE|$SINGLE_USER_CREDENTIALS_USERNAME|g" | \
+       sed "s|SINGLE_USER_CREDENTIALS_PASSWORD_VALUE|$SINGLE_USER_CREDENTIALS_PASSWORD|g" | \
+       sed "s|NIFI_IMAGENAME|$NIFI_IMAGENAME|g" | \
+       sed "s|NIFI_VERSION|$NIFI_VERSION|g" > nifi-pod.yml; then
+        echo "SUCCESS: Generated NIFI pod YAML"
+        echo "---> image: $NIFI_IMAGENAME:$NIFI_VERSION"
+        echo "---> credentials: user=$SINGLE_USER_CREDENTIALS_USERNAME"
+        echo "---> proxy host: $NIFI_DOMAIN_FQDN"
+    else
+        echo "ERROR: Failed to generate NIFI pod YAML" >&2
+        return 1
+    fi
+
+    # ── Copy pod YAML to mission-share ────────────────────────────────────────
+    echo "INFO: Copying pod YAML to /mission-share/podman/containers/"
+    if podman unshare cp -vf nifi-pod.yml /mission-share/podman/containers/nifi-pod.yml; then
+        echo "SUCCESS: pod YAML copied to /mission-share/podman/containers/nifi-pod.yml"
+    else
+        echo "ERROR: Failed to copy pod YAML" >&2
+        return 1
+    fi
+
+    # ── Create pod from YAML (not started yet) ────────────────────────────────
+    echo "INFO: Creating NIFI pod from YAML (start=false)"
+    if podman kube play --replace --start=false --userns=keep-id /mission-share/podman/containers/nifi-pod.yml; then
+        echo "SUCCESS: NIFI pod created"
+    else
+        echo "ERROR: Failed to create NIFI pod from YAML" >&2
+        return 1
+    fi
+
+    # ── Generate and install systemd service files ────────────────────────────
+    echo "INFO: Generating systemd service files"
+    mkdir -p ~/.config/systemd/user
+    if podman generate systemd --name --files nifi && \
+       cp -v pod-nifi.service container-nifi-nifi.service ~/.config/systemd/user/; then
+        echo "SUCCESS: Systemd service files generated and installed"
+    else
+        echo "ERROR: Failed to generate or install systemd service files" >&2
+        return 1
+    fi
+
+    cd "$OLDPWD"
+
+    # ── Reload systemd user daemon ────────────────────────────────────────────
+    echo "INFO: Reloading systemd user daemon"
+    if systemctl --user daemon-reload; then
+        echo "SUCCESS: Systemd user daemon reloaded"
+    else
+        echo "ERROR: Failed to reload systemd user daemon" >&2
+        return 1
+    fi
+
+    # ── Enable linger so services survive logout and start at boot ────────────
+    echo "INFO: Enabling linger for user $USER"
+    if loginctl enable-linger; then
+        echo "SUCCESS: Linger enabled for user $USER"
+    else
+        echo "ERROR: Failed to enable linger for user $USER" >&2
+        return 1
+    fi
+
+    # ── Enable and start the pod service ─────────────────────────────────────
+    echo "INFO: Enabling and starting pod-nifi.service"
+    if systemctl --user enable --now pod-nifi.service; then
+        echo "SUCCESS: pod-nifi.service enabled and started"
+    else
+        echo "ERROR: Failed to enable or start pod-nifi.service" >&2
+        return 1
+    fi
+
+    sleep 3
+    echo "INFO: Listing all containers"
+    podman ps -a -p
+
+    echo "SUCCESS: NIFI pod deployment completed"
+    echo "INFO:   NIFI services available:"
+    echo "INFO: - NiFi on port 8443"
+    echo "INFO: - Parent NGINX proxy on port 443"
+    echo "INFO: - initial login username: $SINGLE_USER_CREDENTIALS_USERNAME"
+    echo "INFO: - initial login password: $SINGLE_USER_CREDENTIALS_PASSWORD"
+}
+
+build_and_start_pod_old() {
     echo "INFO: Building and starting NIFI pod"
 
     podmanshare="/mission-share/podman"
@@ -1720,7 +1911,7 @@ build_and_start_pod() {
         return 1
     fi
 
-    echo "INFO: Creating initial NIFI pod (not starting it yet)"
+    echo "INFO: Creating initial NIFI pod (not starting it yet, this may take some time.)"
     if podman kube play --replace --start=false --userns=keep-id /mission-share/podman/containers/nifi-pod.yml; then
         echo "SUCCESS: Initial NIFI pod created"
     else
@@ -1852,8 +2043,89 @@ stop_pod_named() {
     echo "SUCCESS: Pod '$podname' stopped successfully"
     return 0
 }
-
 stop_and_delete_pod() {
+    local podname="$1"
+
+    # Sanity check: Ensure podname is not empty
+    if [[ -z "$podname" ]]; then
+        echo "ERROR: No pod name provided to stop_and_delete_pod" >&2
+        return 1
+    fi
+
+    echo "INFO: Beginning stop and delete process for pod '$podname'"
+
+    # ── Detect service name — Quadlet (nifi.service) or legacy (pod-nifi.service) ──
+    local quadlet_svc="${podname}.service"
+    local legacy_svc="pod-${podname}.service"
+    local found_svc=""
+
+    if systemctl --user list-units --type=service --all 2>/dev/null | grep -q "${quadlet_svc}"; then
+        found_svc="$quadlet_svc"
+    elif systemctl --user list-units --type=service --all 2>/dev/null | grep -q "${legacy_svc}"; then
+        found_svc="$legacy_svc"
+    fi
+
+    if [[ -n "$found_svc" ]]; then
+        echo "INFO: Found service '$found_svc'"
+        if systemctl --user is-active --quiet "$found_svc" 2>/dev/null; then
+            echo "INFO: '$found_svc' is active — stopping"
+            if ! systemctl --user stop "$found_svc"; then
+                echo "ERROR: Failed to stop '$found_svc'" >&2
+                return 1
+            fi
+            echo "SUCCESS: '$found_svc' stopped successfully"
+        else
+            echo "INFO: '$found_svc' is not active"
+        fi
+        systemctl --user disable "$found_svc" 2>/dev/null \
+            && echo "SUCCESS: '$found_svc' disabled successfully" \
+            || echo "INFO: '$found_svc' was not enabled (skipping disable)"
+    else
+        echo "INFO: No NIFI systemd service found — proceeding to podman operations"
+    fi
+
+    # Stop the pod
+    if ! stop_pod_named "$podname"; then
+        echo "ERROR: Failed to stop pod '$podname'" >&2
+        return 1
+    fi
+
+    # Delete the pod
+    echo "INFO: Deleting pod '$podname' with 'podman pod rm --force $podname'"
+    if ! podman pod rm --force "$podname" &>/dev/null; then
+        echo "ERROR: Failed to delete pod '$podname'" >&2
+        return 1
+    fi
+
+    echo "SUCCESS: Pod '$podname' deleted successfully"
+
+    echo
+    echo
+    read -p "INFO: Confirm you wish to delete the data from pod: $podname (yes/no) " confirm
+    if [[ "$confirm" =~ [yY]|[yY][eE][sS] ]]; then
+        echo "INFO: Removing Container files for pod named: $podname"
+        if [ "$podname" == "nifi" ]; then
+            deletepath="/mission-share/podman/containers/$podname
+	    "
+        fi
+        #run the delete commands with deletepath variable data
+        echo "Standby, this could take a minute"
+        for i in `echo -e $deletepath`; do
+            if run_with_sudo rm -rf "$i"; then
+                echo "SUCCESS: Removed files on path $deletepath"
+            else
+                echo "ERROR: Failed to Remove files on path $deletepath" >&2
+                return 1
+            fi
+        done
+
+    else
+        echo -e "\nSkipping file deletion sequence\n"
+    fi
+    return 0
+}
+
+stop_and_delete_pod_old2() {
     local podname="$1"
 
     # Sanity check: Ensure podname is not empty
@@ -1866,7 +2138,8 @@ stop_and_delete_pod() {
 
     # Check if the pod-$podname service exists
     echo "INFO: Checking if 'pod-$podname' service exists"
-    if ! systemctl --user list-units --type=service --all | grep -q "pod-$podname"; then
+    #if ! systemctl --user list-units --type=service --all | grep -q "pod-$podname"; then
+    if ! systemctl --user list-units --type=service --all | grep -qE "pod-$podname|^$podname\.service"; then
         echo "INFO: 'pod-$podname' service does not exist, proceeding to podman operations"
     else
         # Check if the pod-$podname service is active
@@ -1945,10 +2218,94 @@ stop_and_delete_pod_auto() {
 
     echo "INFO: Beginning stop and delete process for pod '$podname'"
 
+    # ── Detect service name — Quadlet (nifi.service) or legacy (pod-nifi.service) ──
+    local quadlet_svc="${podname}.service"
+    local legacy_svc="pod-${podname}.service"
+    local found_svc=""
+
+    if systemctl --user list-units --type=service --all 2>/dev/null | grep -q "${quadlet_svc}"; then
+        found_svc="$quadlet_svc"
+    elif systemctl --user list-units --type=service --all 2>/dev/null | grep -q "${legacy_svc}"; then
+        found_svc="$legacy_svc"
+    fi
+
+    if [[ -n "$found_svc" ]]; then
+        echo "INFO: Found service '$found_svc'"
+        if systemctl --user is-active --quiet "$found_svc" 2>/dev/null; then
+            echo "INFO: '$found_svc' is active — stopping"
+            if ! systemctl --user stop "$found_svc"; then
+                echo "ERROR: Failed to stop '$found_svc'" >&2
+                return 1
+            fi
+            echo "SUCCESS: '$found_svc' stopped successfully"
+        else
+            echo "INFO: '$found_svc' is not active"
+        fi
+        systemctl --user disable "$found_svc" 2>/dev/null \
+            && echo "SUCCESS: '$found_svc' disabled successfully" \
+            || echo "INFO: '$found_svc' was not enabled (skipping disable)"
+    else
+        echo "INFO: No NIFI systemd service found — proceeding to podman operations"
+    fi
+
+    # Stop the pod
+    if ! stop_pod_named "$podname"; then
+        echo "ERROR: Failed to stop pod '$podname'" >&2
+        return 1
+    fi
+
+    # Delete the pod
+    echo "INFO: Deleting pod '$podname' with 'podman pod rm --force $podname'"
+    if ! podman pod rm --force "$podname" &>/dev/null; then
+        echo "ERROR: Failed to delete pod '$podname'" >&2
+        return 1
+    fi
+
+    echo "SUCCESS: Pod '$podname' deleted successfully"
+
+    echo
+    echo
+    #read -p "INFO: Confirm you wish to delete the data from pod: $podname (yes/no) " confirm
+    confirm="yes"
+    if [[ "$confirm" =~ [yY]|[yY][eE][sS] ]]; then
+        echo "INFO: Removing Container files for pod named: $podname"
+        if [ "$podname" == "nifi" ]; then
+            deletepath="/mission-share/podman/containers/$podname-pod.yml
+            /mission-share/podman/containers/$podname"
+        fi
+        #run the delete commands with deletepath variable data
+        echo "Standby, this could take a minute"
+        for i in `echo -e $deletepath`; do
+            if run_with_sudo rm -rf "$i"; then
+                echo "SUCCESS: Removed files on path $deletepath"
+            else
+                echo "ERROR: Failed to Remove files on path $deletepath" >&2
+                return 1
+            fi
+        done
+
+    else
+        echo -e "\nSkipping file deletion sequence\n"
+    fi
+    return 0
+}
+
+stop_and_delete_pod_auto_old2() {
+    local podname="$1"
+
+    # Sanity check: Ensure podname is not empty
+    if [[ -z "$podname" ]]; then
+        echo "ERROR: No pod name provided to stop_and_delete_pod" >&2
+        return 1
+    fi
+
+    echo "INFO: Beginning stop and delete process for pod '$podname'"
+
     # Check if the pod-$podname service exists
     echo "INFO: Checking if 'pod-$podname' service exists"
-    if ! systemctl --user list-units --type=service --all | grep -q "pod-$podname"; then
-        echo "INFO: 'pod-$podname' service does not exist, proceeding to podman operations"
+    #if ! systemctl --user list-units --type=service --all | grep -q "pod-$podname"; then
+    if ! systemctl --user list-units --type=service --all | grep -qE "pod-$podname|^$podname\.service"; then
+	echo "INFO: 'pod-$podname' service does not exist, proceeding to podman operations"
     else
         # Check if the pod-$podname service is active
         echo "INFO: Checking if 'pod-$podname' service is active"
@@ -2032,6 +2389,69 @@ delete_all_mission-share_data() {
 }
 
 cleanup_pod_services() {
+    local podname="$1"
+    local quadlet_dir="$HOME/.config/containers/systemd"
+    local legacy_dir="$HOME/.config/systemd/user"
+
+    if [[ -z "$podname" ]]; then
+        echo "ERROR: No pod name provided to cleanup_pod_services" >&2
+        return 1
+    fi
+
+    echo "INFO: Beginning cleanup of service files for pod '$podname'"
+
+    # ── Stop and disable quadlet services ─────────────────────────────────────
+    for svc in "${podname}.service" "${podname}-pod.service"; do
+        if systemctl --user is-active --quiet "$svc" 2>/dev/null; then
+            echo "INFO: Stopping $svc"
+            systemctl --user stop "$svc" 2>/dev/null \
+                && echo "SUCCESS: $svc stopped" \
+                || echo "WARNING: Could not stop $svc"
+        fi
+        if systemctl --user is-enabled --quiet "$svc" 2>/dev/null; then
+            echo "INFO: Disabling $svc"
+            systemctl --user disable "$svc" 2>/dev/null \
+                && echo "SUCCESS: $svc disabled" \
+                || echo "WARNING: Could not disable $svc"
+        fi
+    done
+
+    # ── Remove quadlet unit files ──────────────────────────────────────────────
+    for f in "$quadlet_dir/${podname}.container" "$quadlet_dir/${podname}.pod"; do
+        if [[ -f "$f" ]]; then
+            rm -f "$f" \
+                && echo "SUCCESS: Removed $f" \
+                || echo "ERROR: Failed to remove $f"
+        else
+            echo "INFO: $f not found, skipping"
+        fi
+    done
+
+    # ── Also remove any legacy generated systemd service files ────────────────
+    for f in "$legacy_dir/pod-${podname}.service" \
+              "$legacy_dir/container-${podname}-${podname}.service"; do
+        if [[ -f "$f" ]]; then
+            rm -f "$f" \
+                && echo "SUCCESS: Removed legacy file $f" \
+                || echo "WARNING: Could not remove legacy file $f"
+        fi
+    done
+
+    # ── Reload daemon so systemd forgets the removed units ────────────────────
+    echo "INFO: Reloading systemd user daemon"
+    if systemctl --user daemon-reload; then
+        echo "SUCCESS: Systemd user daemon reloaded"
+    else
+        echo "ERROR: Failed to reload systemd user daemon" >&2
+        return 1
+    fi
+
+    echo "SUCCESS: Cleanup of service files for pod '$podname' completed"
+    return 0
+}
+
+
+cleanup_pod_services_old() {
     local podname="$1"
     local systemd_user_dir="$HOME/.config/systemd/user"
     local pod_service="pod-$podname.service"
@@ -2158,58 +2578,17 @@ check_vars_file() {
         export OGS_DOMAIN_NAME
         #nifi stuff
         export NIFI_DOMAIN_FQDN
-	export SINGLE_USER_CREDENTIALS_USERNAME
-	export SINGLE_USER_CREDENTIALS_PASSWORD
+	      export SINGLE_USER_CREDENTIALS_USERNAME
+	      export SINGLE_USER_CREDENTIALS_PASSWORD
         export VARS_FOUND=" \u2714 Vars file found"
-	export ZFTS_DOMAIN_FQDN
-	export IP_ADDRESS
+	      export ZFTS_DOMAIN_FQDN
+	      export IP_ADDRESS
         return 1
     else
         export VARS_FOUND=" \u2716 ERROR:  <-- Vars file Not found -- run this option first"
         return 0
     fi
 }
-
-# ---------- Menu System ----------
-
-show_menu() {
-    clear
-    check_vars_file
-    echo "========================================================================"
-    echo "       Monitoring Stack Deployment Tool - Ver. $script_version"
-    echo "========================================================================"
-    echo " Privileged Operations:"
-    echo -e " 0)  Input/adjust container variables $VARS_FOUND"
-    echo " 1)  Configure System Settings"
-    echo " 1a) Change Network Interface MTU to 1100"
-    echo " 2)  Provision Disk for Podman Data"
-    echo " 3)  Copy container source directories"
-    echo " 4)  Generate SSL Certificates - NIFI and Nginx"
-    echo " 5)  Install and Configure Nginx Proxy -- with pki on zfts"
-    echo " 5a) Install and Configure Nginx Proxy -- no pki on zfts"
-    echo " 6)  Configure Firewall"
-    echo " 7)  Install zfts and sarzip rpms & enable & start user services"
-    echo " 7a) Install zfts customized interface files"
-    echo ""
-    echo "======================== Image Imports ================================="
-    echo "     NOTE: Choose based off networking available "
-    echo " 8i) Pull Container Images - Internet required"
-    echo " 8n) Install Packaged Images - No Internet required"
-    echo ""
-    echo "========================Pod Options====================================="
-    echo " 9) Build and Start NIFI Pod"
-    echo ""
-    echo " q) Exit"
-    echo ""
-    echo "===================== Un-Install Options ==============================="
-    echo " u1) Stop and Delete NIFI pod"
-    echo " u2) RESET all back to before containers installed. "
-    echo "      -- This Runs u1, AND completely clear out all PODS, "
-    echo "      -- containers, keys, files and images on /mission-share"
-    echo "      -- takes /mission-share back to empty state"
-    echo " u3) Remove Container Firewall rules"
-}
-
 
 umount_disk() {
     #only unmount the /mission-share
@@ -2407,6 +2786,52 @@ change_interface_mtuold() {
 
 }
 
+# ---------- Menu System ----------
+
+show_menu() {
+    clear
+    check_vars_file
+    echo "========================================================================"
+    echo "       Monitoring Stack Deployment Tool - Ver. $script_version"
+    echo "========================================================================"
+    echo ""
+    echo "====================== Initial files and setup  ========================"
+    echo -e " 0)  Input/adjust container variables $VARS_FOUND"
+    echo " 1)  Configure System Settings"
+    echo " 1a) Change Network Interface MTU to 1100"
+    echo " 2)  Provision Disk for Podman Data"
+    echo " 3)  Copy container source directories"
+    echo ""
+    echo "======================== SSL and NGINX ================================="
+    echo " 4)  Generate SSL Certificates - NIFI and Nginx"
+    echo " 5)  Install and Configure and start Nginx Proxy -- with pki on zfts"
+    echo " 5a) Install and Configure and start Nginx Proxy -- no pki on zfts"
+    echo " 6)  Configure Firewall"
+    echo ""
+    echo "======================== Image Imports ================================="
+    echo " 7) Install Packaged Container Images "
+    echo ""
+    echo "======================== Pod Options ==================================="
+    echo " 8) Build and Start NIFI Pod"
+    echo ""
+    echo "======================== zfts options ================================="
+    echo " 9)  Install zfts and sarzip rpms & enable & start zfts services"
+    echo " 9a) Install zfts customized web interface files"
+    echo ""
+    echo " q) Exit"
+    echo ""
+    echo "===================== Un-Install Options ==============================="
+    echo " u1) Stop and Delete NIFI pod"
+    echo " u2) RESET all back to before containers installed. "
+    echo "      -- This Runs u1, AND completely clear out all PODS, "
+    echo "      -- containers, keys, files and images on /mission-share"
+    echo "      -- takes /mission-share back to empty state"
+    echo " u3) Remove Container Firewall rules"
+}
+
+
+
+
 # ---------- Main Execution ----------
 
 # Always get sudo password at the very start
@@ -2427,13 +2852,12 @@ while true; do
         3) copy_source_directories ;;
         4) generate_ssl_keys ;;
         5) install_nginx ;;
-	    5a) install_nginx_no_pki ;;
+	      5a) install_nginx_no_pki ;;
         6) configure_firewall ;;
-        7) install_sarzip_and_zfts_rpms ;;
-        7a) install_zfts_html_files ;;
-        8i) pull_container_images ;;
-        8n) install_tarball_images ;;
-        9) build_and_start_pod ;;
+        7) install_tarball_images ;;
+        8) build_and_start_pod ;;
+        9) install_sarzip_and_zfts_rpms ;;
+        9a) install_zfts_html_files ;;
         u1)
             if stop_and_delete_pod "nifi"; then
                 echo "SUCCESS: Stopped and deleted pod 'nifi'"

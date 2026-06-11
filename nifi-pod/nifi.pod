@@ -1,0 +1,11 @@
+[Unit]
+Description=Apache NiFi Pod
+After=network-online.target
+Wants=network-online.target
+
+[Pod]
+PodName=nifi
+PublishPort=8443:8443
+
+[Install]
+WantedBy=default.target
