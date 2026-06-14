@@ -7,10 +7,10 @@ Wants=network-online.target
 [Service]
 Type=simple
 UMask=0022
-#User=admin
-#Group=admin
+User=admin
+Group=admin
 #ExecStart=/opt/prgsnap/bin/zfts -c /usr/share/nginx/html/zfts/zfts-admin/config/zfts.configs/zfts_zcomp_gnd_107.ini
-ExecStart=/bin/bash -c 'stdbuf -oL -eL /opt/prgsnap/bin/zfts -c /etc/zfts.configs/zfts_zcomp_gnd_107.ini 2>&1 | tee -a /var/log/zfts-107.log'
+ExecStart=/bin/bash -c 'stdbuf -oL -eL /opt/prgsnap/bin/zfts -c /etc/zfts.configs/zfts_zcomp_gnd_107.ini 2>&1 | tee -a /home/admin/logs/zfts-107.log'
 ExecStop=/bin/kill -TERM $MAINPID
 PIDFile=/run/zcompd.pid
 WorkingDirectory=/opt/prgsnap
@@ -21,8 +21,9 @@ NoNewPrivileges=true
 PrivateTmp=true
 
 # Pre-create log file
-ExecStartPre=/usr/bin/touch /var/log/zfts-107.log
-ExecStartPre=/usr/bin/chmod 0644 /var/log/zfts-107.log
+ExecStartPre=/usr/bin/mkdir -p /home/admin/logs
+ExecStartPre=/usr/bin/touch /home/admin/zfts-107.log
+ExecStartPre=/usr/bin/chmod 0644 /home/admin/zfts-107.log
 
 # Logging
 StandardOutput=journal

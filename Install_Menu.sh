@@ -1035,6 +1035,16 @@ fi
 		echo "ERROR: failed to move install zfts and zcompd logrotate configuration files"
 		return 1
 	fi
+
+#chown the logrotate files, logrotate will not honor conf not owned as root
+        echo "INFO: fixing ownership on zfts and zcompd logrotate configuration files"
+        if run_with_sudo chown root:root /etc/logrotate.d/* ; then
+                echo "SUCCESS: fixed ownership on logrotate configuration files"
+        else
+                echo "ERROR: failed to fix ownership on zfts and zcompd logrotate configuration files"
+                return 1
+        fi
+
 #install the extra bin files
 	echo "INFO: Installing zfts and zcompd log collector in /usr/local/bin/zfts_collector.py"
 	if run_with_sudo rsync -avh /opt/upload/nifi-configurator/zfts_html/bin/zfts_collector.py /usr/local/bin/ ; then
@@ -1053,20 +1063,21 @@ fi
 		return 1
 	fi
   
-	#enable them
-  echo "INFO: Setting zfts and zcompd services to start at boot up"
-  if run_with_sudo systemctl enable zfts-105 zcompd-105 zfts-107 zcompd-107 zfts-dops-p2 zcompd-dops-p2 zfts-collector; then
-          echo "SUCCESS: zfts services are now enabled"
-  else
-          echo "ERROR: unable to enable zfts with command systemctl enable zfts-105 zcompd-105 zfts-107 zcompd-107 zfts-dops-p2 zcompd-dops-p2 zfts-collector"
-          return 1
-  fi
-  if run_with_sudo systemctl start zfts-105 zcompd-105 zfts-107 zcompd-107 zfts-dops-p2 zcompd-dops-p2 zfts-collector ; then
-          echo "SUCCESS: zfts services are now started"
-  else
-          echo "ERROR: unable to start zfts with command systemctl start zfts-105 zcompd-105 zfts-107 zcompd-107 zfts-dops-p2 zcompd-dops-p2 zfts-collector"
-          return 1
-  fi
+#enable them
+        echo "INFO: Setting zfts and zcompd services to start at boot up"
+        if run_with_sudo systemctl enable zfts-105 zcompd-105 zfts-107 zcompd-107 zfts-dops-p2 zcompd-dops-p2 zfts-collector; then
+                echo "SUCCESS: zfts services are now enabled"
+        else
+                echo "ERROR: unable to enable zfts with command systemctl enable zfts-105 zcompd-105 zfts-107 zcompd-107 zfts-dops-p2 zcompd-dops-p2 zfts-collector"
+                return 1
+        fi
+
+        if run_with_sudo systemctl start zfts-105 zcompd-105 zfts-107 zcompd-107 zfts-dops-p2 zcompd-dops-p2 zfts-collector ; then
+                echo "SUCCESS: zfts services are now started"
+        else
+                echo "ERROR: unable to start zfts with command systemctl start zfts-105 zcompd-105 zfts-107 zcompd-107 zfts-dops-p2 zcompd-dops-p2 zfts-collector"
+                return 1
+        fi
 }
 
 install_nginx() {

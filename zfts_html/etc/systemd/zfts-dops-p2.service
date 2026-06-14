@@ -7,9 +7,9 @@ Wants=network-online.target
 [Service]
 Type=simple
 UMask=0022
-#User=admin
-#Group=admin
-ExecStart=/bin/bash -c 'stdbuf -oL -eL /opt/prgsnap/bin/zfts -c /etc/zfts.configs/zfts_zcomp_gnd_dops_p2.ini 2>&1 | tee -a /var/log/zfts-dops-p2.log'
+User=admin
+Group=admin
+ExecStart=/bin/bash -c 'stdbuf -oL -eL /opt/prgsnap/bin/zfts -c /etc/zfts.configs/zfts_zcomp_gnd_dops_p2.ini 2>&1 | tee -a /home/admin/logs/zfts-dops-p2.log'
 ExecStop=/bin/kill -TERM $MAINPID
 PIDFile=/run/zcompd.pid
 WorkingDirectory=/opt/prgsnap
@@ -24,8 +24,9 @@ PrivateTmp=true
 # StandardError=journal
 
 # Pre-create log file
-ExecStartPre=/usr/bin/touch /var/log/zfts-dops-p2.log
-ExecStartPre=/usr/bin/chmod 0644 /var/log/zfts-dops-p2.log
+ExecStartPre=/usr/bin/mkdir -p /home/admin/logs
+ExecStartPre=/usr/bin/touch /home/admin/zfts-dops-p2.log
+ExecStartPre=/usr/bin/chmod 0644 /home/admin/zfts-dops-p2.log
 
 SyslogIdentifier=zfts-dops-p2
 
