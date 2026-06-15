@@ -22,8 +22,8 @@ PrivateTmp=true
 
 # Pre-create log file
 ExecStartPre=/usr/bin/mkdir -p /home/admin/logs
-ExecStartPre=/usr/bin/touch /home/admin/zfts-107.log
-ExecStartPre=/usr/bin/chmod 0644 /home/admin/zfts-107.log
+ExecStartPre=/usr/bin/touch /home/admin/logs/zfts-107.log
+ExecStartPre=/usr/bin/chmod 0644 /home/admin/logs/zfts-107.log
 
 # Logging
 StandardOutput=journal
