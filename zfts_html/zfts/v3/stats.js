@@ -1,5 +1,6 @@
 //--------------------------------------------------------------------
-// ZFTS Ground Instance Monitor — v2
+// ZFTS Ground Instance Monitor — v3
+// ver 2026.0615
 // Three ground instances: ZFTS-105, ZFTS-107, DOPS-P2
 // Polling + stall detection + summary bar + collapsible sections
 // + Completed Files modal (feeds from per-service JSON files)

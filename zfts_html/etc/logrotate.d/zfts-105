@@ -1,4 +1,4 @@
-/var/log/zfts-105.log {
+/home/admin/logs/zfts-105.log {
     size 50M
     rotate 1
     copytruncate
